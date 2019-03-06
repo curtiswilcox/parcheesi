@@ -3,11 +3,19 @@
 //
 
 #include <iostream>
+#include <QApplication>
+
+#include "MainWindow.h"
 
 using namespace std;
 
-int main() {
-    cout << "Hello, World!" << endl;
+int main(int argc, char **argv) {
+    int exitCode = 0;
 
-    return 0;
+    QApplication app(argc, argv);
+    MainWindow mainWindow;
+    mainWindow.show();
+    exitCode = app.exec();
+
+    return exitCode;
 };
