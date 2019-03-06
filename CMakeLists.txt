@@ -1,6 +1,20 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 project(parcheesi)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type")
 
-add_executable(parcheesi main.cpp)
+set(CMAKE_PREFIX_PATH "/Users/$ENV{USER}/Qt/5.12.1/clang_64")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+
+#find_package(Boost COMPONENTS REQUIRED)
+find_package(Qt5Core COMPONENTS REQUIRED)
+find_package(Qt5Gui COMPONENTS REQUIRED)
+find_package(Qt5Widgets COMPONENTS REQUIRED)
+
+#include_directories(boost_1_61_0)
+
+add_executable(parcheesi main.cpp MainWindow.cpp MainWindow.h Board.cpp Board.h Tile.cpp Tile.h Die.cpp Die.h Player.cpp Player.h)
+
+target_link_libraries(parcheesi Qt5::Core Qt5::Gui Qt5::Widgets)
