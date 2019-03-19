@@ -5,16 +5,18 @@
 #ifndef PARCHEESI_BOARD_H
 #define PARCHEESI_BOARD_H
 
+#include <QGridLayout>
 #include <vector>
 
 #include "Player.h"
 #include "Tile.h"
 
-class Board {
+class Board : public QGridLayout {
 private:
     std::vector<Tile> tiles;
     std::vector<Player> players;
-
+public:
+    explicit Board(QWidget *parent = nullptr);
 };
 
 
