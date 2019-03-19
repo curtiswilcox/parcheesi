@@ -3,30 +3,30 @@
 //
 
 #include <iostream>
+#include <QShortcut>
 
 #include "MainWindow.h"
 
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
     this->setWindowTitle("Parcheesi");
     this->resize(600, 600);
-//    this->resize(QDesktopWidget().availableGeometry(this).size() * 0.8);
 
-
-    this->board = new Board;
+    this->board = new Board(parent);
 
     QPointer<QGridLayout> layout = createBoard();
     this->setLayout(layout);
 }
 
-MainWindow::~MainWindow() {
-    delete this->board;
-    this->board = nullptr;
-}
+//MainWindow::~MainWindow() {
+//    delete this->board;
+//    this->board = nullptr;
+//}
 
 QPointer<QGridLayout> MainWindow::createBoard() {
-    auto layout = new QGridLayout(this);
+    QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
 
     QPointer<StartTile> redStart = new StartTile({240, 240}, Qt::red);

@@ -9,54 +9,64 @@
 #include <QPainter>
 #include <QWidget>
 
+///////////////////////////////////////////////////////////////////////////
+// Dimensions struct declaration
+///////////////////////////////////////////////////////////////////////////
+
 struct Dimensions {
-    int height;
-    int width;
+    const int height;
+    const int width;
 };
 
-//struct Point {
-//    int x;
-//    int y;
-//};
+///////////////////////////////////////////////////////////////////////////
+// Tile class declaration
+///////////////////////////////////////////////////////////////////////////
 
 class Tile : public QWidget {
 protected:
     bool hasBlockade = false;
+    const bool isSafe;
 
     Dimensions dimensions = {0, 0};
-//    Point point = {0, 0};
 public:
     static const int TILE_SPACING = 1;
 
     const Qt::GlobalColor color;
 
     explicit Tile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
-//    Tile(const Point &p, const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override = 0;
 };
 
+///////////////////////////////////////////////////////////////////////////
+// StartTile class declaration
+///////////////////////////////////////////////////////////////////////////
+
 class StartTile : public Tile {
 public:
     explicit StartTile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
-//    StartTile(const Point &p, const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override;
 };
+
+///////////////////////////////////////////////////////////////////////////
+// HomeTile class declaration
+///////////////////////////////////////////////////////////////////////////
 
 class HomeTile : public Tile {
 public:
     explicit HomeTile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
-//    HomeTile(const Point &p, const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
-//
     void paintEvent(QPaintEvent *event) override;
 };
+
+///////////////////////////////////////////////////////////////////////////
+// RectangleTile class declaration
+///////////////////////////////////////////////////////////////////////////
 
 class RectangleTile : public Tile {
 public:
     explicit RectangleTile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
-//    RectangleTile(const Point &p, const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override;
 };

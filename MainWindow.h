@@ -23,7 +23,7 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+//    ~MainWindow() override;
     QPointer<QGridLayout> createBoard();
     void move(Player activePlayer, int spaces);
 };

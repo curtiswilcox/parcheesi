@@ -9,47 +9,73 @@
 using namespace std;
 using Qt::GlobalColor;
 
-Tile::Tile(const Dimensions &d, const GlobalColor &c) : dimensions(d), color(c) {}
-//Tile::Tile(const Point &p, const Dimensions &d, const GlobalColor &c) : point(p), dimensions(d), color(c) {}
+///////////////////////////////////////////////////////////////////////////
+// Tile methods
+///////////////////////////////////////////////////////////////////////////
+
+Tile::Tile(const Dimensions &d, const GlobalColor &c) : dimensions(d), color(c), isSafe(c == Qt::cyan) {}
+
+///////////////////////////////////////////////////////////////////////////
+// StartTile methods
+///////////////////////////////////////////////////////////////////////////
 
 StartTile::StartTile(const Dimensions &d, const GlobalColor &c) : Tile(d, c) {};
-//StartTile::StartTile(const Point &p, const Dimensions &d, const GlobalColor &c) : Tile(p, d, c) {};
 
 void StartTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     QRect rect;
     rect.setRect(0, 0, dimensions.width, dimensions.height);
-//    rect.setRect(point.x, point.y, dimensions.width, dimensions.height);
     painter.setPen(QPen(QBrush(Qt::black), TILE_SPACING));
     painter.drawRect(rect);
     painter.fillRect(rect, Qt::lightGray);
 
-    painter.drawEllipse(0, 0, dimensions.width - 5, dimensions.height - 5);
-//    painter.drawArc(0, 0, dimensions.width - 5, dimensions.height - 5, 30 * 16, 180 * 16);
+    painter.setBrush(QBrush(GlobalColor::cyan));
+    painter.drawRect(40, 30, dimensions.width - 80, dimensions.height - 80);
+
+    int angle = 30 * 16;
+    int length = 120 * 16;
+
+    painter.setBrush(QBrush(GlobalColor::yellow));
+    painter.drawChord(27, 0, dimensions.width - 54, 120, angle, length);
+
+    painter.setBrush(QBrush(QColor(0, 143, 229)));
+    painter.rotate(90);
+    painter.drawChord(17, -dimensions.width + 10, dimensions.width - 54, 120, angle, length);
+
+    painter.setBrush(QBrush(QColor(231, 0, 48)));
+    painter.rotate(90);
+    painter.drawChord(-213, -dimensions.width + 20, dimensions.width - 54, 120, angle, length);
+
+    painter.setBrush(QBrush(GlobalColor::darkGreen));
+    painter.rotate(90);
+    painter.drawChord(-dimensions.height + 37, 10, dimensions.width - 54, 120, angle, length);
 }
 
+///////////////////////////////////////////////////////////////////////////
+// HomeTile methods
+///////////////////////////////////////////////////////////////////////////
+
 HomeTile::HomeTile(const Dimensions &d, const GlobalColor &c) : Tile(d, c) {};
-//HomeTile::HomeTile(const Point &p, const Dimensions &d, const GlobalColor &c) : Tile(p, d, c) {};
 
 void HomeTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     QRect rect;
     rect.setRect(0, 0, dimensions.width, dimensions.height);
-//    rect.setRect(point.x, point.y, dimensions.width, dimensions.height);
     painter.setPen(QPen(QBrush(Qt::black), TILE_SPACING));
     painter.drawRect(rect);
     painter.fillRect(rect, color);
-//    painter.drawText(0, 0, 80, 80, 0, "Home");
 }
 
+///////////////////////////////////////////////////////////////////////////
+// RectangleTile methods
+///////////////////////////////////////////////////////////////////////////
+
 RectangleTile::RectangleTile(const Dimensions &d, const GlobalColor &c) : Tile(d, c) {}
-//RectangleTile::RectangleTile(const Point &p, const Dimensions &d, const GlobalColor &c) : Tile(p, d, c) {}
 
 void RectangleTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     QRect rect;
     rect.setRect(0, 0, dimensions.width, dimensions.height);
-//    rect.setRect(point.x, point.y, dimensions.width, dimensions.height);
     painter.setPen(QPen(QBrush(Qt::black), TILE_SPACING));
     painter.drawRect(rect);
     painter.fillRect(rect, color);
