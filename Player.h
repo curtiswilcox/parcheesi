@@ -5,6 +5,7 @@
 #ifndef PARCHEESI_PLAYER_H
 #define PARCHEESI_PLAYER_H
 
+
 #include <vector>
 
 #include "Tile.h"
@@ -20,7 +21,7 @@ enum PawnStatus {
 struct Pawn {
     PawnColor color;
     PawnStatus status = START;
-    Tile currentTile;
+    std::unique_ptr<Tile> currentTile;
 
     explicit Pawn(PawnColor color);
 };
@@ -31,6 +32,9 @@ private:
     std::vector<Pawn> pawns;
 public:
     Player() = default;
+
+    int numPawnsStart();
+    int numPawnsHome();
 };
 
 
