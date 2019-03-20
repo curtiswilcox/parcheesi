@@ -5,16 +5,19 @@
 #ifndef PARCHEESI_DIE_H
 #define PARCHEESI_DIE_H
 
+#include <QWidget>
 
-class Die {
+class Die : public QWidget {
 private:
     int value;
 public:
-    Die() = default;
+    explicit Die(QWidget *parent = nullptr);
 
     void roll();
 
     int getValue();
+
+    void paintEvent(QPaintEvent *event) override;
 
     explicit operator int();
 

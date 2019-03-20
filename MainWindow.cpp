@@ -12,7 +12,7 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
     this->setWindowTitle("Parcheesi");
-    this->resize(600, 600);
+    this->resize(780, 600);
 
     this->board = new Board(parent);
 
@@ -51,8 +51,12 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     vector<int> safeNums = {4, 12, 20, 28, 35, 43, 51, 59};
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 8; ++j) { // red "home" tiles and safe tiles at the edge
+            bool tileNeedsArrow = (((j == 0 || j == 7)) && !((i < 2 && j == 0) || (i >= 2 && j == 7)));
+
             QPointer<Tile> tile = new RectangleTile(i % 2 == 0 ? horizontal : vertical,
-                                                    (i < 2 && j == 0) || (i >= 2 && j == 7) ? Qt::cyan : Qt::red);
+                                                         (i < 2 && j == 0) || (i >= 2 && j == 7) ? Qt::cyan : getPathColor(i),
+                                                         tileNeedsArrow);
+
             switch (i) {
                 case 0:
                     layout->addWidget(tile, j, 9);
@@ -99,7 +103,26 @@ QPointer<QGridLayout> MainWindow::createBoard() {
         }
     }
 
+    QPointer<Die> die = new Die();
+    layout->addWidget(die, 0, 19, 3, 3);
+    QPointer<Die> secondDie = new Die();
+    layout->addWidget(secondDie, 0, 22, 3, 3);
+
     return layout;
+}
+
+QColor MainWindow::getPathColor(int i) const {
+    switch (i) {
+        case 0:
+            return {0, 143, 229}; // blue
+        case 1:
+            return Qt::GlobalColor::yellow;
+        case 2:
+            return Qt::GlobalColor::darkGreen;
+        case 3:
+            return {231, 0, 48}; // red
+        default: return Qt::GlobalColor::white;
+    }
 }
 
 void MainWindow::move(Player activePlayer, int spaces) {

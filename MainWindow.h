@@ -14,6 +14,7 @@
 #include <QWidget>
 
 #include "Board.h"
+#include "Die.h"
 
 class MainWindow : public QWidget {
 Q_OBJECT
@@ -25,6 +26,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
 //    ~MainWindow() override;
     QPointer<QGridLayout> createBoard();
+    QColor getPathColor(int i) const;
     void move(Player activePlayer, int spaces);
 };
 

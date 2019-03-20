@@ -31,9 +31,9 @@ protected:
 public:
     static const int TILE_SPACING = 1;
 
-    const Qt::GlobalColor color;
+    const QColor color;
 
-    explicit Tile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
+    explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override = 0;
 };
@@ -65,8 +65,10 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 class RectangleTile : public Tile {
+private:
+    const bool needsArrow;
 public:
-    explicit RectangleTile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
+    explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, bool needsArrow = false);
 
     void paintEvent(QPaintEvent *event) override;
 };
