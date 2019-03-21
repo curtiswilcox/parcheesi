@@ -8,6 +8,7 @@
 #include "MainWindow.h"
 
 using namespace std;
+using Qt::GlobalColor;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
@@ -29,16 +30,16 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
 
-    QPointer<StartTile> redStart = new StartTile({240, 240}, Qt::red);
+    QPointer<StartTile> redStart = new StartTile({240, 240}, GlobalColor::red);
     layout->addWidget(redStart, 0, 0, 8, 8);
 
-    QPointer<StartTile> yellowStart = new StartTile({240, 240}, Qt::yellow);
+    QPointer<StartTile> yellowStart = new StartTile({240, 240}, GlobalColor::yellow);
     layout->addWidget(yellowStart, 0, 11, 8, 8);
 
-    QPointer<StartTile> greenStart = new StartTile({240, 240}, Qt::darkGreen);
+    QPointer<StartTile> greenStart = new StartTile({240, 240}, GlobalColor::darkGreen);
     layout->addWidget(greenStart, 11, 0, 8, 8);
 
-    QPointer<StartTile> blueStart = new StartTile({240, 240}, Qt::darkBlue);
+    QPointer<StartTile> blueStart = new StartTile({240, 240}, GlobalColor::darkBlue);
     layout->addWidget(blueStart, 11, 11, 8, 8);
 
     QPointer<HomeTile> home = new HomeTile({240, 240});
@@ -52,7 +53,8 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 8; ++j) { // red "home" tiles and safe tiles at the edge
             QPointer<Tile> tile = new RectangleTile(i % 2 == 0 ? horizontal : vertical,
-                                                         (i < 2 && j == 0) || (i >= 2 && j == 7) ? Qt::cyan : getPathColor(i));
+                                                    (i < 2 && j == 0) || (i >= 2 && j == 7) ? GlobalColor::cyan
+                                                                                            : getPathColor(i));
 
             switch (i) {
                 case 0:
@@ -76,7 +78,9 @@ QPointer<QGridLayout> MainWindow::createBoard() {
             for (int k = 0; k < 8; ++k) {
                 QPointer<Tile> tile =
                         new RectangleTile(i % 2 == 0 ? horizontal : vertical,
-                                          std::find(safeNums.begin(), safeNums.end(), tileCounter) != safeNums.end() ? Qt::cyan : Qt::white);
+                                          std::find(safeNums.begin(), safeNums.end(), tileCounter) != safeNums.end()
+                                          ? GlobalColor::cyan
+                                          : Qt::white);
 
                 switch (i) {
                     case 0:
@@ -112,12 +116,13 @@ QColor MainWindow::getPathColor(int i) const {
         case 0:
             return {0, 143, 229}; // blue
         case 1:
-            return Qt::GlobalColor::yellow;
+            return GlobalColor::yellow;
         case 2:
-            return Qt::GlobalColor::darkGreen;
+            return GlobalColor::darkGreen;
         case 3:
             return {231, 0, 48}; // red
-        default: return Qt::GlobalColor::white;
+        default:
+            return GlobalColor::white;
     }
 }
 
