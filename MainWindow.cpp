@@ -51,11 +51,8 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     vector<int> safeNums = {4, 12, 20, 28, 35, 43, 51, 59};
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 8; ++j) { // red "home" tiles and safe tiles at the edge
-            bool tileNeedsArrow = (((j == 0 || j == 7)) && !((i < 2 && j == 0) || (i >= 2 && j == 7)));
-
             QPointer<Tile> tile = new RectangleTile(i % 2 == 0 ? horizontal : vertical,
-                                                         (i < 2 && j == 0) || (i >= 2 && j == 7) ? Qt::cyan : getPathColor(i),
-                                                         tileNeedsArrow);
+                                                         (i < 2 && j == 0) || (i >= 2 && j == 7) ? Qt::cyan : getPathColor(i));
 
             switch (i) {
                 case 0:
@@ -74,7 +71,6 @@ QPointer<QGridLayout> MainWindow::createBoard() {
                     break;
             }
         }
-
 
         for (int j = 0; j < 2; ++j) { // other surrounding tiles
             for (int k = 0; k < 8; ++k) {

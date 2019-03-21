@@ -32,6 +32,8 @@ void StartTile::paintEvent(QPaintEvent *event) {
     painter.setBrush(QBrush(GlobalColor::cyan));
     painter.drawRect(40, 40, dimensions.width - 80, dimensions.height - 80);
 
+    // NOTE: all of these are completely magic numbers
+
     int angle = 30 * 16;
     int length = 120 * 16;
 
@@ -72,8 +74,7 @@ void HomeTile::paintEvent(QPaintEvent *event) {
 // RectangleTile methods
 ///////////////////////////////////////////////////////////////////////////
 
-RectangleTile::RectangleTile(const Dimensions &d, const QColor &c, bool needsArrow) : needsArrow(needsArrow),
-                                                                                      Tile(d, c) {}
+RectangleTile::RectangleTile(const Dimensions &d, const QColor &c) : Tile(d, c) {}
 
 void RectangleTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
@@ -82,22 +83,4 @@ void RectangleTile::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(QBrush(Qt::black), TILE_SPACING));
     painter.drawRect(rect);
     painter.fillRect(rect, color);
-
-//    if (needsArrow) {
-//        int bottomLeftX = 0;
-//        int bottomLeftY = dimensions.height;
-//
-//        int bottomRightX = dimensions.width;
-//        int bottomRightY = dimensions.height;
-//
-//        int topX = dimensions.width / 2;
-//        int topY = 0;
-//
-//        QPainterPath path;
-//        path.moveTo(bottomLeftX, bottomLeftY);
-//        path.lineTo(bottomRightX, bottomRightY);
-//        path.lineTo(topX, topY);
-//        path.lineTo(bottomLeftX, bottomLeftY);
-//        painter.fillPath(path, QBrush(GlobalColor::black));
-//    }
 }

@@ -65,10 +65,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 class RectangleTile : public Tile {
-private:
-    const bool needsArrow;
 public:
-    explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, bool needsArrow = false);
+    explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override;
 };
