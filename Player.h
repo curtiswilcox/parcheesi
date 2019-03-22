@@ -31,7 +31,7 @@ class Player : public QWidget {
 private:
     std::vector<Pawn> pawns;
 public:
-    Player(QWidget *parent = nullptr);
+    explicit Player(QWidget *parent = nullptr);
 
     int numPawnsStart();
     int numPawnsHome();
