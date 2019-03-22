@@ -27,11 +27,11 @@ struct Pawn {
 };
 
 
-class Player {
+class Player : public QWidget {
 private:
     std::vector<Pawn> pawns;
 public:
-    Player() = default;
+    Player(QWidget *parent = nullptr);
 };
 
 

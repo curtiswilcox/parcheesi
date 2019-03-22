@@ -5,3 +5,5 @@
 #include "Player.h"
 
 Pawn::Pawn(PawnColor color) : color(color) {}
+
+Player::Player(QWidget *parent) : QWidget(parent) {}
