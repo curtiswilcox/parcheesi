@@ -44,7 +44,7 @@ public:
 
 class StartTile : public Tile {
 public:
-    explicit StartTile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
+    explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override;
 };

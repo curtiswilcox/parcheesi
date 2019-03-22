@@ -19,7 +19,7 @@ Tile::Tile(const Dimensions &d, const QColor &c) : dimensions(d), color(c), isSa
 // StartTile methods
 ///////////////////////////////////////////////////////////////////////////
 
-StartTile::StartTile(const Dimensions &d, const GlobalColor &c) : Tile(d, c) {};
+StartTile::StartTile(const Dimensions &d, const QColor &c) : Tile(d, c) {};
 
 void StartTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
@@ -29,7 +29,7 @@ void StartTile::paintEvent(QPaintEvent *event) {
     painter.drawRect(rect);
     painter.fillRect(rect, Qt::lightGray);
 
-    painter.setBrush(QBrush(GlobalColor::cyan));
+    painter.setBrush(QBrush(color));
     painter.drawRect(40, 40, dimensions.width - 80, dimensions.height - 80);
 
     // NOTE: all of these are completely magic numbers

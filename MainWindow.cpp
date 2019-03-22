@@ -30,17 +30,17 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
 
-    QPointer<StartTile> redStart = new StartTile({240, 240}, GlobalColor::red);
-    layout->addWidget(redStart, 0, 0, 8, 8);
+    QPointer<StartTile> blueStart = new StartTile({240, 240}, QColor(0, 143, 229));
+    layout->addWidget(blueStart, 0, 0, 8, 8);
+
+    QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48));
+    layout->addWidget(redStart, 0, 11, 8, 8);
 
     QPointer<StartTile> yellowStart = new StartTile({240, 240}, GlobalColor::yellow);
-    layout->addWidget(yellowStart, 0, 11, 8, 8);
+    layout->addWidget(yellowStart, 11, 0, 8, 8);
 
     QPointer<StartTile> greenStart = new StartTile({240, 240}, GlobalColor::darkGreen);
-    layout->addWidget(greenStart, 11, 0, 8, 8);
-
-    QPointer<StartTile> blueStart = new StartTile({240, 240}, GlobalColor::darkBlue);
-    layout->addWidget(blueStart, 11, 11, 8, 8);
+    layout->addWidget(greenStart, 11, 11, 8, 8);
 
     QPointer<HomeTile> home = new HomeTile({240, 240});
     layout->addWidget(home, 8, 8, 3, 3);
