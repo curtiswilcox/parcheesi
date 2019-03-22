@@ -30,19 +30,19 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
 
-    QPointer<StartTile> blueStart = new StartTile({240, 240}, QColor(0, 143, 229));
+    QPointer<StartTile> blueStart = new StartTile({240, 240}, QColor(0, 143, 229), this);
     layout->addWidget(blueStart, 0, 0, 8, 8);
 
-    QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48));
+    QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48), this);
     layout->addWidget(redStart, 0, 11, 8, 8);
 
-    QPointer<StartTile> yellowStart = new StartTile({240, 240}, GlobalColor::yellow);
+    QPointer<StartTile> yellowStart = new StartTile({240, 240}, GlobalColor::yellow, this);
     layout->addWidget(yellowStart, 11, 0, 8, 8);
 
-    QPointer<StartTile> greenStart = new StartTile({240, 240}, GlobalColor::darkGreen);
+    QPointer<StartTile> greenStart = new StartTile({240, 240}, GlobalColor::darkGreen, this);
     layout->addWidget(greenStart, 11, 11, 8, 8);
 
-    QPointer<HomeTile> home = new HomeTile({240, 240});
+    QPointer<HomeTile> home = new HomeTile({240, 240}, this);
     layout->addWidget(home, 8, 8, 3, 3);
 
     Dimensions horizontal = {30, 80};
@@ -54,7 +54,8 @@ QPointer<QGridLayout> MainWindow::createBoard() {
         for (int j = 0; j < 8; ++j) { // red "home" tiles and safe tiles at the edge
             QPointer<Tile> tile = new RectangleTile(i % 2 == 0 ? horizontal : vertical,
                                                     (i < 2 && j == 0) || (i >= 2 && j == 7) ? GlobalColor::cyan
-                                                                                            : getPathColor(i));
+                                                                                            : getPathColor(i),
+                                                    this);
 
             switch (i) {
                 case 0:
@@ -80,7 +81,8 @@ QPointer<QGridLayout> MainWindow::createBoard() {
                         new RectangleTile(i % 2 == 0 ? horizontal : vertical,
                                           std::find(safeNums.begin(), safeNums.end(), tileCounter) != safeNums.end()
                                           ? GlobalColor::cyan
-                                          : Qt::white);
+                                          : Qt::white,
+                                          this);
 
                 switch (i) {
                     case 0:
@@ -103,9 +105,9 @@ QPointer<QGridLayout> MainWindow::createBoard() {
         }
     }
 
-    QPointer<Die> die = new Die();
+    QPointer<Die> die = new Die(this);
     layout->addWidget(die, 0, 19, 3, 3);
-    QPointer<Die> secondDie = new Die();
+    QPointer<Die> secondDie = new Die(this);
     layout->addWidget(secondDie, 0, 22, 3, 3);
 
     return layout;

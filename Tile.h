@@ -33,7 +33,7 @@ public:
 
     const QColor color;
 
-    explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white);
+    explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     void paintEvent(QPaintEvent *event) override = 0;
 };
@@ -44,7 +44,7 @@ public:
 
 class StartTile : public Tile {
 public:
-    explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white);
+    explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     void paintEvent(QPaintEvent *event) override;
 };
@@ -55,7 +55,7 @@ public:
 
 class HomeTile : public Tile {
 public:
-    explicit HomeTile(const Dimensions &d, const Qt::GlobalColor &c = Qt::GlobalColor::white);
+    explicit HomeTile(const Dimensions &d, QWidget *parent = nullptr, const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override;
 };
@@ -66,7 +66,7 @@ public:
 
 class RectangleTile : public Tile {
 public:
-    explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white);
+    explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     void paintEvent(QPaintEvent *event) override;
 };

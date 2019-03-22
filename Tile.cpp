@@ -13,13 +13,13 @@ using Qt::GlobalColor;
 // Tile methods
 ///////////////////////////////////////////////////////////////////////////
 
-Tile::Tile(const Dimensions &d, const QColor &c) : dimensions(d), color(c), isSafe(c == Qt::cyan) {}
+Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c), isSafe(c == Qt::cyan) {}
 
 ///////////////////////////////////////////////////////////////////////////
 // StartTile methods
 ///////////////////////////////////////////////////////////////////////////
 
-StartTile::StartTile(const Dimensions &d, const QColor &c) : Tile(d, c) {};
+StartTile::StartTile(const Dimensions &d, const QColor &c, QWidget *parent) : Tile(d, c, parent) {};
 
 void StartTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
@@ -57,7 +57,7 @@ void StartTile::paintEvent(QPaintEvent *event) {
 // HomeTile methods
 ///////////////////////////////////////////////////////////////////////////
 
-HomeTile::HomeTile(const Dimensions &d, const GlobalColor &c) : Tile(d, c) {};
+HomeTile::HomeTile(const Dimensions &d, QWidget *parent, const GlobalColor &c) : Tile(d, c, parent) {};
 
 void HomeTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
@@ -74,7 +74,7 @@ void HomeTile::paintEvent(QPaintEvent *event) {
 // RectangleTile methods
 ///////////////////////////////////////////////////////////////////////////
 
-RectangleTile::RectangleTile(const Dimensions &d, const QColor &c) : Tile(d, c) {}
+RectangleTile::RectangleTile(const Dimensions &d, const QColor &c, QWidget *parent) : Tile(d, c, parent) {}
 
 void RectangleTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
