@@ -5,13 +5,13 @@
 #ifndef PARCHEESI_PLAYER_H
 #define PARCHEESI_PLAYER_H
 
-
+#include <memory>
 #include <vector>
 
 #include "Tile.h"
 
 enum PawnColor {
-    RED, YELLOW, GREEN, BLUE
+    RED = Qt::red, YELLOW = Qt::yellow, GREEN = Qt::green, BLUE = Qt::blue
 };
 
 enum PawnStatus {
@@ -27,11 +27,11 @@ struct Pawn {
 };
 
 
-class Player {
+class Player : public QWidget {
 private:
     std::vector<Pawn> pawns;
 public:
-    Player() = default;
+    Player(QWidget *parent = nullptr);
 
     int numPawnsStart();
     int numPawnsHome();

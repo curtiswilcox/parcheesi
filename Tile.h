@@ -5,17 +5,70 @@
 #ifndef PARCHEESI_TILE_H
 #define PARCHEESI_TILE_H
 
+#include <QEvent>
+#include <QPainter>
+#include <QWidget>
 
-class Tile {
-private:
+///////////////////////////////////////////////////////////////////////////
+// Dimensions struct declaration
+///////////////////////////////////////////////////////////////////////////
+
+struct Dimensions {
+    const int height;
+    const int width;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// Tile class declaration
+///////////////////////////////////////////////////////////////////////////
+
+class Tile : public QWidget {
+protected:
     bool hasBlockade = false;
-public:
     const bool isSafe;
 
-    Tile();
+    Dimensions dimensions = {0, 0};
+public:
+    static const int TILE_SPACING = 1;
 
-    explicit Tile(bool safe);
+    const QColor color;
 
+    explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+
+    void paintEvent(QPaintEvent *event) override = 0;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// StartTile class declaration
+///////////////////////////////////////////////////////////////////////////
+
+class StartTile : public Tile {
+public:
+    explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+
+    void paintEvent(QPaintEvent *event) override;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// HomeTile class declaration
+///////////////////////////////////////////////////////////////////////////
+
+class HomeTile : public Tile {
+public:
+    explicit HomeTile(const Dimensions &d, QWidget *parent = nullptr, const Qt::GlobalColor &c = Qt::GlobalColor::white);
+
+    void paintEvent(QPaintEvent *event) override;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// RectangleTile class declaration
+///////////////////////////////////////////////////////////////////////////
+
+class RectangleTile : public Tile {
+public:
+    explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+
+    void paintEvent(QPaintEvent *event) override;
 };
 
 

@@ -10,6 +10,8 @@ using namespace std;
 
 Pawn::Pawn(PawnColor color) : color(color) {}
 
+Player::Player(QWidget *parent) : QWidget(parent) {}
+
 int Player::numPawnsStart() {
     return accumulate(pawns.begin(), pawns.end(), 0, [&](const Pawn &pawn) { return pawn.status == PawnStatus::START; });
 }
