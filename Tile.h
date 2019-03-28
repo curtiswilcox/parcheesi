@@ -16,6 +16,9 @@
 struct Dimensions {
     const int height;
     const int width;
+
+    friend Dimensions operator*(Dimensions &d, double multiplier);
+    friend Dimensions operator/(Dimensions &d, int multiplier);
 };
 
 ///////////////////////////////////////////////////////////////////////////

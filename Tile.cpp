@@ -9,11 +9,25 @@
 using namespace std;
 using Qt::GlobalColor;
 
+
+///////////////////////////////////////////////////////////////////////////
+// Dimensions operators
+///////////////////////////////////////////////////////////////////////////
+
+Dimensions operator*(Dimensions &d, double multiplier) {
+    return {(int) (d.height * multiplier), (int) (d.width * multiplier)};
+}
+
+Dimensions operator/(Dimensions &d, int multiplier) {
+    return d * ((double) 1 / multiplier);
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // Tile methods
 ///////////////////////////////////////////////////////////////////////////
 
-Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c), isSafe(c == Qt::cyan) {}
+Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c),
+                                                                    isSafe(c == Qt::cyan) {}
 
 ///////////////////////////////////////////////////////////////////////////
 // StartTile methods
