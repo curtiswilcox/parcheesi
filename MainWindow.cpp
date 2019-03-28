@@ -3,28 +3,97 @@
 //
 
 #include <iostream>
+#include <QAction>
+#include <QLabel>
 #include <QShortcut>
+#include <QScrollArea>
 
 #include "MainWindow.h"
 
 using namespace std;
 using Qt::GlobalColor;
 
+
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
+    this->setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowTitle("Parcheesi");
     this->resize(780, 600);
-
     this->board = new Board(parent);
+
+    QPointer<QMenuBar> menuBar = new QMenuBar(this);
+    QPointer<QMenu> fileMenu = menuBar->addMenu("&Help");
+    menuBar->addMenu(fileMenu);
+    QPointer<QAction> gameplayInstructions = fileMenu->addAction("&Rules");
+    gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
+
+    auto showRules = [&]() {
+        rulesWindow = new QWidget(this, Qt::Window);
+        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), rulesWindow, SLOT(close()));
+        rulesWindow->resize(780, 600);
+        rulesWindow->setWindowTitle("Parcheesi Rules");
+
+        QPointer<QScrollArea> scroll = new QScrollArea(rulesWindow);
+        scroll->resize(rulesWindow->size());
+
+        QPointer<QLabel> rulesText = new QLabel(scroll);
+        rulesText->setWordWrap(true);
+        rulesText->setContentsMargins(
+                5, rulesText->contentsMargins().top(), 5, rulesText->contentsMargins().bottom()
+        );
+        rulesText->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
+        rulesText->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
+        rulesText->setText(
+                "<h1>Gameplay/Rules:</h1>\n\n"
+                "<ul>"
+                "<li>A player rolls the dice and must use the top die values shown to move their pieces around the board in one of the following ways:</li>\n"
+                "<li>Only pieces not in the nest may move forward on the board.</li>\n"
+                "<li>Pieces may only leave the nest with a roll of a five on a single die or the sum of the dice. A double five can be used to move two pieces from the nest simultaneously.</li>\n"
+                "<li>In the case of a non-doubles roll, a player may move one or two pieces, either one piece by each of the numbers on the two dice or one piece by the total. If no move is possible, the turn is forfeited.</li>\n"
+                "<li>When moving a single piece the total of two dice the turn is taken in increments, allowing pieces to be captured along the way. For example, if a double two is rolled and an opponent's piece lies on a cream space two spaces in front of the piece you wish to move the full four, you would move the piece two, and then two again, allowing the opponent's piece to be captured.</li>\n"
+                "<li>All die rolls must be taken and may not be voluntarily forfeited by a player.</li>\n"
+                "<li>If either of two rolls must be forfeited, the player must forfeit the lower number.</li>\n"
+                "<li>All die moves must be taken before the application of any extra rewards for sending an opponent to their nest or moving a piece to its home position.</li>\n"
+                "<li>With a roll of doubles, the player makes four moves, one for each of the numbers on top of the two dice and one for each of the numbers on the bottoms. The player may distribute these four moves among one, two, three, or four pieces. Note that the sum of numbers on the opposite sides of a die is always seven, so with doubles, there are a total of fourteen spaces to move. This can only be done if all four pieces are out of the nest.</li>\n"
+                "<li>When the player rolls doubles, the player rolls again after moving.</li>\n"
+                "<li>When a piece ends its move on the same space as an opponent's piece, the opponent's piece is sent back to its nest.</li>\n"
+                "<li>A piece may not be placed on a safe space (generally colored light blue) if it is occupied by an opponent's piece. The exception is the safe space used when a piece leaves its nest — a single piece occupying such a safe space is sent back to its nest when an opponent's piece leaves the nest and occupies the space.</li>\n"
+                "<li>A blockade is formed when two pieces of a single player occupy the same space. No piece of any player may move through a blockade, including pieces of the blockade owner. Blockade pieces may not be moved forward together with the roll of a double. Another player's piece cannot land in a space occupied by a blockade, even to leave its nest.</li>\n"
+                "<li>A piece is not required to enter the home row and can pass the row and start another circuit of the board voluntarily or as the result of requirement of the use of the total die roll.</li>\n"
+                "<li>A turn ends when the next player rolls the dice with the consent of the current player. Any rewards not taken are lost.</li>\n\n"
+                "</ul>"
+
+                "<h1>Rewards:</h1>\n"
+                "<ul>"
+                "<li>The reward for sending an opponent's piece to the nest is a free move of twenty spaces that may not be split between pieces.</li>\n"
+                "<li>The reward for landing a piece in the home space is a free move of ten spaces that may not be split between pieces.</li>\n\n"
+                "</ul>"
+
+                "<h1>Winning:</h1>\n"
+                "<ul>"
+                "<li>Moving all four pieces to the home position wins the game.</li>\n"
+                "<li>Pieces may only be moved to the home position with an exact application of the total roll, the value on a single die, or the complete application of a reward.</li>"
+                "</ul>"
+                "\n\n\n"
+                "Rules courtesy of \"https://en.wikipedia.org/wiki/Parcheesi#Rules\".");
+        rulesText->adjustSize();
+        scroll->setWidget(rulesText);
+        rulesWindow->show();
+    };
+
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showRules);
+    connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
     QPointer<QGridLayout> layout = createBoard();
     this->setLayout(layout);
 }
 
-//MainWindow::~MainWindow() {
-//    delete this->board;
-//    this->board = nullptr;
-//}
+
+MainWindow::~MainWindow() {
+    delete this->rulesWindow;
+    this->rulesWindow = nullptr;
+}
+
 
 QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<QGridLayout> layout = new QGridLayout(this);
@@ -56,7 +125,6 @@ QPointer<QGridLayout> MainWindow::createBoard() {
                                                     (i < 2 && j == 0) || (i >= 2 && j == 7) ? GlobalColor::cyan
                                                                                             : getPathColor(i),
                                                     this);
-
             switch (i) {
                 case 0:
                     layout->addWidget(tile, j, 9);
@@ -76,7 +144,7 @@ QPointer<QGridLayout> MainWindow::createBoard() {
         }
 
         for (int j = 0; j < 2; ++j) { // other surrounding tiles
-            for (int k = 0; k < 8; ++k) {
+            for (int k = 0; k < 8; ++k, ++tileCounter) {
                 QPointer<Tile> tile =
                         new RectangleTile(i % 2 == 0 ? horizontal : vertical,
                                           std::find(safeNums.begin(), safeNums.end(), tileCounter) != safeNums.end()
@@ -100,7 +168,6 @@ QPointer<QGridLayout> MainWindow::createBoard() {
                     default:
                         break;
                 }
-                ++tileCounter;
             }
         }
     }
