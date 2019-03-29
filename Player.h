@@ -18,12 +18,19 @@ enum PawnStatus {
     START, PLAYING, HOME
 };
 
-struct Pawn {
-    PawnColor color;
-    PawnStatus status = START;
+
+class Pawn : public QWidget {
+private:
     std::unique_ptr<Tile> currentTile;
 
-    explicit Pawn(PawnColor color);
+    Dimensions dimensions = {0, 0};
+
+public:
+    const PawnColor color;
+    PawnStatus status = START;
+
+    explicit Pawn(const Dimensions &d, const PawnColor &c, QWidget *parent = nullptr);
+
 };
 
 

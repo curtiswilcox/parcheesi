@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Pawn::Pawn(PawnColor color) : color(color) {}
+Pawn::Pawn(const Dimensions &d, const PawnColor &c, QWidget *parent) : dimensions(d), color(c), QWidget(parent) {}
 
 Player::Player(QWidget *parent) : QWidget(parent) {}
 
