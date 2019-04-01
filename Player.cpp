@@ -15,12 +15,9 @@ void Pawn::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     QRect rect;
     rect.setRect(0, 0, dimensions.width, dimensions.height);
-    painter.setPen(QPen(QBrush(Qt::black), 2));
+    painter.setPen(QPen(QBrush(Qt::black), 1));
     painter.drawRect(rect);
-    painter.fillRect(rect, Qt::lightGray);
-
-    painter.setBrush(QBrush(color));
-    painter.drawRect(30, 30, dimensions.width - 60, dimensions.height - 60);
+    painter.fillRect(rect, color);
 
     // NOTE: all of these are completely magic numbers
 }

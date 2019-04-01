@@ -33,9 +33,6 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<StartTile> blueStart = new StartTile({240, 240}, QColor(0, 143, 229), this);
     layout->addWidget(blueStart, 0, 0, 8, 8);
 
-    QPointer<Pawn> bluePawns = new Pawn({40,40}, QColor(231,120,48), this);
-    layout->addWidget(bluePawns, 0, 0, 12, 12);
-
     QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48), this);
     layout->addWidget(redStart, 0, 11, 8, 8);
 
@@ -107,6 +104,16 @@ QPointer<QGridLayout> MainWindow::createBoard() {
             }
         }
     }
+
+    QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
+    layout->addWidget(blueOne, 8, 8, 11, 11);
+
+//    QPointer<Pawn> blueTwo = new Pawn({50, 50}, QColor(231,120,48), this);
+//    layout->addWidget(blueTwo, 12, 12, 0, 0);
+
+    QPointer<Pawn> bluePawn = new Pawn({10, 10}, QColor(231,120,48), this);
+    layout->addWidget(bluePawn, 0, 0, 0, 0);
+
 
     QPointer<Die> die = new Die(this);
     layout->addWidget(die, 0, 19, 3, 3);
