@@ -110,7 +110,24 @@ QPointer<QGridLayout> MainWindow::createBoard() {
             QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
             layout->addWidget(blueOne, i + 2, j + 2, 4, 4);
         }
-
+    }
+    for (int i = 0; i < 2; i ++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
+            layout->addWidget(blueOne, i + 2, j + 13, 4, 4);
+        }
+    }
+    for (int i = 0; i < 2; i ++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
+            layout->addWidget(blueOne, i + 13, j + 2, 4, 4);
+        }
+    }
+    for (int i = 0; i < 2; i ++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
+            layout->addWidget(blueOne, i + 13, j + 13, 4, 4);
+        }
     }
 
 
