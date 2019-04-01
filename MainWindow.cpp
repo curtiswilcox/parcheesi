@@ -105,30 +105,44 @@ QPointer<QGridLayout> MainWindow::createBoard() {
         }
     }
 
+    // TODO assign each pawn set to a player
     for (int i = 0; i < 2; i ++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
+            QPointer<Pawn> blueOne = new Pawn({10, 20}, QColor(0, 0, 153), this);
             layout->addWidget(blueOne, i + 2, j + 2, 4, 4);
         }
     }
     for (int i = 0; i < 2; i ++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
-            layout->addWidget(blueOne, i + 2, j + 13, 4, 4);
+            QPointer<Pawn> redOne = new Pawn({10, 20}, QColor(153, 0, 0), this);
+            layout->addWidget(redOne, i + 2, j + 13, 6, 6);
         }
     }
     for (int i = 0; i < 2; i ++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
-            layout->addWidget(blueOne, i + 13, j + 2, 4, 4);
+            QPointer<Pawn> yellowOne = new Pawn({10, 20}, QColor(153, 153, 0), this);
+            layout->addWidget(yellowOne, i + 13, j + 2, 4, 4);
         }
     }
     for (int i = 0; i < 2; i ++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> blueOne = new Pawn({10, 10}, QColor(231,120,48), this);
-            layout->addWidget(blueOne, i + 13, j + 13, 4, 4);
+            QPointer<Pawn> greenOneOne = new Pawn({10, 20}, QColor(0, 102, 0), this);
+            layout->addWidget(greenOneOne, i + 13, j + 13, 4, 4);
         }
     }
+
+    // pawns to test the placement on board pieces
+    // TODO not sure how to make the pawns closer together
+    // maybe some alignPawn method
+    QPointer<Pawn> exPawn = new Pawn({10, 20}, QColor(0, 0, 153), this);
+    layout->addWidget(exPawn, 8, 13, 1, 1);
+
+    QPointer<Pawn> exPawn2 = new Pawn({10, 20}, QColor(0, 0, 153), this);
+    layout->addWidget(exPawn2, 8, 14, 1, 1);
+
+    QPointer<Pawn> exPawn3 = new Pawn({10, 20}, QColor(0, 0, 153), this);
+    layout->addWidget(exPawn3, 9, 13, 1, 1);
+
 
 
 
