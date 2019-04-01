@@ -21,15 +21,15 @@ enum PawnStatus {
 
 class Pawn : public QWidget {
 private:
-    std::unique_ptr<Tile> currentTile;
-
     Dimensions dimensions = {0, 0};
 
 public:
-    const PawnColor color;
+    const QColor color;
     PawnStatus status = START;
 
-    explicit Pawn(const Dimensions &d, const PawnColor &c, QWidget *parent = nullptr);
+    explicit Pawn(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+
+    void paintEvent(QPaintEvent *event);
 
 };
 

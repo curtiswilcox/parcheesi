@@ -33,6 +33,9 @@ QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<StartTile> blueStart = new StartTile({240, 240}, QColor(0, 143, 229), this);
     layout->addWidget(blueStart, 0, 0, 8, 8);
 
+    QPointer<Pawn> bluePawns = new Pawn({40,40}, QColor(231,120,48), this);
+    layout->addWidget(bluePawns, 0, 0, 12, 12);
+
     QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48), this);
     layout->addWidget(redStart, 0, 11, 8, 8);
 
