@@ -9,11 +9,40 @@
 using namespace std;
 using Qt::GlobalColor;
 
+
+///////////////////////////////////////////////////////////////////////////
+// Dimensions operators
+///////////////////////////////////////////////////////////////////////////
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "bugprone-narrowing-conversions" // suppress warnings
+
+void Dimensions::operator*=(double multiplier) {
+    this->height *= multiplier;
+    this->width *= multiplier;
+}
+
+void Dimensions::operator/=(int multiplier) {
+    this->height *= ((double) 1 / multiplier);
+    this->width *= ((double) 1 / multiplier);
+}
+
+#pragma clang diagnostic pop
+
+Dimensions operator*(Dimensions &d, double multiplier) {
+    return {(int) (d.height * multiplier), (int) (d.width * multiplier)};
+}
+
+Dimensions operator/(Dimensions &d, int multiplier) {
+    return d * ((double) 1 / multiplier);
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // Tile methods
 ///////////////////////////////////////////////////////////////////////////
 
-Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c), isSafe(c == Qt::cyan) {}
+Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c),
+                                                                    isSafe(c == Qt::cyan) {}
 
 ///////////////////////////////////////////////////////////////////////////
 // StartTile methods

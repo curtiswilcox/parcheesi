@@ -9,7 +9,7 @@
 
 using Qt::GlobalColor;
 
-Die::Die(QWidget *parent) : QWidget(parent) {}
+Die::Die(QWidget *parent) : QWidget(parent), value(0) {}
 
 void Die::roll() {
     this->value = arc4random() % 6 + 1;

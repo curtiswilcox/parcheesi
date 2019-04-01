@@ -10,31 +10,27 @@
 
 #include "Tile.h"
 
-enum PawnColor {
-    RED = Qt::red, YELLOW = Qt::yellow, GREEN = Qt::green, BLUE = Qt::blue
-};
-
 enum PawnStatus {
     START, PLAYING, HOME
 };
 
-
 class Pawn : public QWidget {
+Q_OBJECT
 private:
     Dimensions dimensions = {0, 0};
-
-public:
     const QColor color;
     PawnStatus status = START;
 
-    explicit Pawn(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+    friend class Player; // allow a player to directly access pawn information
 
-    void paintEvent(QPaintEvent *event);
-
+public:
+    explicit Pawn(const Dimensions &d, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+    void paintEvent(QPaintEvent *event) override;
 };
 
 
 class Player : public QWidget {
+Q_OBJECT
 private:
     std::vector<Pawn> pawns;
 public:

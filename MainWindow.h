@@ -22,11 +22,16 @@ Q_OBJECT
 private:
     QPointer<Board> board;
 
+    void addStartTiles(QPointer<QGridLayout> &layout);
+    void addHomeTiles(QPointer<QGridLayout> &layout);
+    void addGeneralTiles(QPointer<QGridLayout> &layout);
+    void addPlayers(QPointer<QGridLayout> &layout);
+    void addDice(QPointer<QGridLayout> &layout);
+    QColor getPathColor(int i) const;
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-//    ~MainWindow() override;
     QPointer<QGridLayout> createBoard();
-    QColor getPathColor(int i) const;
     void move(Player activePlayer, int spaces);
 };
 

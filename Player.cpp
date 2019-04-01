@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by Curtis Wilcox on 2019-03-04.
 //
@@ -9,7 +11,7 @@
 using namespace std;
 using Qt::GlobalColor;
 
-Pawn::Pawn(const Dimensions &d, const QColor &c, QWidget *parent) : dimensions(d), color(c), QWidget(parent) {}
+Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)), QWidget(parent) {}
 
 void Pawn::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
@@ -18,8 +20,6 @@ void Pawn::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(QBrush(Qt::black), 1));
     painter.drawRect(rect);
     painter.fillRect(rect, color);
-
-    // NOTE: all of these are completely magic numbers
 }
 
 Player::Player(QWidget *parent) : QWidget(parent) {}
