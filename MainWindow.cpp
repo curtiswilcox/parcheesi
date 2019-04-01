@@ -39,13 +39,13 @@ void MainWindow::addStartTiles(QPointer<QGridLayout> &layout) {
     layout->addWidget(blueStart, 0, 0, 16, 16);
 
     QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48), this);
-    layout->addWidget(redStart, 0, 11 * 2, 16, 16);
+    layout->addWidget(redStart, 0, 22, 16, 16);
 
     QPointer<StartTile> yellowStart = new StartTile({240, 240}, GlobalColor::yellow, this);
-    layout->addWidget(yellowStart, 11 * 2, 0, 16, 16);
+    layout->addWidget(yellowStart, 22, 0, 16, 16);
 
     QPointer<StartTile> greenStart = new StartTile({240, 240}, GlobalColor::darkGreen, this);
-    layout->addWidget(greenStart, 11 * 2, 11 * 2, 16, 16);
+    layout->addWidget(greenStart, 22, 22, 16, 16);
 }
 
 void MainWindow::addHomeTiles(QPointer<QGridLayout> &layout) {
