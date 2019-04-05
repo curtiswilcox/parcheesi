@@ -15,7 +15,7 @@ class Player {
 private:
     std::vector<QPointer<Pawn>> pawns;
 public:
-    Player(std::vector<QPointer<Pawn>> pawns);
+    explicit Player(std::vector<QPointer<Pawn>> pawns);
 
     int numPawnsStart();
     int numPawnsHome();
