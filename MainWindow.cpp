@@ -91,6 +91,11 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
     QPointer<QGridLayout> layout = createBoard();
+    QPointer<Die> die = new Die(this);
+    layout->addWidget(die, 0, 19, 3, 3);
+    QPointer<Die> secondDie = new Die(this);
+    layout->addWidget(secondDie, 0, 22, 3, 3);
+
     this->setLayout(layout);
 }
 
@@ -155,7 +160,7 @@ QPointer<QGridLayout> MainWindow::createBoard() {
                         new RectangleTile(i % 2 == 0 ? horizontal : vertical,
                                           std::find(safeNums.begin(), safeNums.end(), tileCounter) != safeNums.end()
                                           ? GlobalColor::cyan
-                                          : Qt::white,
+                                          : GlobalColor::white,
                                           this);
 
                 switch (i) {
@@ -177,11 +182,6 @@ QPointer<QGridLayout> MainWindow::createBoard() {
             }
         }
     }
-
-    QPointer<Die> die = new Die(this);
-    layout->addWidget(die, 0, 19, 3, 3);
-    QPointer<Die> secondDie = new Die(this);
-    layout->addWidget(secondDie, 0, 22, 3, 3);
 
     return layout;
 }
