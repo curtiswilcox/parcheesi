@@ -25,9 +25,11 @@ void Pawn::paintEvent(QPaintEvent *event) {
 Player::Player(QWidget *parent) : QWidget(parent) {}
 
 int Player::numPawnsStart() {
-    return accumulate(pawns.begin(), pawns.end(), 0, [&](int total, const Pawn &pawn) { return pawn.status == PawnStatus::START; });
+    auto lambda = [&](int total, const Pawn &pawn) { return pawn.status == PawnStatus::START; };
+    return accumulate(pawns.begin(), pawns.end(), 0, lambda);
 }
 
 int Player::numPawnsHome() {
-    return accumulate(pawns.begin(), pawns.end(), 0, [&](int total, const Pawn &pawn) { return pawn.status == PawnStatus::HOME; });
+    auto lambda = [&](int total, const Pawn &pawn) { return pawn.status == PawnStatus::HOME; };
+    return accumulate(pawns.begin(), pawns.end(), 0, lambda);
 }

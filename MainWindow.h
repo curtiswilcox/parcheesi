@@ -5,23 +5,27 @@
 #ifndef PARCHEESI_MAINWINDOW_H
 #define PARCHEESI_MAINWINDOW_H
 
+#include <functional>
 #include <memory>
 #include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QGridLayout>
 #include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
 #include <QPointer>
 #include <QWidget>
+#include <QWindow>
 
 #include "Board.h"
 #include "Die.h"
+
 
 class MainWindow : public QWidget {
 Q_OBJECT
 
 private:
     QPointer<Board> board;
-
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
@@ -31,8 +35,14 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    QWidget *rulesWindow;
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
     QPointer<QGridLayout> createBoard();
     void move(Player activePlayer, int spaces);
+
+//public slots:
+//    std::unique_ptr<Window> showRules();
 };
 
 

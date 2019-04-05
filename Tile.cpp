@@ -29,14 +29,6 @@ void Dimensions::operator/=(int multiplier) {
 
 #pragma clang diagnostic pop
 
-Dimensions operator*(Dimensions &d, double multiplier) {
-    return {(int) (d.height * multiplier), (int) (d.width * multiplier)};
-}
-
-Dimensions operator/(Dimensions &d, int multiplier) {
-    return d * ((double) 1 / multiplier);
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // Tile methods
 ///////////////////////////////////////////////////////////////////////////
