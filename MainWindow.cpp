@@ -218,14 +218,14 @@ void MainWindow::addPlayers(QPointer<QGridLayout> &layout) {
     }
 
     // pawns to test the placement on board pieces
-    QPointer<Pawn> exPawn = new Pawn({10, 30}, QColor(0, 0, 153), this);
-    layout->addWidget(exPawn, 16, 26, 1, 2);
+//    QPointer<Pawn> exPawn = new Pawn({10, 30}, QColor(0, 0, 153), this);
+//    layout->addWidget(exPawn, 16, 26, 1, 2);
 //
 //    QPointer<Pawn> exPawn2 = new Pawn({10, 20}, QColor(0, 0, 153), this);
 //    layout->addWidget(exPawn2, 16, 27, 1, 1);
 
-    QPointer<Pawn> exPawn3 = new Pawn({10, 30}, QColor(0, 0, 153), this);
-    layout->addWidget(exPawn3, 17, 26, 1, 2);
+//    QPointer<Pawn> exPawn3 = new Pawn({10, 30}, QColor(0, 0, 153), this);
+//    layout->addWidget(exPawn3, 17, 26, 1, 2);
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {

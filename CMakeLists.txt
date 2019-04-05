@@ -17,6 +17,6 @@ find_package(Qt5Core COMPONENTS REQUIRED)
 find_package(Qt5Gui COMPONENTS REQUIRED)
 find_package(Qt5Widgets COMPONENTS REQUIRED)
 
-add_executable(Parcheesi main.cpp MainWindow.cpp MainWindow.h Board.cpp Board.h Tile.cpp Tile.h Die.cpp Die.h Player.cpp Player.h)
+add_executable(Parcheesi main.cpp MainWindow.cpp MainWindow.h Board.cpp Board.h Tile.cpp Tile.h Die.cpp Die.h Player.cpp Player.h Pawn.cpp Pawn.h)
 
 target_link_libraries(Parcheesi Qt5::Core Qt5::Gui Qt5::Widgets)

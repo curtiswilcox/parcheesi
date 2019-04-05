@@ -8,33 +8,14 @@
 #include <memory>
 #include <vector>
 
+#include "Pawn.h"
 #include "Tile.h"
 
-enum PawnStatus {
-    START, PLAYING, HOME
-};
-
-class Pawn : public QWidget {
-Q_OBJECT
-private:
-    Dimensions dimensions = {0, 0};
-    const QColor color;
-    PawnStatus status = START;
-
-    friend class Player; // allow a player to directly access pawn information
-
-public:
-    explicit Pawn(const Dimensions &d, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
-    void paintEvent(QPaintEvent *event) override;
-};
-
-
-class Player : public QWidget {
-Q_OBJECT
+class Player {
 private:
     std::vector<Pawn> pawns;
 public:
-    explicit Player(QWidget *parent = nullptr);
+    Player(std::vector<Pawn> pawns);
 
     int numPawnsStart();
     int numPawnsHome();

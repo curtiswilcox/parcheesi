@@ -19,12 +19,16 @@
 
 #include "Board.h"
 #include "Die.h"
+#include "Pawn.h"
+#include "Player.h"
+#include "Tile.h"
 
 
 class MainWindow : public QWidget {
 Q_OBJECT
 
 private:
+    QWidget *rulesWindow;
     QPointer<Board> board;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
@@ -32,7 +36,6 @@ private:
     void addPlayers(QPointer<QGridLayout> &layout);
     void addDice(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
-    QWidget *rulesWindow;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
