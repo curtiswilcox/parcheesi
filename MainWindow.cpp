@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QShortcut>
 #include <QScrollArea>
+#include <QSizePolicy>
 
 #include "MainWindow.h"
 
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowTitle("Parcheesi");
     this->resize(780, 600);
+    this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
+    this->setFixedSize(this->width(), this->height());
     this->board = new Board(parent);
 
     QPointer<QMenuBar> menuBar = new QMenuBar(this);
@@ -78,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
                 "Rules courtesy of \"https://en.wikipedia.org/wiki/Parcheesi#Rules\".");
         rulesText->adjustSize();
         scroll->setWidget(rulesText);
+        rulesWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
+        rulesWindow->setFixedSize(rulesWindow->width(), rulesWindow->height());
         rulesWindow->show();
     };
 
