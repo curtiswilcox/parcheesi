@@ -19,9 +19,6 @@ struct Dimensions {
 
     void operator*=(double multiplier);
     void operator/=(int multiplier);
-
-    friend Dimensions operator*(Dimensions &d, double multiplier);
-    friend Dimensions operator/(Dimensions &d, int multiplier);
 };
 
 ///////////////////////////////////////////////////////////////////////////

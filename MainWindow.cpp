@@ -91,11 +91,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
     QPointer<QGridLayout> layout = createBoard();
-    QPointer<Die> die = new Die(this);
-    layout->addWidget(die, 0, 19, 3, 3);
-    QPointer<Die> secondDie = new Die(this);
-    layout->addWidget(secondDie, 0, 22, 3, 3);
-
     this->setLayout(layout);
 }
 

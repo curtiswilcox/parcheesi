@@ -32,10 +32,8 @@ private:
     void addPlayers(QPointer<QGridLayout> &layout);
     void addDice(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
-
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
     QWidget *rulesWindow;
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     QPointer<QGridLayout> createBoard();
