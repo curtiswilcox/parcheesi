@@ -8,6 +8,7 @@
 #include <QWidget>
 
 class Die : public QWidget {
+Q_OBJECT
 private:
     int value;
 public:

@@ -14,13 +14,20 @@ using Qt::GlobalColor;
 // Dimensions operators
 ///////////////////////////////////////////////////////////////////////////
 
-Dimensions operator*(Dimensions &d, double multiplier) {
-    return {(int) (d.height * multiplier), (int) (d.width * multiplier)};
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "bugprone-narrowing-conversions" // suppress warnings
+
+void Dimensions::operator*=(double multiplier) {
+    this->height *= multiplier;
+    this->width *= multiplier;
 }
 
-Dimensions operator/(Dimensions &d, int multiplier) {
-    return d * ((double) 1 / multiplier);
+void Dimensions::operator/=(int multiplier) {
+    this->height *= ((double) 1 / multiplier);
+    this->width *= ((double) 1 / multiplier);
 }
+
+#pragma clang diagnostic pop
 
 ///////////////////////////////////////////////////////////////////////////
 // Tile methods

@@ -100,33 +100,44 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 }
 
 
-MainWindow::~MainWindow() {
-    delete this->rulesWindow;
-    this->rulesWindow = nullptr;
-}
-
-
 QPointer<QGridLayout> MainWindow::createBoard() {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
 
+    addStartTiles(layout);
+    addHomeTiles(layout);
+    addGeneralTiles(layout);
+    addPlayers(layout);
+    addDice(layout);
+
+    return layout;
+}
+
+void MainWindow::addStartTiles(QPointer<QGridLayout> &layout) {
     QPointer<StartTile> blueStart = new StartTile({240, 240}, QColor(0, 143, 229), this);
-    layout->addWidget(blueStart, 0, 0, 8, 8);
+    layout->addWidget(blueStart, 0, 0, 16, 16);
 
     QPointer<StartTile> redStart = new StartTile({240, 240}, QColor(231, 0, 48), this);
-    layout->addWidget(redStart, 0, 11, 8, 8);
+    layout->addWidget(redStart, 0, 22, 16, 16);
 
     QPointer<StartTile> yellowStart = new StartTile({240, 240}, GlobalColor::yellow, this);
-    layout->addWidget(yellowStart, 11, 0, 8, 8);
+    layout->addWidget(yellowStart, 22, 0, 16, 16);
 
     QPointer<StartTile> greenStart = new StartTile({240, 240}, GlobalColor::darkGreen, this);
-    layout->addWidget(greenStart, 11, 11, 8, 8);
+    layout->addWidget(greenStart, 22, 22, 16, 16);
+}
 
+void MainWindow::addHomeTiles(QPointer<QGridLayout> &layout) {
     QPointer<HomeTile> home = new HomeTile({240, 240}, this);
-    layout->addWidget(home, 8, 8, 3, 3);
+    layout->addWidget(home, 16, 16, 6, 6);
+}
 
+void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
     Dimensions horizontal = {30, 80};
     Dimensions vertical = {80, 30};
+
+    horizontal *= 2;
+    vertical *= 2;
 
     int tileCounter = 0;
     vector<int> safeNums = {4, 12, 20, 28, 35, 43, 51, 59};
@@ -138,16 +149,16 @@ QPointer<QGridLayout> MainWindow::createBoard() {
                                                     this);
             switch (i) {
                 case 0:
-                    layout->addWidget(tile, j, 9);
+                    layout->addWidget(tile, j * 2, 18, 2, 2);
                     break;
                 case 1:
-                    layout->addWidget(tile, 9, j);
+                    layout->addWidget(tile, 18, j * 2, 2, 2);
                     break;
                 case 2:
-                    layout->addWidget(tile, j + 11, 9);
+                    layout->addWidget(tile, (j + 11) * 2, 18, 2, 2);
                     break;
                 case 3:
-                    layout->addWidget(tile, 9, j + 11);
+                    layout->addWidget(tile, 18, (j + 11) * 2, 2, 2);
                     break;
                 default:
                     break;
@@ -165,16 +176,16 @@ QPointer<QGridLayout> MainWindow::createBoard() {
 
                 switch (i) {
                     case 0:
-                        layout->addWidget(tile, k, j == 0 ? 8 : 10);
+                        layout->addWidget(tile, k * 2, (j == 0 ? 8 : 10) * 2, 2, 2);
                         break;
                     case 1:
-                        layout->addWidget(tile, j == 0 ? 8 : 10, k);
+                        layout->addWidget(tile, (j == 0 ? 8 : 10) * 2, k * 2, 2, 2);
                         break;
                     case 2:
-                        layout->addWidget(tile, k + 11, j == 0 ? 8 : 10);
+                        layout->addWidget(tile, (k + 11) * 2, (j == 0 ? 8 : 10) * 2, 2, 2);
                         break;
                     case 3:
-                        layout->addWidget(tile, j == 0 ? 8 : 10, k + 11);
+                        layout->addWidget(tile, (j == 0 ? 8 : 10) * 2, (k + 11) * 2, 2, 2);
                         break;
                     default:
                         break;
@@ -182,8 +193,51 @@ QPointer<QGridLayout> MainWindow::createBoard() {
             }
         }
     }
+}
 
-    return layout;
+void MainWindow::addPlayers(QPointer<QGridLayout> &layout) {
+    // TODO assign each pawn set to a player
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> blueOne = new Pawn({10, 20}, QColor(0, 0, 153), this);
+            layout->addWidget(blueOne, (i + 2) * 2, (j + 2) * 2, 8, 8);
+        }
+    }
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> redOne = new Pawn({10, 20}, QColor(153, 0, 0), this);
+            layout->addWidget(redOne, (i + 2) * 2, (j + 13) * 2, 12, 12);
+        }
+    }
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> yellowOne = new Pawn({10, 20}, QColor(153, 153, 0), this);
+            layout->addWidget(yellowOne, (i + 13) * 2, (j + 2) * 2, 8, 8);
+        }
+    }
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            QPointer<Pawn> greenOneOne = new Pawn({10, 20}, QColor(0, 102, 0), this);
+            layout->addWidget(greenOneOne, (i + 13) * 2, (j + 13) * 2, 8, 8);
+        }
+    }
+
+    // pawns to test the placement on board pieces
+    QPointer<Pawn> exPawn = new Pawn({10, 30}, QColor(0, 0, 153), this);
+    layout->addWidget(exPawn, 16, 26, 1, 2);
+//
+//    QPointer<Pawn> exPawn2 = new Pawn({10, 20}, QColor(0, 0, 153), this);
+//    layout->addWidget(exPawn2, 16, 27, 1, 1);
+
+    QPointer<Pawn> exPawn3 = new Pawn({10, 30}, QColor(0, 0, 153), this);
+    layout->addWidget(exPawn3, 17, 26, 1, 2);
+}
+
+void MainWindow::addDice(QPointer<QGridLayout> &layout) {
+    QPointer<Die> die = new Die(this);
+    layout->addWidget(die, 0, 38, 6, 6);
+    QPointer<Die> secondDie = new Die(this);
+    layout->addWidget(secondDie, 0, 44, 6, 6);
 }
 
 QColor MainWindow::getPathColor(int i) const {

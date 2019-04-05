@@ -14,8 +14,11 @@
 ///////////////////////////////////////////////////////////////////////////
 
 struct Dimensions {
-    const int height;
-    const int width;
+    int height;
+    int width;
+
+    void operator*=(double multiplier);
+    void operator/=(int multiplier);
 
     friend Dimensions operator*(Dimensions &d, double multiplier);
     friend Dimensions operator/(Dimensions &d, int multiplier);
@@ -26,6 +29,7 @@ struct Dimensions {
 ///////////////////////////////////////////////////////////////////////////
 
 class Tile : public QWidget {
+Q_OBJECT
 protected:
     bool hasBlockade = false;
     const bool isSafe;
@@ -46,6 +50,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 class StartTile : public Tile {
+Q_OBJECT
 public:
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
@@ -57,8 +62,10 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 class HomeTile : public Tile {
+Q_OBJECT
 public:
-    explicit HomeTile(const Dimensions &d, QWidget *parent = nullptr, const Qt::GlobalColor &c = Qt::GlobalColor::white);
+    explicit HomeTile(const Dimensions &d, QWidget *parent = nullptr,
+                      const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
     void paintEvent(QPaintEvent *event) override;
 };
@@ -68,6 +75,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 class RectangleTile : public Tile {
+Q_OBJECT
 public:
     explicit RectangleTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
