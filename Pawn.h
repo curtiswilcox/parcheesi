@@ -5,6 +5,7 @@
 #ifndef PARCHEESI_PAWN_H
 #define PARCHEESI_PAWN_H
 
+#include <QPointer>
 #include <QWidget>
 
 #include "Tile.h"
