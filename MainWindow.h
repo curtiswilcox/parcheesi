@@ -39,8 +39,9 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    QString readRules();
     QPointer<QGridLayout> createBoard();
-    void move(Player activePlayer, int spaces);
+    bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
 //public slots:
 //    std::unique_ptr<Window> showRules();
