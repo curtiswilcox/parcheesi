@@ -48,8 +48,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         );
         rulesText->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
         rulesText->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
-        rulesText->setText(
-                readRules()//                "<h1>Gameplay/Rules:</h1>\n\n"
+        rulesText->setText(readRules() /* //                "<h1>Gameplay/Rules:</h1>\n\n"
 //                "<ul>"
 //                "<li>A player rolls the dice and must use the top die values shown to move their pieces around the board in one of the following ways:</li>\n"
 //                "<li>Only pieces not in the nest may move forward on the board.</li>\n"
@@ -80,8 +79,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 //                "<li>Pieces may only be moved to the home position with an exact application of the total roll, the value on a single die, or the complete application of a reward.</li>"
 //                "</ul>"
 //                "\n\n\n"
-//                "Rules courtesy of \"https://en.wikipedia.org/wiki/Parcheesi#Rules\"."
-        );
+//                "Rules courtesy of \"https://en.wikipedia.org/wiki/Parcheesi#Rules\"." */ );
         rulesText->adjustSize();
         scroll->setWidget(rulesText);
         rulesWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
@@ -92,8 +90,11 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showRules);
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
-    QPointer<QGridLayout> layout = createBoard();
+    QPointer<QGridLayout> layout = new QGridLayout(this);
+    vector<Player> players = createBoard(layout);
     this->setLayout(layout);
+
+    this->play(players);
 }
 
 QString MainWindow::readRules() {
@@ -111,17 +112,16 @@ QString MainWindow::readRules() {
 }
 
 
-QPointer<QGridLayout> MainWindow::createBoard() {
-    QPointer<QGridLayout> layout = new QGridLayout(this);
+vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     layout->setSpacing(Tile::TILE_SPACING);
 
     addStartTiles(layout);
     addHomeTiles(layout);
     addGeneralTiles(layout);
-    addPlayers(layout);
+    vector<Player> players = addPawns(layout);
     addDice(layout);
 
-    return layout;
+    return players;
 }
 
 void MainWindow::addStartTiles(QPointer<QGridLayout> &layout) {
@@ -236,32 +236,44 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
     }
 }
 
-void MainWindow::addPlayers(QPointer<QGridLayout> &layout) {
-    // TODO assign each pawn set to a player
+vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
+    Player bluePlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> blueOne = new Pawn({10, 20}, QColor(0, 0, 153), this);
             layout->addWidget(blueOne, (i + 2) * 2, (j + 2) * 2, 8, 8);
+            bluePlayer.addPawn(blueOne);
         }
     }
+
+    Player redPlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> redOne = new Pawn({10, 20}, QColor(153, 0, 0), this);
             layout->addWidget(redOne, (i + 2) * 2, (j + 13) * 2, 12, 12);
+            redPlayer.addPawn(redOne);
         }
     }
+
+    Player yellowPlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> yellowOne = new Pawn({10, 20}, QColor(153, 153, 0), this);
             layout->addWidget(yellowOne, (i + 13) * 2, (j + 2) * 2, 8, 8);
+            yellowPlayer.addPawn(yellowOne);
         }
     }
+
+    Player greenPlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> greenOne = new Pawn({10, 20}, QColor(0, 102, 0), this);
             layout->addWidget(greenOne, (i + 13) * 2, (j + 13) * 2, 8, 8);
+            greenPlayer.addPawn(greenOne);
         }
     }
+
+    return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
 
     // pawns to test the placement on board pieces
 //    QPointer<Pawn> exPawn = new Pawn({10, 30}, QColor(0, 0, 153), this);
@@ -296,6 +308,11 @@ QColor MainWindow::getPathColor(int i) const {
     }
 }
 
+void MainWindow::play(const vector<Player> &players) {
+
+}
+
+
 bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces) {
     if (qobject_cast<HomeTile *>(tile)) return false;
     if (qobject_cast<StartTile *>(tile)) return spaces == 5;
@@ -305,13 +322,13 @@ bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile,
         if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
             if (auto t = dynamic_cast<RectangleTile *>(widItem->widget())) {
                 if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
-                        !t->isBlockaded() && (!(t->isSafe && t->isOccupied()))) {
+                    !t->isBlockaded() &&
+                    (!(t->isSafe && t->isOccupied()))) {
                     cout << "Found!" << endl; // TODO not tested in the slightest
                     return true;
                 }
             }
         }
     }
-
     return false;
 }

@@ -33,14 +33,15 @@ private:
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
-    void addPlayers(QPointer<QGridLayout> &layout);
+    std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
     void addDice(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     QString readRules();
-    QPointer<QGridLayout> createBoard();
+    std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
+    void play(const std::vector<Player> &players);
     bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
 //public slots:

@@ -136,8 +136,8 @@ void RectangleTile::paintEvent(QPaintEvent *event) {
     painter.drawRect(rect);
     painter.fillRect(rect, color);
 
-    stringstream numAsString;
-    numAsString << this->number;
-    painter.setFont(QFont("Arial", 10));
-    painter.drawText(10, 12, QString(numAsString.str().c_str()));
+//    stringstream numAsString;
+//    numAsString << this->number;
+//    painter.setFont(QFont("Arial", 10));
+//    painter.drawText(10, 12, QString(numAsString.str().c_str()));
 }

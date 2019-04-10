@@ -15,7 +15,10 @@ class Player {
 private:
     std::vector<QPointer<Pawn>> pawns;
 public:
+    Player() = default;
     explicit Player(std::vector<QPointer<Pawn>> pawns);
+
+    void addPawn(const QPointer<Pawn> &pawn);
 
     int numPawnsStart();
     int numPawnsHome();
