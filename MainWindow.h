@@ -29,6 +29,7 @@ Q_OBJECT
 
 private:
     QWidget *rulesWindow;
+    QWidget *menuWindow;
     QPointer<Board> board;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);

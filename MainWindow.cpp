@@ -31,6 +31,23 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     menuBar->addMenu(fileMenu);
     QPointer<QAction> gameplayInstructions = fileMenu->addAction("&Rules");
     gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
+    QPointer<QAction> gameMenu = fileMenu->addAction("&Menu");
+    gameMenu->setShortcut(Qt::CTRL + Qt::Key_M);
+
+
+    auto showMenu = [&]() {
+        menuWindow = new QWidget(this, Qt::Window);
+        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), menuWindow, SLOT(close()));
+
+        menuWindow->resize(780, 600);
+        menuWindow->setWindowTitle("Game Menu");
+
+        menuWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
+        menuWindow->setFixedSize(menuWindow->width(), menuWindow->height());
+        menuWindow->show();
+
+    };
+
 
     auto showRules = [&]() {
         rulesWindow = new QWidget(this, Qt::Window);
