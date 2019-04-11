@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     };
 
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showMenu);
+    connect(gameMenu, &QAction::triggered, this, showMenu);
+
 
     auto showRules = [&]() {
         rulesWindow = new QWidget(this, Qt::Window);
