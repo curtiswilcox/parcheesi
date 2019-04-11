@@ -5,15 +5,11 @@
 #ifndef PARCHEESI_TILE_H
 #define PARCHEESI_TILE_H
 
-#include <experimental/optional>
+#include <optional>
 #include <QEvent>
 #include <QPainter>
 #include <QWidget>
 #include "Pawn.h"
-
-
-using std::experimental::optional;
-using std::experimental::nullopt;
 
 ///////////////////////////////////////////////////////////////////////////
 // PlayerAddition enum declaration
@@ -42,7 +38,7 @@ public:
 
     explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
-    virtual optional<QPointer<Pawn>> getOccupyingPawn() const = 0;
+    virtual std::optional<QPointer<Pawn>> getOccupyingPawn() const = 0;
 
     inline bool isBlockaded() const { return hasBlockade; }
 
@@ -56,11 +52,11 @@ public:
 class StartTile : public Tile {
 Q_OBJECT
 private:
-    std::vector<optional<QPointer<Pawn>>> pawns;
+    std::vector<std::optional<QPointer<Pawn>>> pawns;
 public:
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
-    optional<QPointer<Pawn>> getOccupyingPawn() const override;
+    std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 
     void paintEvent(QPaintEvent *event) override;
 };
@@ -72,12 +68,12 @@ public:
 class HomeTile : public Tile {
 Q_OBJECT
 private:
-    std::vector<optional<QPointer<Pawn>>> pawns;
+    std::vector<std::optional<QPointer<Pawn>>> pawns;
 public:
     explicit HomeTile(const Dimensions &d, QWidget *parent = nullptr,
                       const Qt::GlobalColor &c = Qt::GlobalColor::white);
 
-    optional<QPointer<Pawn>> getOccupyingPawn() const override;
+    std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 
     void paintEvent(QPaintEvent *event) override;
 };
@@ -90,17 +86,17 @@ class RectangleTile : public Tile {
 Q_OBJECT
 private:
     const int number;
-    optional<QPointer<Pawn>> occupyingPawn = nullopt;
-    optional<QPointer<Pawn>> secondPawn = nullopt;
+    std::optional<QPointer<Pawn>> occupyingPawn = std::nullopt;
+    std::optional<QPointer<Pawn>> secondPawn = std::nullopt;
 public:
     explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
                            QWidget *parent = nullptr);
 
     PlayerAddition addPawn(const QPointer<Pawn> &pawn);
-    optional<QPointer<Pawn>> removePawn();
-    optional<QPointer<Pawn>> getOccupyingPawn() const override;
+    std::optional<QPointer<Pawn>> removePawn();
+    std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 
-    inline bool isOccupied() const { return this->getOccupyingPawn() != nullopt; }
+    inline bool isOccupied() const { return this->getOccupyingPawn() != std::nullopt; }
 
     inline int getNumber() { return this->number; }
 
