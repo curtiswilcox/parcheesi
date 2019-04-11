@@ -50,6 +50,8 @@ public:
     inline const PawnStatus &getStatus() const { return this->status; }
     inline const QColor &getColor() const { return this->color; }
 
+    inline void setStatus(PawnStatus status) { this->status = status; }
+
     void paintEvent(QPaintEvent *event) override;
 };
 

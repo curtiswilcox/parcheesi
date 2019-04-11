@@ -97,25 +97,37 @@ void HomeTile::paintEvent(QPaintEvent *event) {
 
 RectangleTile::RectangleTile(int counter, const Dimensions &d, const QColor &c, QWidget *parent) : number(counter), Tile(d, c, parent) {}
 
-bool RectangleTile::addPawn(const QPointer<Pawn> &pawn) {
-    if (!this->occupyingPawn) {
+PlayerAddition RectangleTile::addPawn(const QPointer<Pawn> &pawn) {
+    if (!this->occupyingPawn) { // tile is empty
         this->occupyingPawn = pawn;
-        return true;
-    } else if (!this->secondPawn && (*occupyingPawn)->getColor() == pawn->getColor()) {
-        this->secondPawn = pawn;
-        return true;
+        return SUCCESS;
     }
-    return false;
+
+    if (!this->secondPawn && (*occupyingPawn)->getColor() == pawn->getColor()) { // make a blockade
+        this->secondPawn = pawn;
+        this->hasBlockade = true;
+        return SUCCESS;
+    }
+
+    if (this->occupyingPawn && (*occupyingPawn)->getColor() != pawn->getColor()) { // capture current pawn
+        (*occupyingPawn)->setStatus(PawnStatus::START);
+        // TODO move the occupyingPawn back to its Start
+        occupyingPawn = pawn;
+        return CAPTURE;
+    }
+
+    return FAILURE;
 }
 
-optional<QPointer<Pawn>> RectangleTile::removePawn(const QPointer<Pawn> &pawn) {
+optional<QPointer<Pawn>> RectangleTile::removePawn() {
     if (this->secondPawn) {
-        QPointer<Pawn> toReturn = *this->secondPawn;
+        QPointer<Pawn> toReturn = *secondPawn;
         this->secondPawn = nullopt;
+        this->hasBlockade = false;
         return toReturn;
     }
     if (this->occupyingPawn) {
-        QPointer<Pawn> toReturn = *this->occupyingPawn;
+        QPointer<Pawn> toReturn = *occupyingPawn;
         this->occupyingPawn = nullopt;
         return toReturn;
     }

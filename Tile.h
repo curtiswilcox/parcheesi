@@ -16,6 +16,14 @@ using std::experimental::optional;
 using std::experimental::nullopt;
 
 ///////////////////////////////////////////////////////////////////////////
+// PlayerAddition enum declaration
+///////////////////////////////////////////////////////////////////////////
+
+enum PlayerAddition {
+    SUCCESS, FAILURE, CAPTURE
+};
+
+///////////////////////////////////////////////////////////////////////////
 // Tile class declaration
 ///////////////////////////////////////////////////////////////////////////
 
@@ -85,12 +93,15 @@ private:
     optional<QPointer<Pawn>> occupyingPawn = nullopt;
     optional<QPointer<Pawn>> secondPawn = nullopt;
 public:
-    explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+    explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
+                           QWidget *parent = nullptr);
 
-    bool addPawn(const QPointer<Pawn> &pawn);
-    optional<QPointer<Pawn>> removePawn(const QPointer<Pawn> &pawn);
+    PlayerAddition addPawn(const QPointer<Pawn> &pawn);
+    optional<QPointer<Pawn>> removePawn();
     optional<QPointer<Pawn>> getOccupyingPawn() const override;
+
     inline bool isOccupied() const { return this->getOccupyingPawn() != nullopt; }
+
     inline int getNumber() { return this->number; }
 
     void paintEvent(QPaintEvent *event) override;
