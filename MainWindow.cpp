@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->resize(780, 600);
     this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
     this->setFixedSize(this->width(), this->height());
-    this->setStyleSheet("background-color: black;");
+    this->setStyleSheet("background-color: black; color: white;");
     this->board = new Board(parent);
 
     QPointer<QMenuBar> menuBar = new QMenuBar(this);
