@@ -6,6 +6,7 @@
 #include <iostream>
 #include <QAction>
 #include <QLabel>
+#include <QPushButton>
 #include <QShortcut>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -48,38 +49,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         );
         rulesText->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
         rulesText->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
-        rulesText->setText(readRules() /* //                "<h1>Gameplay/Rules:</h1>\n\n"
-//                "<ul>"
-//                "<li>A player rolls the dice and must use the top die values shown to move their pieces around the board in one of the following ways:</li>\n"
-//                "<li>Only pieces not in the nest may move forward on the board.</li>\n"
-//                "<li>Pieces may only leave the nest with a roll of a five on a single die or the sum of the dice. A double five can be used to move two pieces from the nest simultaneously.</li>\n"
-//                "<li>In the case of a non-doubles roll, a player may move one or two pieces, either one piece by each of the numbers on the two dice or one piece by the total. If no move is possible, the turn is forfeited.</li>\n"
-//                "<li>When moving a single piece the total of two dice the turn is taken in increments, allowing pieces to be captured along the way. For example, if a double two is rolled and an opponent's piece lies on a cream space two spaces in front of the piece you wish to move the full four, you would move the piece two, and then two again, allowing the opponent's piece to be captured.</li>\n"
-//                "<li>All die rolls must be taken and may not be voluntarily forfeited by a player.</li>\n"
-//                "<li>If either of two rolls must be forfeited, the player must forfeit the lower number.</li>\n"
-//                "<li>All die moves must be taken before the application of any extra rewards for sending an opponent to their nest or moving a piece to its home position.</li>\n"
-//                "<li>With a roll of doubles, the player makes four moves, one for each of the numbers on top of the two dice and one for each of the numbers on the bottoms. The player may distribute these four moves among one, two, three, or four pieces. Note that the sum of numbers on the opposite sides of a die is always seven, so with doubles, there are a total of fourteen spaces to move. This can only be done if all four pieces are out of the nest.</li>\n"
-//                "<li>When the player rolls doubles, the player rolls again after moving.</li>\n"
-//                "<li>When a piece ends its move on the same space as an opponent's piece, the opponent's piece is sent back to its nest.</li>\n"
-//                "<li>A piece may not be placed on a safe space (generally colored light blue) if it is occupied by an opponent's piece. The exception is the safe space used when a piece leaves its nest — a single piece occupying such a safe space is sent back to its nest when an opponent's piece leaves the nest and occupies the space.</li>\n"
-//                "<li>A blockade is formed when two pieces of a single player occupy the same space. No piece of any player may move through a blockade, including pieces of the blockade owner. Blockade pieces may not be moved forward together with the roll of a double. Another player's piece cannot land in a space occupied by a blockade, even to leave its nest.</li>\n"
-//                "<li>A piece is not required to enter the home row and can pass the row and start another circuit of the board voluntarily or as the result of requirement of the use of the total die roll.</li>\n"
-//                "<li>A turn ends when the next player rolls the dice with the consent of the current player. Any rewards not taken are lost.</li>\n\n"
-//                "</ul>"
-//
-//                "<h1>Rewards:</h1>\n"
-//                "<ul>"
-//                "<li>The reward for sending an opponent's piece to the nest is a free move of twenty spaces that may not be split between pieces.</li>\n"
-//                "<li>The reward for landing a piece in the home space is a free move of ten spaces that may not be split between pieces.</li>\n\n"
-//                "</ul>"
-//
-//                "<h1>Winning:</h1>\n"
-//                "<ul>"
-//                "<li>Moving all four pieces to the home position wins the game.</li>\n"
-//                "<li>Pieces may only be moved to the home position with an exact application of the total roll, the value on a single die, or the complete application of a reward.</li>"
-//                "</ul>"
-//                "\n\n\n"
-//                "Rules courtesy of \"https://en.wikipedia.org/wiki/Parcheesi#Rules\"." */ );
+        rulesText->setText(readRules());
         rulesText->adjustSize();
         scroll->setWidget(rulesText);
         rulesWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
@@ -95,6 +65,19 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setLayout(layout);
 
     this->play(players);
+}
+
+MainWindow::~MainWindow() {
+    for (int i = 0; i < this->layout()->count(); ++i) {
+        auto item = this->layout()->itemAt(i);
+        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+            if (auto t = dynamic_cast<Die *>(widItem->widget())) {
+                this->layout()->removeWidget(t);
+                delete t;
+                t = nullptr;
+            }
+        }
+    }
 }
 
 QString MainWindow::readRules() {
@@ -287,10 +270,27 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
-    QPointer<Die> die = new Die(this);
+    Die *die = new Die(this);
     layout->addWidget(die, 0, 38, 6, 6);
-    QPointer<Die> secondDie = new Die(this);
+    Die *secondDie = new Die(this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
+
+    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
+    rollButton->setStyleSheet("background-color: white; color: black;");
+
+    auto rollDice = [&, this]() {
+//        cout << "First roll call" << endl;
+        die->roll();
+//        cout << "First roll call end" << endl;
+//        cout << "Second roll call" << endl;
+        secondDie->roll();
+//        cout << "Second roll call end" << endl;
+        this->repaint();
+        cout << "MW After Roll 1 " << ((int) *die) << endl;
+    };
+
+    connect(rollButton, &QPushButton::released, rollDice);
+    layout->addWidget(rollButton, 7, 38, 12, 3);
 }
 
 QColor MainWindow::getPathColor(int i) const {

@@ -16,6 +16,8 @@ public:
 
     void roll();
 
+    std::string test();
+
     int getValue();
 
     void paintEvent(QPaintEvent *event) override;
@@ -23,6 +25,16 @@ public:
     explicit operator int();
 
     friend bool operator==(const Die &lhs, const Die &rhs);
+
+    friend bool operator!=(const Die &lhs, const Die &rhs);
+
+    friend bool operator<=(const Die &lhs, const Die &rhs);
+
+    friend bool operator<(const Die &lhs, const Die &rhs);
+
+    friend bool operator>(const Die &lhs, const Die &rhs);
+
+    friend bool operator>=(const Die &lhs, const Die &rhs);
 };
 
 
