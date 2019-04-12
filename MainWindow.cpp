@@ -280,7 +280,7 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
     rollButton->setStyleSheet("background-color: white; color: black;");
 
-    connect(rollButton, &QPushButton::released, [&, this]() {
+    connect(rollButton, &QPushButton::released, [this]() {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
             if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
