@@ -40,6 +40,7 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     void play(const std::vector<Player> &players);
