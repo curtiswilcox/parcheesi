@@ -6,6 +6,7 @@
 #include <iostream>
 #include <QAction>
 #include <QLabel>
+#include <QPushButton>
 #include <QShortcut>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -64,6 +65,19 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setLayout(layout);
 
     this->play(players);
+}
+
+MainWindow::~MainWindow() {
+    for (int i = 0; i < this->layout()->count(); ++i) {
+        auto item = this->layout()->itemAt(i);
+        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+            if (auto t = dynamic_cast<Die *>(widItem->widget())) {
+                this->layout()->removeWidget(t);
+                delete t;
+                t = nullptr;
+            }
+        }
+    }
 }
 
 QString MainWindow::readRules() {
@@ -256,10 +270,27 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
-    QPointer<Die> die = new Die(this);
+    Die *die = new Die(this);
     layout->addWidget(die, 0, 38, 6, 6);
-    QPointer<Die> secondDie = new Die(this);
+    Die *secondDie = new Die(this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
+
+    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
+    rollButton->setStyleSheet("background-color: white; color: black;");
+
+    auto rollDice = [&, this]() {
+//        cout << "First roll call" << endl;
+        die->roll();
+//        cout << "First roll call end" << endl;
+//        cout << "Second roll call" << endl;
+        secondDie->roll();
+//        cout << "Second roll call end" << endl;
+        this->repaint();
+        cout << "MW After Roll 1 " << ((int) *die) << endl;
+    };
+
+    connect(rollButton, &QPushButton::released, rollDice);
+    layout->addWidget(rollButton, 7, 38, 12, 3);
 }
 
 QColor MainWindow::getPathColor(int i) const {
