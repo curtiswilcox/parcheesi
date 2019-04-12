@@ -31,7 +31,7 @@ void Die::paintEvent(QPaintEvent *event) {
     valueAsString << this->value;
     painter.setFont(QFont("Arial", 20));
     painter.setPen(QPen(GlobalColor::black));
-    painter.drawText(40, 50, QString(valueAsString.str().c_str()));
+    painter.drawText(40, 50, QString(value == 0 ? "-" : valueAsString.str().c_str()));
 //    painter.drawText(10, 12, QString::fromStdString(test()));
 //    cerr << "value: " << this->value << ", test(): " << test() << endl;
 }

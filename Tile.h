@@ -36,6 +36,8 @@ public:
 
     const QColor color;
 
+    explicit Tile(QWidget *parent = nullptr);
+
     explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     virtual std::optional<QPointer<Pawn>> getOccupyingPawn() const = 0;
@@ -89,6 +91,7 @@ private:
     std::optional<QPointer<Pawn>> occupyingPawn = std::nullopt;
     std::optional<QPointer<Pawn>> secondPawn = std::nullopt;
 public:
+    explicit RectangleTile(QWidget *parent = nullptr);
     explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
                            QWidget *parent = nullptr);
 

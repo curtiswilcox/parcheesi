@@ -15,6 +15,8 @@ using Qt::GlobalColor;
 // Tile methods
 ///////////////////////////////////////////////////////////////////////////
 
+Tile::Tile(QWidget *parent) : QWidget(parent), isSafe(false) {}
+
 Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c),
                                                                     isSafe(c == Qt::cyan) {}
 
@@ -94,6 +96,8 @@ void HomeTile::paintEvent(QPaintEvent *event) {
 ///////////////////////////////////////////////////////////////////////////
 // RectangleTile methods
 ///////////////////////////////////////////////////////////////////////////
+
+RectangleTile::RectangleTile(QWidget *parent) : number(-1), Tile(parent) {}
 
 RectangleTile::RectangleTile(int counter, const Dimensions &d, const QColor &c, QWidget *parent) : number(counter), Tile(d, c, parent) {}
 

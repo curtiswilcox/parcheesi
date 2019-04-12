@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
     this->setFixedSize(this->width(), this->height());
     this->setStyleSheet("background-color: black; color: white;");
-    this->board = new Board(parent);
+//    this->board = new Board(parent);
 
     QPointer<QMenuBar> menuBar = new QMenuBar(this);
     QPointer<QMenu> fileMenu = menuBar->addMenu("&Help");
@@ -103,6 +103,7 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addGeneralTiles(layout);
     vector<Player> players = addPawns(layout);
     addDice(layout);
+    addDialogueBox(layout);
 
     return players;
 }
@@ -271,28 +272,41 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     QPointer<Die> die = new Die(this);
-    die->roll();
+//    die->roll();
     layout->addWidget(die, 0, 38, 6, 6);
     QPointer<Die> secondDie = new Die(this);
-    secondDie->roll();
+//    secondDie->roll();
     layout->addWidget(secondDie, 0, 44, 6, 6);
 
     QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
     rollButton->setStyleSheet("background-color: white; color: black;");
 
-    connect(rollButton, &QPushButton::released, [this]() {
-        for (int i = 0; i < this->layout()->count(); ++i) {
-            auto item = this->layout()->itemAt(i);
-            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-                if (auto d = qobject_cast<Die *>(widItem->widget())) {
-                    d->roll();
-                    this->repaint();
-                }
+    connect(rollButton, &QPushButton::released, [&, this]() {
+        QPointer<Die> ignoreThis = new Die(this);
+        iterateThroughLayout(ignoreThis, [this](QWidgetItem *item) {
+            if (auto d = qobject_cast<Die *>(item->widget())) {
+                d->roll();
+                this->repaint();
             }
-        }
+        });
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
+}
+
+void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
+    QPointer<QLabel> label = new QLabel(this);
+
+    label->setWordWrap(true);
+    label->setContentsMargins(
+            5, label->contentsMargins().top(), 5, label->contentsMargins().bottom()
+    );
+    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
+    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
+
+    label->setText("Welcome!");
+    label->setStyleSheet("background-color: white; color: black;");
+    layout->addWidget(label, 10, 39, 28, 10);
 }
 
 
@@ -320,18 +334,32 @@ bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile,
     if (qobject_cast<HomeTile *>(tile)) return false;
     if (qobject_cast<StartTile *>(tile)) return spaces == 5;
 
-    for (int i = 0; i < this->layout()->count(); ++i) {
-        auto item = this->layout()->itemAt(i);
-        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-            if (auto t = dynamic_cast<RectangleTile *>(widItem->widget())) {
-                if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
-                    !t->isBlockaded() &&
-                    (!(t->isSafe && t->isOccupied()))) {
-                    cout << "Found!" << endl; // TODO not tested in the slightest
-                    return true;
-                }
+    QPointer<RectangleTile> ignoreThis = new RectangleTile(this);
+
+    bool found = false;
+    iterateThroughLayout(ignoreThis, [&](QWidgetItem *item) {
+        if (auto t = dynamic_cast<RectangleTile *>(item->widget())) {
+            if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+                !t->isBlockaded() &&
+                (!(t->isSafe && t->isOccupied()))) {
+                cout << "Found!" << endl; // TODO not tested in the slightest
+                found = true;
             }
         }
-    }
-    return false;
+    });
+
+//    for (int i = 0; i < this->layout()->count(); ++i) {
+//        auto item = this->layout()->itemAt(i);
+//        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+//            if (auto t = dynamic_cast<RectangleTile *>(widItem->widget())) {
+//                if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+//                    !t->isBlockaded() &&
+//                    (!(t->isSafe && t->isOccupied()))) {
+//                    cout << "Found!" << endl; // TODO not tested in the slightest
+//                    return true;
+//                }
+//            }
+//        }
+//    }
+    return found;
 }

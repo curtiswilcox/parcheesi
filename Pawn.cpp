@@ -23,6 +23,12 @@ void Dimensions::operator/=(int multiplier) {
     this->width *= ((double) 1 / multiplier);
 }
 
+void Dimensions::operator^=(int multiplier) {
+    int tmpHeight = height;
+    height = width;
+    width = tmpHeight;
+}
+
 #pragma clang diagnostic pop
 
 ///////////////////////////////////////////////////////////////////////////

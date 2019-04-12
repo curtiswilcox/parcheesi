@@ -17,7 +17,6 @@
 #include <QWidget>
 #include <QWindow>
 
-#include "Board.h"
 #include "Die.h"
 #include "Pawn.h"
 #include "Player.h"
@@ -29,12 +28,12 @@ Q_OBJECT
 
 private:
     QWidget *rulesWindow;
-    QPointer<Board> board;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
     void addDice(QPointer<QGridLayout> &layout);
+    void addDialogueBox(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
 
 public:
@@ -45,20 +44,18 @@ public:
     void play(const std::vector<Player> &players);
     bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
-//    template<typename T>
-//    void iteratorThroughLayout(T toCast, std::function<void(T*)> &func) {
-//        for (int i = 0; i < this->layout()->count(); ++i) {
-//            auto item = this->layout()->itemAt(i);
-//            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+    template<typename T>
+    void iterateThroughLayout(QPointer<T> toCast, std::function<void(QWidgetItem*)> func) {
+        for (int i = 0; i < this->layout()->count(); ++i) {
+            auto item = this->layout()->itemAt(i);
+            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+                func(widItem);
 //                if (auto t = qobject_cast<T *>(widItem->widget())) {
 //                    func(t);
 //                }
-//            }
-//        }
-//    }
-
-//public slots:
-//    std::unique_ptr<Window> showRules();
+            }
+        }
+    }
 };
 
 
