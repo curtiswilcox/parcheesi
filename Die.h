@@ -16,7 +16,7 @@ public:
 
     void roll();
 
-    std::string test();
+//    std::string test();
 
     int getValue();
 

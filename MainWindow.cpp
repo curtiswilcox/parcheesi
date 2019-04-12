@@ -87,18 +87,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->play(players);
 }
 
-MainWindow::~MainWindow() {
-    for (int i = 0; i < this->layout()->count(); ++i) {
-        auto item = this->layout()->itemAt(i);
-        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-            if (auto t = dynamic_cast<Die *>(widItem->widget())) {
-                this->layout()->removeWidget(t);
-                delete t;
-                t = nullptr;
-            }
-        }
-    }
-}
+//MainWindow::~MainWindow() {
+//    for (int i = 0; i < this->layout()->count(); ++i) {
+//        auto item = this->layout()->itemAt(i);
+//        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+//            if (auto t = dynamic_cast<Die *>(widItem->widget())) {
+//                this->layout()->removeWidget(t);
+//                delete t;
+//                t = nullptr;
+//            }
+//        }
+//    }
+//}
 
 QString MainWindow::readRules() {
     ifstream infile;
@@ -290,28 +290,31 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
-    Die *die = new Die(this);
+    QPointer<Die> die = new Die(this);
+    die->roll();
     layout->addWidget(die, 0, 38, 6, 6);
-    Die *secondDie = new Die(this);
+    QPointer<Die> secondDie = new Die(this);
+    secondDie->roll();
     layout->addWidget(secondDie, 0, 44, 6, 6);
 
     QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
     rollButton->setStyleSheet("background-color: white; color: black;");
 
-    auto rollDice = [&, this]() {
-//        cout << "First roll call" << endl;
-        die->roll();
-//        cout << "First roll call end" << endl;
-//        cout << "Second roll call" << endl;
-        secondDie->roll();
-//        cout << "Second roll call end" << endl;
-        this->repaint();
-        cout << "MW After Roll 1 " << ((int) *die) << endl;
-    };
+    connect(rollButton, &QPushButton::released, [this]() {
+        for (int i = 0; i < this->layout()->count(); ++i) {
+            auto item = this->layout()->itemAt(i);
+            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+                if (auto d = qobject_cast<Die *>(widItem->widget())) {
+                    d->roll();
+                    this->repaint();
+                }
+            }
+        }
+    });
 
-    connect(rollButton, &QPushButton::released, rollDice);
-    layout->addWidget(rollButton, 7, 38, 12, 3);
+    layout->addWidget(rollButton, 7, 39, 1, 10);
 }
+
 
 QColor MainWindow::getPathColor(int i) const {
     switch (i) {

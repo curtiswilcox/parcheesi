@@ -16,12 +16,13 @@ Die::Die(QWidget *parent) : QWidget(parent), value(0) {}
 
 void Die::roll() {
     this->value = arc4random() % 6 + 1;
-    cout << "After roll:" << this->value << endl;
+//    cout << "After roll:" << this->value << endl;
 }
 
 int Die::getValue() { return this->value; }
 
 void Die::paintEvent(QPaintEvent *event) {
+//    cout << "Die paintEvent!" << endl;
     QPainter painter(this);
     painter.setBrush(QBrush(QColor(GlobalColor::white)));
     painter.drawRect(0, 0, 90, 90);
@@ -30,22 +31,30 @@ void Die::paintEvent(QPaintEvent *event) {
     valueAsString << this->value;
     painter.setFont(QFont("Arial", 20));
     painter.setPen(QPen(GlobalColor::black));
-//    painter.drawText(10, 12, QString(valueAsString.str().c_str()));
-    painter.drawText(10, 12, QString::fromStdString(test()));
-    cerr << "value: " << this->value << ", vAS" << valueAsString.str() << endl;
+    painter.drawText(40, 50, QString(valueAsString.str().c_str()));
+//    painter.drawText(10, 12, QString::fromStdString(test()));
+//    cerr << "value: " << this->value << ", test(): " << test() << endl;
 }
 
-string Die::test() {
-    switch (value) {
-        case 1: return "one"; break;
-        case 2: return "two"; break;
-        case 3: return "three"; break;
-        case 4: return "four"; break;
-        case 5: return "five"; break;
-        case 6: return "six"; break;
-        default: return "problem";
-    }
-}
+//string Die::test() {
+//    cout << "test function value: " << value << endl;
+//    switch (value) {
+//        case 1:
+//            return "one";
+//        case 2:
+//            return "two";
+//        case 3:
+//            return "three";
+//        case 4:
+//            return "four";
+//        case 5:
+//            return "five";
+//        case 6:
+//            return "six";
+//        default:
+//            return "problem";
+//    }
+//}
 
 Die::operator int() { return this->value; }
 
