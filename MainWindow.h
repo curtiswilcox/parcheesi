@@ -6,6 +6,7 @@
 #define PARCHEESI_MAINWINDOW_H
 
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <QCoreApplication>
 #include <QDesktopWidget>
@@ -45,17 +46,17 @@ public:
     bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
     template<typename T>
-    void iterateThroughLayout(QPointer<T> toCast, std::function<void(QWidgetItem*)> func) {
+    void iterateThroughLayout(QPointer<T> toCast, const std::function<void(T *)> &func) {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
             if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-                func(widItem);
-//                if (auto t = qobject_cast<T *>(widItem->widget())) {
-//                    func(t);
-//                }
+                if (auto t = dynamic_cast<T *>(item->widget())) {
+                    func(t);
+                }
             }
         }
     }
+
 };
 
 

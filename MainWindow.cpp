@@ -257,16 +257,6 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     }
 
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
-
-    // pawns to test the placement on board pieces
-//    QPointer<Pawn> exPawn = new Pawn({10, 30}, QColor(0, 0, 153), this);
-//    layout->addWidget(exPawn, 16, 26, 1, 2);
-//
-//    QPointer<Pawn> exPawn2 = new Pawn({10, 20}, QColor(0, 0, 153), this);
-//    layout->addWidget(exPawn2, 16, 27, 1, 1);
-//
-//    QPointer<Pawn> exPawn3 = new Pawn({10, 30}, QColor(0, 0, 153), this);
-//    layout->addWidget(exPawn3, 17, 26, 1, 2);
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
@@ -282,12 +272,19 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
 
     connect(rollButton, &QPushButton::released, [&, this]() {
         QPointer<Die> ignoreThis = new Die(this);
-        iterateThroughLayout(ignoreThis, [this](QWidgetItem *item) {
-            if (auto d = qobject_cast<Die *>(item->widget())) {
-                d->roll();
-                this->repaint();
-            }
-        });
+
+        function<void(Die *)> lambda = [&](Die *die) {
+            die->roll();
+            this->repaint();
+        };
+        iterateThroughLayout(ignoreThis, lambda);
+
+//        iterateThroughLayout(ignoreThis, [this](QWidgetItem *item) {
+//            if (auto d = qobject_cast<Die *>(item->widget())) {
+//                d->roll();
+//                this->repaint();
+//            }
+//        });
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
@@ -336,16 +333,26 @@ bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile,
     QPointer<RectangleTile> ignoreThis = new RectangleTile(this);
 
     bool found = false;
-    iterateThroughLayout(ignoreThis, [&](QWidgetItem *item) {
-        if (auto t = dynamic_cast<RectangleTile *>(item->widget())) {
-            if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
-                !t->isBlockaded() &&
-                (!(t->isSafe && t->isOccupied()))) {
-                cout << "Found!" << endl; // TODO not tested in the slightest
-                found = true;
-            }
+//    iterateThroughLayout(ignoreThis, [&](QWidgetItem *item) {
+//        if (auto t = dynamic_cast<RectangleTile *>(item->widget())) {
+//            if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+//                !t->isBlockaded() &&
+//                (!(t->isSafe && t->isOccupied()))) {
+//                cout << "Found!" << endl; // TODO not tested in the slightest
+//                found = true;
+//            }
+//        }
+//    });
+
+    function<void(RectangleTile *)> lambda = [&](RectangleTile *rectangleTile) {
+        if ((rectangleTile->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+            !rectangleTile->isBlockaded() &&
+            (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) {
+            cout << "Found!" << endl; // TODO not tested in the slightest
+            found = true;
         }
-    });
+    };
+    iterateThroughLayout(ignoreThis, lambda);
 
 //    for (int i = 0; i < this->layout()->count(); ++i) {
 //        auto item = this->layout()->itemAt(i);
