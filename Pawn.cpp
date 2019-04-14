@@ -2,6 +2,8 @@
 // Created by Curtis Wilcox on 2019-04-05.
 //
 
+#include <iostream>
+
 #include "Pawn.h"
 
 using namespace std;
@@ -40,6 +42,10 @@ Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), colo
                                                ? 25 : c == Qt::GlobalColor::darkGreen
                                                ? 42 : 8),
                                                QWidget(parent) {
+}
+
+void Pawn::mouseReleaseEvent(QMouseEvent *event) {
+    cout << "Pressed Pawn color (" << color.red() << ", " << color.green() << ", " << color.blue() << ")!" << endl;
 }
 
 void Pawn::paintEvent(QPaintEvent *event) {
