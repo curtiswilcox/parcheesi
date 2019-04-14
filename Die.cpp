@@ -34,6 +34,9 @@ void Die::paintEvent(QPaintEvent *event) {
     painter.drawText(35, 55, QString(value == 0 ? "-" : valueAsString.str().c_str()));
 }
 
+int operator+(const Die &lhs, const Die &rhs) {
+    return lhs.value + rhs.value;
+}
 
 bool operator==(const Die &lhs, const Die &rhs) {
     return lhs.value == rhs.value;

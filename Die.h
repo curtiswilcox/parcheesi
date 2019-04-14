@@ -20,6 +20,8 @@ public:
 
     void paintEvent(QPaintEvent *event) override;
 
+    friend int operator+(const Die &lhs, const Die &rhs);
+
     friend bool operator==(const Die &lhs, const Die &rhs);
 
     friend bool operator!=(const Die &lhs, const Die &rhs);
