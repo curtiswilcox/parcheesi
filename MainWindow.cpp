@@ -7,6 +7,7 @@
 #include <QAction>
 #include <QLabel>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QShortcut>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -32,25 +33,25 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     menuBar->addMenu(fileMenu);
     QPointer<QAction> gameplayInstructions = fileMenu->addAction("&Rules");
     gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
-    QPointer<QAction> gameMenu = fileMenu->addAction("&Menu");
-    gameMenu->setShortcut(Qt::CTRL + Qt::Key_M);
+    QPointer<QAction> gameMenu = fileMenu->addAction("&New Game");
+    gameMenu->setShortcut(Qt::CTRL + Qt::Key_N);
 
 
-    auto showMenu = [&]() {
-        menuWindow = new QWidget(this, Qt::Window);
-        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), menuWindow, SLOT(close()));
+    auto newGame = [&]() {
+        startWindow = new QWidget(this, Qt::Window);
+        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), startWindow, SLOT(close()));
 
-        menuWindow->resize(780, 600);
-        menuWindow->setWindowTitle("Game Menu");
+        startWindow->resize(780, 600);
+        startWindow->setWindowTitle("Game Menu");
 
-        menuWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
-        menuWindow->setFixedSize(menuWindow->width(), menuWindow->height());
-        menuWindow->show();
+        startWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
+        startWindow->setFixedSize(startWindow->width(), startWindow->height());
+        startWindow->show();
 
     };
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showMenu);
-    connect(gameMenu, &QAction::triggered, this, showMenu);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, newGame);
+    connect(gameMenu, &QAction::triggered, this, newGame);
 
 
     auto showRules = [&]() {
@@ -118,6 +119,7 @@ QString MainWindow::readRules() {
 vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     layout->setSpacing(Tile::TILE_SPACING);
 
+    addStartMenu(layout);
     addStartTiles(layout);
     addHomeTiles(layout);
     addGeneralTiles(layout);
@@ -125,6 +127,28 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addDice(layout);
 
     return players;
+}
+
+void MainWindow::addStartMenu(QPointer<QGridLayout> &layout) {
+    QPointer<QRadioButton> colorRed = new QRadioButton("Red", this);
+    QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", this);
+    QPointer<QRadioButton> colorGreen = new QRadioButton("Green", this);
+    QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", this);
+    layout->addWidget(colorRed, 10, 39, 6, 6);
+    layout->addWidget(colorBlue, 12, 39, 6, 6);
+    layout->addWidget(colorGreen, 14, 39, 6, 6);
+    layout->addWidget(colorYellow, 16, 39, 6, 6);
+
+    QPointer<QPushButton> startButton = new QPushButton("Start Game", this);
+    startButton->setStyleSheet("background-color: white; color: black;");
+
+    layout->addWidget(startButton, 21, 39, 1, 10);
+
+// create start menu window (use code from rules window) - call in constructor
+// hide MainWindow (this->hide())
+// add the options
+// when user selects and starts game, "save" preferences to MW
+// close start menu and show MW
 }
 
 void MainWindow::addStartTiles(QPointer<QGridLayout> &layout) {
