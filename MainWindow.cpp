@@ -272,7 +272,8 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     rollButton->setStyleSheet("background-color: white; color: black;");
 
     connect(rollButton, &QPushButton::released, [&, this]() {
-        QPointer<Die> ignoreThis = new Die(this);
+//        QPointer<Die> ignoreThis = new Die(this);
+        Die ignoreThis;
 
         function<void(Die *)> lambda = [&](Die *die) {
             die->roll();
@@ -329,7 +330,8 @@ bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile,
     if (qobject_cast<HomeTile *>(tile)) return false;
     if (qobject_cast<StartTile *>(tile)) return spaces == 5;
 
-    QPointer<RectangleTile> ignoreThis = new RectangleTile(this);
+//    QPointer<RectangleTile> ignoreThis = new RectangleTile(this);
+    RectangleTile ignoreThis;
 
     bool found = false;
 //    iterateThroughLayout(ignoreThis, [&](QWidgetItem *item) {

@@ -46,7 +46,7 @@ public:
     bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
     template<typename T>
-    void iterateThroughLayout(QPointer<T> toCast, const std::function<void(T *)> &func) {
+    void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
             if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
