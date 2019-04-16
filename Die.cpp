@@ -16,13 +16,11 @@ Die::Die(QWidget *parent) : QWidget(parent), value(0) {}
 
 void Die::roll() {
     this->value = arc4random() % 6 + 1;
-//    cout << "After roll:" << this->value << endl;
 }
 
 int Die::getValue() { return this->value; }
 
 void Die::paintEvent(QPaintEvent *event) {
-//    cout << "Die paintEvent!" << endl;
     QPainter painter(this);
     painter.setBrush(QBrush(QColor(GlobalColor::white)));
     painter.drawRect(0, 0, 90, 90);
@@ -46,12 +44,12 @@ bool operator!=(const Die &lhs, const Die &rhs) {
     return !(lhs == rhs);
 }
 
-bool operator<=(const Die &lhs, const Die &rhs) {
-    return lhs < rhs || lhs == rhs;
-}
-
 bool operator<(const Die &lhs, const Die &rhs) {
     return lhs.value < rhs.value;
+}
+
+bool operator<=(const Die &lhs, const Die &rhs) {
+    return lhs < rhs || lhs == rhs;
 }
 
 bool operator>(const Die &lhs, const Die &rhs) {
