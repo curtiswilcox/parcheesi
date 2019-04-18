@@ -55,6 +55,10 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", startWindow);
         QPointer<QRadioButton> colorGreen = new QRadioButton("Green", startWindow);
         QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", startWindow);
+        colorChoice->addButton(colorRed, 1);
+        colorChoice->addButton(colorBlue, 2);
+        colorChoice->addButton(colorGreen, 3);
+        colorChoice->addButton(colorYellow, 4);
 
         QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
         numPlayers->setStyleSheet("background-color: white; color: black;");
@@ -62,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         numPlayers->setMaximum(4);
         numPlayers->setSingleStep(1);
         numPlayers->setValue(4);
-        int colorChoiceId = colorChoice->checkedId();
+
 
 
         QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
@@ -92,16 +96,17 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
 //        menuBox->setLayout(vbox);
         startWindow->setLayout(vbox);
 
-        connect(startButton, &QPushButton::released, this, [&, this]() {
+        connect(startButton, &QPushButton::released, this, [colorChoice, this]() {
             int val;
+            int colorChoiceId = colorChoice->checkedId();
             QSpinBox ignoreThis;
             function<void(QSpinBox *)> lambda = [&](QSpinBox *box) {
                 val = box->value();
                 cout << val << endl;
                 cout << colorChoiceId << endl;
             };
-            iterateThroughLayout(startWindow->layout(), ignoreThis, lambda);
 
+            iterateThroughLayout(startWindow->layout(), ignoreThis, lambda);
             settings.setValue("playerColor", colorChoiceId);
             settings.setValue("numPlayers", val);
             this->show();
