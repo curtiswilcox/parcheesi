@@ -15,6 +15,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPointer>
+#include <QSettings>
 #include <QWidget>
 #include <QWindow>
 
@@ -30,6 +31,7 @@ Q_OBJECT
 private:
     QWidget *rulesWindow;
     QWidget *startWindow;
+    QSettings settings;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
@@ -47,9 +49,9 @@ public:
     bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
     template<typename T>
-    void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
-        for (int i = 0; i < this->layout()->count(); ++i) {
-            auto item = this->layout()->itemAt(i);
+    void iterateThroughLayout(const QLayout *layout, const T &toCast, const std::function<void(T *)> &func) {
+        for (int i = 0; i < layout->count(); ++i) {
+            auto item = layout->itemAt(i);
             if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
                 if (auto t = dynamic_cast<T *>(item->widget())) {
                     func(t);

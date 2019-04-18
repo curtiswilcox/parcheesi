@@ -14,7 +14,6 @@
 #include <QVBoxLayout>
 #include <QShortcut>
 #include <QScrollArea>
-#include <QSettings>
 #include <QShortcut>
 #include <QSizePolicy>
 
@@ -23,9 +22,7 @@
 using namespace std;
 using Qt::GlobalColor;
 
-QSettings settings("CS205", "Parcheesi"); // NOLINT(cert-err58-cpp)
-
-MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Parcheesi") {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
     this->setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowTitle("Parcheesi");
@@ -51,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         startWindow->setWindowTitle("New Game of Parcheesi");
 
 
-        QPointer<QGroupBox> menuBox = new QGroupBox(startWindow);
+//        QPointer<QGroupBox> menuBox = new QGroupBox(startWindow);
 
         QPointer<QButtonGroup> colorChoice = new QButtonGroup(startWindow);
         QPointer<QRadioButton> colorRed = new QRadioButton("Red", startWindow);
@@ -60,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", startWindow);
 
         QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
+        numPlayers->setStyleSheet("background-color: white; color: black;");
         numPlayers->setMinimum(2);
         numPlayers->setMaximum(4);
         numPlayers->setSingleStep(1);
@@ -69,12 +67,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
         QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
         startButton->setStyleSheet("background-color: white; color: black;");
-        connect(startButton, &QPushButton::released, this, [&, this]() {
-            settings.setValue("playerColor", colorChoiceId);
-            settings.setValue("numPlayers", numPlayers->value());
-            this->show();
-            startWindow->destroy();
-        });
 
         QPointer<QButtonGroup> startGroup = new QButtonGroup(startWindow);
 
@@ -97,8 +89,24 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         vbox->addWidget(startButton);
         vbox->addStretch(1);
         vbox->setAlignment(Qt::AlignCenter);
-        menuBox->setLayout(vbox);
+//        menuBox->setLayout(vbox);
+        startWindow->setLayout(vbox);
 
+        connect(startButton, &QPushButton::released, this, [&, this]() {
+            int val;
+            QSpinBox ignoreThis;
+            function<void(QSpinBox *)> lambda = [&](QSpinBox *box) {
+                val = box->value();
+                cout << val << endl;
+                cout << colorChoiceId << endl;
+            };
+            iterateThroughLayout(startWindow->layout(), ignoreThis, lambda);
+
+            settings.setValue("playerColor", colorChoiceId);
+            settings.setValue("numPlayers", val);
+            this->show();
+            startWindow->hide();
+        });
 
         // create start menu window (use code from rules window) - call in constructor
         // hide MainWindow (this->hide())
@@ -368,7 +376,7 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
             die->roll();
             this->repaint();
         };
-        iterateThroughLayout(ignoreThis, lambda);
+        iterateThroughLayout(this->layout(), ignoreThis, lambda);
 
 //        iterateThroughLayout(ignoreThis, [this](QWidgetItem *item) {
 //            if (auto d = qobject_cast<Die *>(item->widget())) {
@@ -444,7 +452,7 @@ bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile,
         }
     };
 
-    iterateThroughLayout(ignoreThis, lambda);
+    iterateThroughLayout(this->layout(), ignoreThis, lambda);
 
 //    for (int i = 0; i < this->layout()->count(); ++i) {
 //        auto item = this->layout()->itemAt(i);
