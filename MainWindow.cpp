@@ -43,8 +43,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     gameMenu->setShortcut(Qt::CTRL + Qt::Key_N);
 
 
-    auto newGame = [&]() {
+    auto newGame = [&, this]() {
         startWindow = new QWidget(this, Qt::Window);
+        this->hide();
         new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), startWindow, SLOT(close()));
         startWindow->resize(780, 600);
         startWindow->setWindowTitle("New Game of Parcheesi");
@@ -59,14 +60,21 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", startWindow);
 
         QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
-        numPlayers->setMinimum(1);
+        numPlayers->setMinimum(2);
         numPlayers->setMaximum(4);
         numPlayers->setSingleStep(1);
         numPlayers->setValue(4);
+        int colorChoiceId = colorChoice->checkedId();
 
 
         QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
         startButton->setStyleSheet("background-color: white; color: black;");
+        connect(startButton, &QPushButton::released, this, [&, this]() {
+            settings.setValue("playerColor", colorChoiceId);
+            settings.setValue("numPlayers", numPlayers->value());
+            this->show();
+            startWindow->destroy();
+        });
 
         QPointer<QButtonGroup> startGroup = new QButtonGroup(startWindow);
 
@@ -104,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     };
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, newGame);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_N), this), &QShortcut::activated, newGame);
     connect(gameMenu, &QAction::triggered, this, newGame);
 
 
@@ -135,12 +143,16 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showRules);
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
+
     QPointer<QGridLayout> layout = new QGridLayout(this);
     vector<Player> players = createBoard(layout);
     this->setLayout(layout);
+//    this->hide();
+//    newGame();
 
-    this->play(players);
+//    this->play(players);
 }
+
 
 //MainWindow::~MainWindow() {
 //    for (int i = 0; i < this->layout()->count(); ++i) {
