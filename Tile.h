@@ -36,11 +36,15 @@ public:
 
     const QColor color;
 
+    explicit Tile(QWidget *parent = nullptr);
+
     explicit Tile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     virtual std::optional<QPointer<Pawn>> getOccupyingPawn() const = 0;
 
     inline bool isBlockaded() const { return hasBlockade; }
+
+    void mouseReleaseEvent(QMouseEvent *event) override = 0;
 
     void paintEvent(QPaintEvent *event) override = 0;
 };
@@ -57,6 +61,8 @@ public:
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
+
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
 };
@@ -75,6 +81,8 @@ public:
 
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
     void paintEvent(QPaintEvent *event) override;
 };
 
@@ -89,6 +97,7 @@ private:
     std::optional<QPointer<Pawn>> occupyingPawn = std::nullopt;
     std::optional<QPointer<Pawn>> secondPawn = std::nullopt;
 public:
+    explicit RectangleTile(QWidget *parent = nullptr);
     explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
                            QWidget *parent = nullptr);
 
@@ -99,6 +108,8 @@ public:
     inline bool isOccupied() const { return this->getOccupyingPawn() != std::nullopt; }
 
     inline int getNumber() { return this->number; }
+
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
 };

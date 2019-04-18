@@ -10,6 +10,8 @@
 #include <QRadioButton>
 #include <QShortcut>
 #include <QScrollArea>
+#include <QSettings>
+#include <QShortcut>
 #include <QSizePolicy>
 
 #include "MainWindow.h"
@@ -17,6 +19,7 @@
 using namespace std;
 using Qt::GlobalColor;
 
+QSettings settings("CS205", "Parcheesi"); // NOLINT(cert-err58-cpp)
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
@@ -26,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
     this->setFixedSize(this->width(), this->height());
     this->setStyleSheet("background-color: black; color: white;");
-    this->board = new Board(parent);
 
     QPointer<QMenuBar> menuBar = new QMenuBar(this);
     QPointer<QMenu> fileMenu = menuBar->addMenu("&Help");
@@ -146,6 +148,7 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addGeneralTiles(layout);
     vector<Player> players = addPawns(layout);
     addDice(layout);
+    addDialogueBox(layout);
 
     return players;
 }
@@ -235,24 +238,24 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 
                 switch (i) {
                     case 0:
-                        j == 0
-                        ? layout->addWidget(tile, (14 - (2 * k)), 10 * 2, 2, 2)
-                        : layout->addWidget(tile, k * 2, 8 * 2, 2, 2);
+                        j == 0 ?
+                        layout->addWidget(tile, (14 - (2 * k)), 10 * 2, 2, 2) :
+                        layout->addWidget(tile, k * 2, 8 * 2, 2, 2);
                         break;
                     case 1:
-                        j == 0
-                        ? layout->addWidget(tile, 8 * 2, (14 - (k * 2)), 2, 2)
-                        : layout->addWidget(tile, 10 * 2, k * 2, 2, 2);
+                        j == 0 ?
+                        layout->addWidget(tile, 8 * 2, (14 - (k * 2)), 2, 2) :
+                        layout->addWidget(tile, 10 * 2, k * 2, 2, 2);
                         break;
                     case 2:
-                        j == 0
-                        ? layout->addWidget(tile, (k + 11) * 2, 8 * 2, 2, 2)
-                        : layout->addWidget(tile, (14 + 4 - k) * 2, 10 * 2, 2, 2);
+                        j == 0 ?
+                        layout->addWidget(tile, (k + 11) * 2, 8 * 2, 2, 2) :
+                        layout->addWidget(tile, (14 + 4 - k) * 2, 10 * 2, 2, 2);
                         break;
                     case 3:
-                        j == 0
-                        ? layout->addWidget(tile, 10 * 2, (k + 11) * 2, 2, 2)
-                        : layout->addWidget(tile, 8 * 2, ((int) (14.5 * 2 - (k + 11)) * 2), 2, 2);
+                        j == 0 ?
+                        layout->addWidget(tile, 10 * 2, (k + 11) * 2, 2, 2) :
+                        layout->addWidget(tile, 8 * 2, ((int) (14.5 * 2 - (k + 11)) * 2), 2, 2);
                         break;
                     default:
                         break;
@@ -267,7 +270,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> blueOne = new Pawn({10, 20}, QColor(0, 0, 153), this);
-            layout->addWidget(blueOne, (i + 2) * 2, (j + 2) * 2, 8, 8);
+            layout->addWidget(blueOne, (i + 2) * 2, (j + 2) * 2, 1, 2);
             bluePlayer.addPawn(blueOne);
         }
     }
@@ -276,7 +279,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> redOne = new Pawn({10, 20}, QColor(153, 0, 0), this);
-            layout->addWidget(redOne, (i + 2) * 2, (j + 13) * 2, 12, 12);
+            layout->addWidget(redOne, (i + 2) * 2, (j + 13) * 2, 1, 2);
             redPlayer.addPawn(redOne);
         }
     }
@@ -285,7 +288,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> yellowOne = new Pawn({10, 20}, QColor(153, 153, 0), this);
-            layout->addWidget(yellowOne, (i + 13) * 2, (j + 2) * 2, 8, 8);
+            layout->addWidget(yellowOne, (i + 13) * 2, (j + 2) * 2, 1, 2);
             yellowPlayer.addPawn(yellowOne);
         }
     }
@@ -294,48 +297,56 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> greenOne = new Pawn({10, 20}, QColor(0, 102, 0), this);
-            layout->addWidget(greenOne, (i + 13) * 2, (j + 13) * 2, 8, 8);
+            layout->addWidget(greenOne, (i + 13) * 2, (j + 13) * 2, 1, 2);
             greenPlayer.addPawn(greenOne);
         }
     }
 
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
-
-    // pawns to test the placement on board pieces
-//    QPointer<Pawn> exPawn = new Pawn({10, 30}, QColor(0, 0, 153), this);
-//    layout->addWidget(exPawn, 16, 26, 1, 2);
-//
-//    QPointer<Pawn> exPawn2 = new Pawn({10, 20}, QColor(0, 0, 153), this);
-//    layout->addWidget(exPawn2, 16, 27, 1, 1);
-//
-//    QPointer<Pawn> exPawn3 = new Pawn({10, 30}, QColor(0, 0, 153), this);
-//    layout->addWidget(exPawn3, 17, 26, 1, 2);
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     QPointer<Die> die = new Die(this);
-    die->roll();
     layout->addWidget(die, 0, 38, 6, 6);
+
     QPointer<Die> secondDie = new Die(this);
-    secondDie->roll();
     layout->addWidget(secondDie, 0, 44, 6, 6);
 
     QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
     rollButton->setStyleSheet("background-color: white; color: black;");
 
-    connect(rollButton, &QPushButton::released, [this]() {
-        for (int i = 0; i < this->layout()->count(); ++i) {
-            auto item = this->layout()->itemAt(i);
-            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-                if (auto d = qobject_cast<Die *>(widItem->widget())) {
-                    d->roll();
-                    this->repaint();
-                }
-            }
-        }
+    connect(rollButton, &QPushButton::released, [&, this]() {
+//        QPointer<Die> ignoreThis = new Die(this);
+        Die ignoreThis;
+
+        function<void(Die *)> lambda = [&](Die *die) {
+            die->roll();
+            this->repaint();
+        };
+        iterateThroughLayout(ignoreThis, lambda);
+
+//        iterateThroughLayout(ignoreThis, [this](QWidgetItem *item) {
+//            if (auto d = qobject_cast<Die *>(item->widget())) {
+//                d->roll();
+//                this->repaint();
+//            }
+//        });
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
+}
+
+void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
+    QPointer<QLabel> label = new QLabel(this);
+
+    label->setWordWrap(true);
+    label->setContentsMargins(5, label->contentsMargins().top(), 5, label->contentsMargins().bottom());
+    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
+    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
+
+    label->setText("Welcome!");
+    label->setStyleSheet("background-color: white; color: black;");
+    layout->addWidget(label, 10, 39, 28, 10);
 }
 
 
@@ -363,18 +374,45 @@ bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile,
     if (qobject_cast<HomeTile *>(tile)) return false;
     if (qobject_cast<StartTile *>(tile)) return spaces == 5;
 
-    for (int i = 0; i < this->layout()->count(); ++i) {
-        auto item = this->layout()->itemAt(i);
-        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-            if (auto t = dynamic_cast<RectangleTile *>(widItem->widget())) {
-                if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
-                    !t->isBlockaded() &&
-                    (!(t->isSafe && t->isOccupied()))) {
-                    cout << "Found!" << endl; // TODO not tested in the slightest
-                    return true;
-                }
-            }
+//    QPointer<RectangleTile> ignoreThis = new RectangleTile(this);
+    RectangleTile ignoreThis;
+
+    bool found = false;
+//    iterateThroughLayout(ignoreThis, [&](QWidgetItem *item) {
+//        if (auto t = dynamic_cast<RectangleTile *>(item->widget())) {
+//            if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+//                !t->isBlockaded() &&
+//                (!(t->isSafe && t->isOccupied()))) {
+//                cout << "Found!" << endl; // TODO not tested in the slightest
+//                found = true;
+//            }
+//        }
+//    });
+
+    function<void(RectangleTile *)> lambda = [&](RectangleTile *rectangleTile) {
+        if ((rectangleTile->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+            !rectangleTile->isBlockaded() &&
+            (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) {
+
+            cout << "Found!" << endl; // TODO not tested in the slightest
+            found = true;
         }
-    }
-    return false;
+    };
+
+    iterateThroughLayout(ignoreThis, lambda);
+
+//    for (int i = 0; i < this->layout()->count(); ++i) {
+//        auto item = this->layout()->itemAt(i);
+//        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+//            if (auto t = dynamic_cast<RectangleTile *>(widItem->widget())) {
+//                if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+//                    !t->isBlockaded() &&
+//                    (!(t->isSafe && t->isOccupied()))) {
+//                    cout << "Found!" << endl; // TODO not tested in the slightest
+//                    return true;
+//                }
+//            }
+//        }
+//    }
+    return found;
 }

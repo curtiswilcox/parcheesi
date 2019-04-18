@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <QSettings>
 #include <sstream>
 
 #include "Tile.h"
@@ -14,6 +15,8 @@ using Qt::GlobalColor;
 ///////////////////////////////////////////////////////////////////////////
 // Tile methods
 ///////////////////////////////////////////////////////////////////////////
+
+Tile::Tile(QWidget *parent) : QWidget(parent), isSafe(false) {}
 
 Tile::Tile(const Dimensions &d, const QColor &c, QWidget *parent) : QWidget(parent), dimensions(d), color(c),
                                                                     isSafe(c == Qt::cyan) {}
@@ -33,6 +36,10 @@ optional<QPointer<Pawn>> StartTile::getOccupyingPawn() const {
         if (pawns[i]) return *pawns[i]; // return the last pawn in the vector that isn't nullopt
     }
     return nullopt;
+}
+
+void StartTile::mouseReleaseEvent(QMouseEvent *event) {
+    cout << "Clicked Start Tile color (" << color.red() << ", " << color.green() << ", " << color.blue() << ")!" << endl;
 }
 
 void StartTile::paintEvent(QPaintEvent *event) {
@@ -80,6 +87,10 @@ optional<QPointer<Pawn>> HomeTile::getOccupyingPawn() const {
     return nullopt;
 }
 
+void HomeTile::mouseReleaseEvent(QMouseEvent *event) {
+    cout << "Clicked Home Tile!" << endl;
+}
+
 void HomeTile::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     QRect rect;
@@ -94,6 +105,8 @@ void HomeTile::paintEvent(QPaintEvent *event) {
 ///////////////////////////////////////////////////////////////////////////
 // RectangleTile methods
 ///////////////////////////////////////////////////////////////////////////
+
+RectangleTile::RectangleTile(QWidget *parent) : number(-1), Tile(parent) {}
 
 RectangleTile::RectangleTile(int counter, const Dimensions &d, const QColor &c, QWidget *parent) : number(counter), Tile(d, c, parent) {}
 
@@ -138,6 +151,13 @@ optional<QPointer<Pawn>> RectangleTile::getOccupyingPawn() const {
     if (this->secondPawn) return *secondPawn;
     if (this->occupyingPawn) return *occupyingPawn;
     return nullopt;
+}
+
+void RectangleTile::mouseReleaseEvent(QMouseEvent *event) {
+    QSettings settings("CS205", "Parcheesi");
+//    cout << "Previous Rectangle Tile: " << settings.value("currentTileNumber", -2).toInt() << endl;
+//    cout << "Clicked Rectangle Tile #" << number << "!" << endl;
+    settings.setValue("currentTileNumber", number);
 }
 
 void RectangleTile::paintEvent(QPaintEvent *event) {

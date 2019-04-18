@@ -16,13 +16,11 @@ public:
 
     void roll();
 
-//    std::string test();
-
     int getValue();
 
     void paintEvent(QPaintEvent *event) override;
 
-    explicit operator int();
+    friend int operator+(const Die &lhs, const Die &rhs);
 
     friend bool operator==(const Die &lhs, const Die &rhs);
 

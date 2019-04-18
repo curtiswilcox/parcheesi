@@ -10,6 +10,7 @@
 #include <QPointer>
 #include <QWidget>
 
+
 ///////////////////////////////////////////////////////////////////////////
 // Dimensions struct declaration
 ///////////////////////////////////////////////////////////////////////////
@@ -20,6 +21,7 @@ struct Dimensions {
 
     void operator*=(double multiplier);
     void operator/=(int multiplier);
+    void operator^=(int multiplier);
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -51,6 +53,8 @@ public:
     inline const QColor &getColor() const { return this->color; }
 
     inline void setStatus(PawnStatus status) { this->status = status; }
+
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
 };

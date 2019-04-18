@@ -6,6 +6,7 @@
 #define PARCHEESI_MAINWINDOW_H
 
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <QCoreApplication>
 #include <QDesktopWidget>
@@ -17,7 +18,6 @@
 #include <QWidget>
 #include <QWindow>
 
-#include "Board.h"
 #include "Die.h"
 #include "Pawn.h"
 #include "Player.h"
@@ -30,13 +30,12 @@ Q_OBJECT
 private:
     QWidget *rulesWindow;
     QWidget *startWindow;
-    QPointer<Board> board;
-    void addStartMenu(QPointer<QGridLayout> &layout);
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
     void addDice(QPointer<QGridLayout> &layout);
+    void addDialogueBox(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
 
 public:
@@ -47,20 +46,18 @@ public:
     void play(const std::vector<Player> &players);
     bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
-//    template<typename T>
-//    void iteratorThroughLayout(T toCast, std::function<void(T*)> &func) {
-//        for (int i = 0; i < this->layout()->count(); ++i) {
-//            auto item = this->layout()->itemAt(i);
-//            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-//                if (auto t = qobject_cast<T *>(widItem->widget())) {
-//                    func(t);
-//                }
-//            }
-//        }
-//    }
+    template<typename T>
+    void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
+        for (int i = 0; i < this->layout()->count(); ++i) {
+            auto item = this->layout()->itemAt(i);
+            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+                if (auto t = dynamic_cast<T *>(item->widget())) {
+                    func(t);
+                }
+            }
+        }
+    }
 
-//public slots:
-//    std::unique_ptr<Window> showRules();
 };
 
 
