@@ -6,6 +6,8 @@
 #include <iostream>
 #include <QAction>
 #include <QLabel>
+#include <QGroupBox>
+#include <QButtonGroup>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QShortcut>
@@ -45,27 +47,30 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         startWindow->resize(780, 600);
         startWindow->setWindowTitle("New Game of Parcheesi");
 
-        QPointer<QGridLayout> startLayout = new QGridLayout(this);
 
-        QPointer<QRadioButton> colorRed = new QRadioButton("Red", this);
-        QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", this);
-        QPointer<QRadioButton> colorGreen = new QRadioButton("Green", this);
-        QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", this);
-        startLayout->addWidget(colorRed, 10, 39, 6, 6);
-        startLayout->addWidget(colorBlue, 12, 39, 6, 6);
-        startLayout->addWidget(colorGreen, 14, 39, 6, 6);
-        startLayout->addWidget(colorYellow, 16, 39, 6, 6);
+        QPointer<QGroupBox> menuBox = new QGroupBox(startWindow);
 
-        QPointer<QPushButton> startButton = new QPushButton("Start Game", this);
+        QPointer<QButtonGroup> colorChoice = new QButtonGroup(startWindow);
+        QPointer<QRadioButton> colorRed = new QRadioButton("Red", startWindow);
+        QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", startWindow);
+        QPointer<QRadioButton> colorGreen = new QRadioButton("Green", startWindow);
+        QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", startWindow);
+        colorChoice->addButton(colorRed, 1);
+        colorChoice->addButton(colorBlue, 2);
+        colorChoice->addButton(colorGreen, 3);
+        colorChoice->addButton(colorYellow, 4);
+
+        QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
         startButton->setStyleSheet("background-color: white; color: black;");
 
-        startLayout->addWidget(startButton, 21, 39, 1, 10);
+        QPointer<QButtonGroup> startGroup = new QButtonGroup(startWindow);
+        startGroup->addButton(startButton, 10);
 
         // create start menu window (use code from rules window) - call in constructor
-// hide MainWindow (this->hide())
-// add the options
-// when user selects and starts game, "save" preferences to MW
-// close start menu and show MW
+        // hide MainWindow (this->hide())
+        // add the options
+        // when user selects and starts game, "save" preferences to MW
+        // close start menu and show MW
 
         startWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
         startWindow->setFixedSize(startWindow->width(), startWindow->height());
@@ -149,6 +154,8 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     vector<Player> players = addPawns(layout);
     addDice(layout);
     addDialogueBox(layout);
+
+    this->hide();
 
     return players;
 }
