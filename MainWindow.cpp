@@ -10,6 +10,8 @@
 #include <QButtonGroup>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSpinBox>
+#include <QVBoxLayout>
 #include <QShortcut>
 #include <QScrollArea>
 #include <QSettings>
@@ -55,16 +57,40 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
         QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", startWindow);
         QPointer<QRadioButton> colorGreen = new QRadioButton("Green", startWindow);
         QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", startWindow);
-        colorChoice->addButton(colorRed, 1);
-        colorChoice->addButton(colorBlue, 2);
-        colorChoice->addButton(colorGreen, 3);
-        colorChoice->addButton(colorYellow, 4);
+
+        QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
+        numPlayers->setMinimum(1);
+        numPlayers->setMaximum(4);
+        numPlayers->setSingleStep(1);
+        numPlayers->setValue(4);
+
 
         QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
         startButton->setStyleSheet("background-color: white; color: black;");
 
         QPointer<QButtonGroup> startGroup = new QButtonGroup(startWindow);
-        startGroup->addButton(startButton, 10);
+
+        QPointer<QVBoxLayout> vbox = new QVBoxLayout(startWindow);
+        QPointer<QLabel> colorLabel = new QLabel(startWindow);
+        colorLabel->setText("Choose your color:");
+
+        QPointer<QLabel> playersLabel = new QLabel(startWindow);
+        playersLabel->setText("Choose your number of players:");
+
+        vbox->addWidget(colorLabel);
+        vbox->addWidget(colorRed);
+        vbox->addWidget(colorBlue);
+        vbox->addWidget(colorGreen);
+        vbox->addWidget(colorYellow);
+
+        vbox->addWidget(playersLabel);
+        vbox->addWidget(numPlayers);
+
+        vbox->addWidget(startButton);
+        vbox->addStretch(1);
+        vbox->setAlignment(Qt::AlignCenter);
+        menuBox->setLayout(vbox);
+
 
         // create start menu window (use code from rules window) - call in constructor
         // hide MainWindow (this->hide())
