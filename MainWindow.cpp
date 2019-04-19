@@ -225,7 +225,9 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player bluePlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> blueOne = new Pawn({10, 20}, QColor(0, 0, 153), this);
+            QPointer<Pawn> blueOne = new Pawn({10, 20}, StartTile::Blue_Start_Num, (2*i)+j, QColor(0, 0, 153), this);
+            // TODO set currentTileNum relative to id
+            settings.setValue(QString::fromStdString("blue" + to_string(blueOne->id)), StartTile::Blue_Start_Num);
             layout->addWidget(blueOne, (i + 2) * 2, (j + 2) * 2, 1, 2);
             bluePlayer.addPawn(blueOne);
         }
@@ -234,7 +236,8 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player redPlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> redOne = new Pawn({10, 20}, QColor(153, 0, 0), this);
+            QPointer<Pawn> redOne = new Pawn({10, 20}, StartTile::Red_Start_Num, (2*i)+j, QColor(153, 0, 0), this);
+            settings.setValue(QString::fromStdString("red" + to_string(redOne->id)), StartTile::Blue_Start_Num);
             layout->addWidget(redOne, (i + 2) * 2, (j + 13) * 2, 1, 2);
             redPlayer.addPawn(redOne);
         }
@@ -243,7 +246,8 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player yellowPlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> yellowOne = new Pawn({10, 20}, QColor(153, 153, 0), this);
+            QPointer<Pawn> yellowOne = new Pawn({10, 20}, StartTile::Yellow_Start_Num, (2*i)+j, QColor(153, 153, 0), this);
+            settings.setValue(QString::fromStdString("yellow" + to_string(yellowOne->id)), StartTile::Blue_Start_Num);
             layout->addWidget(yellowOne, (i + 13) * 2, (j + 2) * 2, 1, 2);
             yellowPlayer.addPawn(yellowOne);
         }
@@ -252,13 +256,20 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player greenPlayer;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> greenOne = new Pawn({10, 20}, QColor(0, 102, 0), this);
+            QPointer<Pawn> greenOne = new Pawn({10, 20}, StartTile::Green_Start_Num, (2*i)+j, QColor(0, 102, 0), this);
+            settings.setValue(QString::fromStdString("green" + to_string(greenOne->id)), StartTile::Blue_Start_Num);
             layout->addWidget(greenOne, (i + 13) * 2, (j + 13) * 2, 1, 2);
             greenPlayer.addPawn(greenOne);
         }
     }
 
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
+}
+
+void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
+    layout->removeWidget(pawn);
+    pawn->currentTileNum++;
+    layout->addWidget(pawn);
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
