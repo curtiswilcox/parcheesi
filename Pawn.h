@@ -44,8 +44,6 @@ private:
     PawnStatus status = START;
 
 public:
-    const int MAX_TILE;
-
     explicit Pawn(const Dimensions &d, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     inline const Dimensions &getDimensions() const { return this->dimensions; }

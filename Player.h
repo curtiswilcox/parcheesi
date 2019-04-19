@@ -14,11 +14,12 @@
 class Player {
 private:
     std::vector<QPointer<Pawn>> pawns;
+    std::string colorString;
 public:
     const QColor color;
+    const int MAX_TILE;
 
-    Player() = default;
-    explicit Player(QColor color);
+    explicit Player(const QColor &color);
     explicit Player(std::vector<QPointer<Pawn>> pawns);
 
     void addPawn(const QPointer<Pawn> &pawn);

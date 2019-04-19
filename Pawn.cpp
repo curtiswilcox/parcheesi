@@ -38,9 +38,6 @@ void Dimensions::operator^=(int multiplier) {
 ///////////////////////////////////////////////////////////////////////////
 
 Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
-            MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
-                                               ? 25 : c == Qt::GlobalColor::darkGreen
-                                               ? 42 : 8),
                                                QWidget(parent) {
 }
 

@@ -68,19 +68,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->play(players);
 }
 
-//MainWindow::~MainWindow() {
-//    for (int i = 0; i < this->layout()->count(); ++i) {
-//        auto item = this->layout()->itemAt(i);
-//        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-//            if (auto t = dynamic_cast<Die *>(widItem->widget())) {
-//                this->layout()->removeWidget(t);
-//                delete t;
-//                t = nullptr;
-//            }
-//        }
-//    }
-//}
-
 QString MainWindow::readRules() {
     ifstream infile;
     infile.open("../rules.txt");
@@ -137,25 +124,76 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 
     int tileCounter = 0;
     vector<int> safeNums = {3, 13, 20, 30, 37, 47, 54, 64}; // top right of home, widdershins
+
+    int lastRecTileNum = 67;
     for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 8; ++j) { // red "home" tiles
+        for (int j = 0; j < 8; ++j) { // "home stretch" tiles
 
             if ((i < 2 && j == 0) || (i >= 2 && j == 7)) continue; // skip safe spaces at end of home tiles
 
-            QPointer<Tile> tile = new RectangleTile(-1, i % 2 == 0 ? horizontal : vertical, getPathColor(i), this);
+            QPointer<Tile> tile = new RectangleTile(++lastRecTileNum, i % 2 == 0 ? horizontal : vertical, getPathColor(i), this);
 
             switch (i) {
                 case 0:
-                    layout->addWidget(tile, j * 2, 18, 2, 2);
+                    layout->addWidget(tile, j * 2, 18, 2, 2); // blue
                     break;
                 case 1:
-                    layout->addWidget(tile, 18, j * 2, 2, 2);
+                    layout->addWidget(tile, 18, j * 2, 2, 2); // yellow
                     break;
                 case 2:
-                    layout->addWidget(tile, (j + 11) * 2, 18, 2, 2);
+                    int use;
+                    switch (j) {
+                        case 0:
+                            use = 6;
+                            break;
+                        case 1:
+                            use = 5;
+                            break;
+                        case 2:
+                            use = 4;
+                            break;
+                        case 3:
+                            use = 3;
+                            break;
+                        case 4:
+                            use = 2;
+                            break;
+                        case 5:
+                            use = 1;
+                            break;
+                        case 6:
+                            use = 0;
+                            break;
+                        default: use = 0;
+                    }
+                    layout->addWidget(tile, (use + 11) * 2, 18, 2, 2); // green
                     break;
                 case 3:
-                    layout->addWidget(tile, 18, (j + 11) * 2, 2, 2);
+                    switch (j) {
+                        case 0:
+                            use = 6;
+                            break;
+                        case 1:
+                            use = 5;
+                            break;
+                        case 2:
+                            use = 4;
+                            break;
+                        case 3:
+                            use = 3;
+                            break;
+                        case 4:
+                            use = 2;
+                            break;
+                        case 5:
+                            use = 1;
+                            break;
+                        case 6:
+                            use = 0;
+                            break;
+                        default: use = 0;
+                    }
+                    layout->addWidget(tile, 18, (use + 11) * 2, 2, 2); // red
                     break;
                 default:
                     break;
@@ -222,7 +260,7 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 }
 
 vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
-    Player bluePlayer;
+    Player bluePlayer(QColor(0, 0, 153));
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> blueOne = new Pawn({10, 20}, QColor(0, 0, 153), this);
@@ -231,7 +269,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         }
     }
 
-    Player redPlayer;
+    Player redPlayer(QColor(153, 0, 0));
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> redOne = new Pawn({10, 20}, QColor(153, 0, 0), this);
@@ -240,7 +278,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         }
     }
 
-    Player yellowPlayer;
+    Player yellowPlayer(QColor(153, 153, 0));
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> yellowOne = new Pawn({10, 20}, QColor(153, 153, 0), this);
@@ -249,7 +287,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         }
     }
 
-    Player greenPlayer;
+    Player greenPlayer(QColor(0, 102, 0));
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             QPointer<Pawn> greenOne = new Pawn({10, 20}, QColor(0, 102, 0), this);
@@ -272,7 +310,6 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     rollButton->setStyleSheet("background-color: white; color: black;");
 
     connect(rollButton, &QPushButton::released, [&, this]() {
-//        QPointer<Die> ignoreThis = new Die(this);
         Die ignoreThis;
 
         function<void(Die *)> lambda = [&](Die *die) {
@@ -280,13 +317,6 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
             this->repaint();
         };
         iterateThroughLayout(ignoreThis, lambda);
-
-//        iterateThroughLayout(ignoreThis, [this](QWidgetItem *item) {
-//            if (auto d = qobject_cast<Die *>(item->widget())) {
-//                d->roll();
-//                this->repaint();
-//            }
-//        });
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
@@ -326,49 +356,44 @@ void MainWindow::play(const vector<Player> &players) {
 }
 
 
-bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces) {
-    if (qobject_cast<HomeTile *>(tile)) return false;
-    if (qobject_cast<StartTile *>(tile)) return spaces == 5;
+bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) {
+    if (qobject_cast<HomeTile *>(tile)) return !firstClick;
+    if (qobject_cast<StartTile *>(tile)) return firstClick && spaces == 5;
 
-//    QPointer<RectangleTile> ignoreThis = new RectangleTile(this);
     RectangleTile ignoreThis;
 
-    bool found = false;
-//    iterateThroughLayout(ignoreThis, [&](QWidgetItem *item) {
-//        if (auto t = dynamic_cast<RectangleTile *>(item->widget())) {
-//            if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
-//                !t->isBlockaded() &&
-//                (!(t->isSafe && t->isOccupied()))) {
-//                cout << "Found!" << endl; // TODO not tested in the slightest
-//                found = true;
-//            }
-//        }
-//    });
+    bool moveIsPossible = false;
 
-    function<void(RectangleTile *)> lambda = [&](RectangleTile *rectangleTile) {
-        if ((rectangleTile->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
+    // TODO still must add the getting to home row
+    // 67 is the max number of tiles that go around (not counting "home stretch" tiles)
+    function<void(RectangleTile *)> findMatchingTile = [&](RectangleTile *rectangleTile) {
+        int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
+        if ((rectangleTile->getNumber() <= 67 && rectangleTile->getNumber() == currentTileNum + spaces) &&
             !rectangleTile->isBlockaded() &&
-            (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) {
+            (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) { // end tile can be moved to
 
-            cout << "Found!" << endl; // TODO not tested in the slightest
-            found = true;
+            RectangleTile ignoreThis;
+            bool blockadePresent = false;
+            function<void(RectangleTile *)> findBlockades = [&](RectangleTile *recTile) {
+                if (recTile->getNumber() > currentTileNum && rectangleTile->getNumber() < currentTileNum + spaces) {
+                    if (!recTile->isBlockaded()) {
+                        blockadePresent = true;
+                    }
+                }
+            };
+            iterateThroughLayout(ignoreThis, findBlockades); // make sure tiles in between aren't blockaded
+
+            if (!blockadePresent) {
+                cout << "Found!" << endl; // TODO not tested in the slightest
+                moveIsPossible = true;
+            }
+        }
+        if (rectangleTile->getNumber() > 67) {
+
         }
     };
 
-    iterateThroughLayout(ignoreThis, lambda);
+    iterateThroughLayout(ignoreThis, findMatchingTile);
 
-//    for (int i = 0; i < this->layout()->count(); ++i) {
-//        auto item = this->layout()->itemAt(i);
-//        if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
-//            if (auto t = dynamic_cast<RectangleTile *>(widItem->widget())) {
-//                if ((t->getNumber() == qobject_cast<RectangleTile *>(tile)->getNumber() + spaces) &&
-//                    !t->isBlockaded() &&
-//                    (!(t->isSafe && t->isOccupied()))) {
-//                    cout << "Found!" << endl; // TODO not tested in the slightest
-//                    return true;
-//                }
-//            }
-//        }
-//    }
-    return found;
+    return moveIsPossible;
 }

@@ -43,7 +43,7 @@ public:
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     void play(const std::vector<Player> &players);
-    bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
+    bool canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
     template<typename T>
     void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
