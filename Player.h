@@ -22,6 +22,8 @@ public:
     explicit Player(const QColor &color);
     explicit Player(std::vector<QPointer<Pawn>> pawns);
 
+    std::string getColorString() const;
+
     void addPawn(const QPointer<Pawn> &pawn);
 
     int numPawnsStart() const;

@@ -33,6 +33,10 @@ void Player::addPawn(const QPointer<Pawn> &pawn) {
     this->pawns.push_back(pawn);
 }
 
+string Player::getColorString() const {
+    return this->colorString;
+}
+
 int Player::numPawnsStart() const {
     function<bool(int, QPointer<Pawn>)> lambda =
             [&](int total, const QPointer<Pawn> &pawn) { return pawn->getStatus() == PawnStatus::START; };

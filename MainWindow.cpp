@@ -131,7 +131,8 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 
             if ((i < 2 && j == 0) || (i >= 2 && j == 7)) continue; // skip safe spaces at end of home tiles
 
-            QPointer<Tile> tile = new RectangleTile(++lastRecTileNum, i % 2 == 0 ? horizontal : vertical, getPathColor(i), this);
+            QPointer<Tile> tile = new RectangleTile(++lastRecTileNum, i % 2 == 0 ? horizontal : vertical,
+                                                    getPathColor(i), this);
 
             switch (i) {
                 case 0:
@@ -164,7 +165,8 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                         case 6:
                             use = 0;
                             break;
-                        default: use = 0;
+                        default:
+                            use = 0;
                     }
                     layout->addWidget(tile, (use + 11) * 2, 18, 2, 2); // green
                     break;
@@ -191,7 +193,8 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                         case 6:
                             use = 0;
                             break;
-                        default: use = 0;
+                        default:
+                            use = 0;
                     }
                     layout->addWidget(tile, 18, (use + 11) * 2, 2, 2); // red
                     break;
@@ -368,7 +371,9 @@ bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPoi
     // 67 is the max number of tiles that go around (not counting "home stretch" tiles)
     function<void(RectangleTile *)> findMatchingTile = [&](RectangleTile *rectangleTile) {
         int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
-        if ((rectangleTile->getNumber() <= 67 && rectangleTile->getNumber() == currentTileNum + spaces) &&
+        if (((rectangleTile->getNumber() <= 67 && rectangleTile->getNumber() == currentTileNum + spaces) ||
+             (rectangleTile->getNumber() > 67 &&
+              rectangleTile->getNumber() == jump(currentTileNum, spaces, activePlayer))) &&
             !rectangleTile->isBlockaded() &&
             (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) { // end tile can be moved to
 
@@ -396,4 +401,20 @@ bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPoi
     iterateThroughLayout(ignoreThis, findMatchingTile);
 
     return moveIsPossible;
+}
+
+int MainWindow::jump(int startNum, int spaces, const Player &player) const {
+    if (startNum + spaces > player.MAX_TILE) {
+        if (player.getColorString() == "blue") {
+            return startNum + spaces + 60;
+        } else if (player.getColorString() == "red") {
+            return startNum + spaces + 30;
+        } else if (player.getColorString() == "yellow") {
+            return startNum + spaces + 50;
+        } else { // green
+            return startNum + spaces + 40;
+        }
+    } else {
+        return startNum + spaces;
+    }
 }

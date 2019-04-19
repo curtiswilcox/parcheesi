@@ -36,6 +36,7 @@ private:
     void addDice(QPointer<QGridLayout> &layout);
     void addDialogueBox(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
+    int jump(int startNum, int spaces, const Player &player) const;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
