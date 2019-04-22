@@ -64,8 +64,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     vector<Player> players = createBoard(layout);
     this->setLayout(layout);
-
-    this->play(players);
 }
 
 QString MainWindow::readRules() {
@@ -123,7 +121,7 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
     vertical *= 2;
 
     int tileCounter = 0;
-    vector<int> safeNums = {3, 13, 20, 30, 37, 47, 54, 64}; // top right of home, widdershins
+    vector<int> safeNums = {3, 13, 20, 30, 37, 47, 54, 64}; // starts top right of home, goes widdershins
 
     int lastRecTileNum = 67;
     for (int i = 0; i < 4; ++i) {
@@ -173,7 +171,7 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                 case 3:
                     switch (j) {
                         case 0:
-                            use = 6;
+                            use = 6; // because scope is special in switch statements
                             break;
                         case 1:
                             use = 5;
@@ -235,22 +233,22 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 
                 switch (i) {
                     case 0:
-                        j == 0 ?
+                        j == 0 ? // note the ternary
                         layout->addWidget(tile, (14 - (2 * k)), 10 * 2, 2, 2) :
                         layout->addWidget(tile, k * 2, 8 * 2, 2, 2);
                         break;
                     case 1:
-                        j == 0 ?
+                        j == 0 ? // note the ternary
                         layout->addWidget(tile, 8 * 2, (14 - (k * 2)), 2, 2) :
                         layout->addWidget(tile, 10 * 2, k * 2, 2, 2);
                         break;
                     case 2:
-                        j == 0 ?
+                        j == 0 ? // note the ternary
                         layout->addWidget(tile, (k + 11) * 2, 8 * 2, 2, 2) :
                         layout->addWidget(tile, (14 + 4 - k) * 2, 10 * 2, 2, 2);
                         break;
                     case 3:
-                        j == 0 ?
+                        j == 0 ? // note the ternary
                         layout->addWidget(tile, 10 * 2, (k + 11) * 2, 2, 2) :
                         layout->addWidget(tile, 8 * 2, ((int) (14.5 * 2 - (k + 11)) * 2), 2, 2);
                         break;
@@ -353,32 +351,38 @@ QColor MainWindow::getPathColor(int i) const {
     }
 }
 
-void MainWindow::play(const vector<Player> &players) {
+void MainWindow::play(const Player &player) {
 
 }
 
 
 bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) {
-    if (qobject_cast<HomeTile *>(tile)) return !firstClick;
-    if (qobject_cast<StartTile *>(tile)) return firstClick && spaces == 5;
+    int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
+
+    if (qobject_cast<HomeTile *>(tile)) {
+        return !firstClick && jump(currentTileNum, spaces, activePlayer) - 1 == activePlayer.MAX_TILE;
+    }
+    if (qobject_cast<StartTile *>(tile)) {
+        return firstClick && spaces == 5;
+    }
 
     bool moveIsPossible = false;
 
-    // TODO still must add the getting to home row
     // 67 is the max number of tiles that go around (not counting "home stretch" tiles)
     function<void(RectangleTile *)> findMatchingTile = [&](RectangleTile *rectangleTile) {
-        int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
         int endTileNum = rectangleTile->getNumber();
         if (((endTileNum <= 67 && endTileNum == currentTileNum + spaces) ||
-             (endTileNum > 67 &&
-              endTileNum == jump(currentTileNum, spaces, activePlayer))) &&
+             ((endTileNum > 67 &&
+               endTileNum == jump(currentTileNum, spaces, activePlayer)) ||
+              jump(currentTileNum, spaces, activePlayer) == activePlayer.MAX_TILE - 1)) &&
+            // TODO if the home button is clicked, its number is -1
             !rectangleTile->isBlockaded() &&
             (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) { // end tile can be moved to
 
             bool blockadePresent = false;
             function<void(RectangleTile *)> findBlockades = [&](RectangleTile *recTile) {
                 if (recTile->getNumber() > currentTileNum && endTileNum < currentTileNum + spaces) {
-                    if (!recTile->isBlockaded()) {
+                    if (recTile->isBlockaded()) { // TODO don't think this is tested for blockades on home stretch
                         blockadePresent = true;
                     }
                 }

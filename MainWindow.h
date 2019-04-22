@@ -42,7 +42,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
-    void play(const std::vector<Player> &players);
+    void play(const Player &player);
     bool canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
 //    template<typename T>

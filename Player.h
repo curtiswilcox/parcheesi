@@ -18,9 +18,9 @@ private:
 public:
     const QColor color;
     const int MAX_TILE;
+    const int START_TILE_NUM;
 
     explicit Player(const QColor &color);
-    explicit Player(std::vector<QPointer<Pawn>> pawns);
 
     std::string getColorString() const;
 
