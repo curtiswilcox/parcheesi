@@ -113,7 +113,7 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     cout << "locOne: x = " << get<0>(locOne) << ", y = " << get<1>(locOne) << endl;
     layout->addWidget(testPawn, get<0>(locOne), get<1>(locOne), 1, 2);
 
-    movePawn(layout, testPawn);
+    movePawn(layout, testPawn, "NormalTile66a");
 
     return players;
 }
@@ -324,10 +324,10 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
 }
 
-void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
+void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, string destination) {
     layout->removeWidget(pawn);
     pawn->currentTileNum++;
-    tuple<int, int> pawnLocationToMove = MainWindow::pawnLocations["NormalTile67b"];
+    tuple<int, int> pawnLocationToMove = MainWindow::pawnLocations[destination];
     layout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 2);
 }
 
