@@ -34,7 +34,7 @@ void Dimensions::operator^=(int multiplier) {
 
 #pragma clang diagnostic pop
 
-QSettings settings("CS205", "Parcheesi");
+
 
 ///////////////////////////////////////////////////////////////////////////
 // Pawn methods
@@ -50,16 +50,8 @@ Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, QColor c, QWidget *p
 }
 
 void Pawn::mouseReleaseEvent(QMouseEvent *event) {
-    cout << "Pressed Pawn color (" << color.red() << ", " << color.green() << ", " << color.blue() << ")!" << endl;
-    if (color.red() == 153 && color.green() == 153) {
-        team = "Yellow";
-    } else if (color.green() == 102) {
-        team = "Green";
-    } else if (color.blue() == 153) {
-        team = "Blue";
-    } else {
-        team = "Red";
-    }
+    QSettings settings("CS205", "Parcheesi");
+    cout << "Pressed ";
     cout << team << " number " << id << endl;
 }
 

@@ -97,10 +97,10 @@ public:
 class RectangleTile : public Tile {
 Q_OBJECT
 private:
-    const int number;
     std::optional<QPointer<Pawn>> occupyingPawn = std::nullopt;
     std::optional<QPointer<Pawn>> secondPawn = std::nullopt;
 public:
+    const int number;
     explicit RectangleTile(QWidget *parent = nullptr);
     explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
                            QWidget *parent = nullptr);
