@@ -41,7 +41,7 @@ private:
     QColor getPathColor(int i) const;
 
 public:
-    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, std::string destination);
+    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
     explicit MainWindow(QWidget *parent = nullptr);
 //    ~MainWindow();
     QString readRules();

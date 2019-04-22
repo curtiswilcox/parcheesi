@@ -113,7 +113,7 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     cout << "locOne: x = " << get<0>(locOne) << ", y = " << get<1>(locOne) << endl;
     layout->addWidget(testPawn, get<0>(locOne), get<1>(locOne), 1, 2);
 
-    movePawn(layout, testPawn, "NormalTile66a");
+    movePawn(layout, testPawn, 66, 'a');
 
     return players;
 }
@@ -324,10 +324,23 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
 }
 
-void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, string destination) {
+void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position) {
     layout->removeWidget(pawn);
-    pawn->currentTileNum++;
-    tuple<int, int> pawnLocationToMove = MainWindow::pawnLocations[destination];
+    pawn->currentTileNum = tileNum;
+    // find toTile type
+    string tileType;
+    if (tileNum >= 0 && tileNum <= 67) {
+        tileType = "NormalTile";
+    } else if (tileNum == -1) {
+        tileType = "BlueStart";
+    } else if (tileNum == -2) {
+        tileType = "GreenStart";
+    } else if (tileNum == -3) {
+        tileType = "RedStart";
+    } else if (tileNum == -4) {
+        tileType = "YellowStart";
+    }
+    tuple<int, int> pawnLocationToMove = MainWindow::pawnLocations[tileType + to_string(tileNum) + position];
     layout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 2);
 }
 
