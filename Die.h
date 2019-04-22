@@ -12,7 +12,9 @@ Q_OBJECT
 private:
     int value;
 public:
-    explicit Die(QWidget *parent = nullptr);
+    const std::string name;
+
+    explicit Die(const std::string& name, QWidget *parent = nullptr);
 
     void roll();
 

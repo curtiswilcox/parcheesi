@@ -64,6 +64,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     vector<Player> players = createBoard(layout);
     this->setLayout(layout);
+
+    this->play(players[0]);
+
+//    function<void(Pawn *)> lambda = [&](Pawn *pawn) {
+//        if (pawn->getColor() == QColor(0, 0, 153)) {
+//            this->layout()->removeWidget(pawn);
+//            qobject_cast<QGridLayout*>(this->layout())->addWidget(pawn, 10, 10, 1, 2);
+//            this->repaint();
+//        }
+//    };
+//    iterateThroughLayout(lambda)
+
 }
 
 QString MainWindow::readRules() {
@@ -301,10 +313,10 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
-    QPointer<Die> die = new Die(this);
+    QPointer<Die> die = new Die("first", this);
     layout->addWidget(die, 0, 38, 6, 6);
 
-    QPointer<Die> secondDie = new Die(this);
+    QPointer<Die> secondDie = new Die("second", this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
 
     QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
@@ -314,8 +326,8 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
         function<void(Die *)> lambda = [&](Die *die) {
             die->roll();
             this->repaint();
+            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
         };
-
         iterateThroughLayout(lambda);
     });
 
@@ -352,11 +364,15 @@ QColor MainWindow::getPathColor(int i) const {
 }
 
 void MainWindow::play(const Player &player) {
-
+    function<void(QLabel *)> lambda = [&, this](QLabel *info) {
+        info->setText(info->text() + "\nIt is " + toupper(player.getColorString()[0]) + QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
+        this->repaint();
+    };
+    iterateThroughLayout(lambda);
 }
 
 
-bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) {
+bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) const {
     int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
 
     if (qobject_cast<HomeTile *>(tile)) {
@@ -369,7 +385,7 @@ bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPoi
     bool moveIsPossible = false;
 
     // 67 is the max number of tiles that go around (not counting "home stretch" tiles)
-    function<void(RectangleTile *)> findMatchingTile = [&](RectangleTile *rectangleTile) {
+    function<void(const RectangleTile *)> findMatchingTile = [&](const RectangleTile *rectangleTile) {
         int endTileNum = rectangleTile->getNumber();
         if (((endTileNum <= 67 && endTileNum == currentTileNum + spaces) ||
              ((endTileNum > 67 &&
@@ -380,17 +396,21 @@ bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPoi
             (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) { // end tile can be moved to
 
             bool blockadePresent = false;
-            function<void(RectangleTile *)> findBlockades = [&](RectangleTile *recTile) {
-                if (recTile->getNumber() > currentTileNum && endTileNum < currentTileNum + spaces) {
-                    if (recTile->isBlockaded()) { // TODO don't think this is tested for blockades on home stretch
-                        blockadePresent = true;
-                    }
+            function<void(const RectangleTile *)> findBlockades = [&](const RectangleTile *recTile) {
+//                if (recTile->getNumber() > currentTileNum && endTileNum < currentTileNum + spaces) {
+//                    if (recTile->isBlockaded()) { // TODO don't think this is tested for blockades on home stretch, the lower one might fix it
+//                        blockadePresent = true;
+//                    }
+//                }
+                if ((endTileNum <= 67 && recTile->getNumber() > currentTileNum && endTileNum > currentTileNum + spaces) ||
+                        (endTileNum > 67 && recTile->getNumber() > jump(currentTileNum, spaces, activePlayer) && endTileNum > jump(currentTileNum, spaces, activePlayer))) {
+                    if (recTile->isBlockaded()) blockadePresent = true;
                 }
             };
             iterateThroughLayout(findBlockades); // make sure tiles in between aren't blockaded
 
             if (!blockadePresent) {
-                cout << "Found!" << endl; // TODO not tested in the slightest
+                cout << "Success!" << endl; // TODO not tested in the slightest
                 moveIsPossible = true;
             }
         }

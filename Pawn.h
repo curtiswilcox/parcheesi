@@ -46,7 +46,9 @@ public:
     explicit Pawn(const Dimensions &d, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     inline const Dimensions &getDimensions() const { return this->dimensions; }
+
     inline const PawnStatus &getStatus() const { return this->status; }
+
     inline const QColor &getColor() const { return this->color; }
 
     inline void setStatus(PawnStatus status) { this->status = status; }
@@ -54,6 +56,10 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
+
+    friend bool operator==(const Pawn &lhs, const Pawn &rhs);
+
+    friend bool operator!=(const Pawn &lhs, const Pawn &rhs);
 };
 
 #endif //PARCHEESI_PAWN_H

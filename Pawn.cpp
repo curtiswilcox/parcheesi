@@ -33,7 +33,7 @@ void Dimensions::operator/=(int multiplier) {
 ///////////////////////////////////////////////////////////////////////////
 
 Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
-                                               QWidget(parent) {
+                                                             QWidget(parent) {
 }
 
 void Pawn::mouseReleaseEvent(QMouseEvent *event) {
@@ -47,4 +47,12 @@ void Pawn::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(QBrush(Qt::black), 1));
     painter.drawRect(rect);
     painter.fillRect(rect, color);
+}
+
+bool operator==(const Pawn &lhs, const Pawn &rhs) {
+    return lhs.color == rhs.color; // also know position?
+}
+
+bool operator!=(const Pawn &lhs, const Pawn &rhs) {
+    return !(lhs == rhs);
 }
