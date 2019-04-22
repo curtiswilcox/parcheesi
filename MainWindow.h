@@ -40,14 +40,25 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-//    ~MainWindow();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     void play(const std::vector<Player> &players);
     bool canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
 
+//    template<typename T>
+//    void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
+//        for (int i = 0; i < this->layout()->count(); ++i) {
+//            auto item = this->layout()->itemAt(i);
+//            if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
+//                if (auto t = dynamic_cast<T *>(item->widget())) {
+//                    func(t);
+//                }
+//            }
+//        }
+//    }
+
     template<typename T>
-    void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
+    void iterateThroughLayout(const std::function<void(T *)> &func) {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
             if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
@@ -57,7 +68,6 @@ public:
             }
         }
     }
-
 };
 
 

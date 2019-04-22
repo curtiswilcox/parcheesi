@@ -313,13 +313,12 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     rollButton->setStyleSheet("background-color: white; color: black;");
 
     connect(rollButton, &QPushButton::released, [&, this]() {
-        Die ignoreThis;
-
         function<void(Die *)> lambda = [&](Die *die) {
             die->roll();
             this->repaint();
         };
-        iterateThroughLayout(ignoreThis, lambda);
+
+        iterateThroughLayout(lambda);
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
@@ -363,42 +362,37 @@ bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPoi
     if (qobject_cast<HomeTile *>(tile)) return !firstClick;
     if (qobject_cast<StartTile *>(tile)) return firstClick && spaces == 5;
 
-    RectangleTile ignoreThis;
-
     bool moveIsPossible = false;
 
     // TODO still must add the getting to home row
     // 67 is the max number of tiles that go around (not counting "home stretch" tiles)
     function<void(RectangleTile *)> findMatchingTile = [&](RectangleTile *rectangleTile) {
         int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
-        if (((rectangleTile->getNumber() <= 67 && rectangleTile->getNumber() == currentTileNum + spaces) ||
-             (rectangleTile->getNumber() > 67 &&
-              rectangleTile->getNumber() == jump(currentTileNum, spaces, activePlayer))) &&
+        int endTileNum = rectangleTile->getNumber();
+        if (((endTileNum <= 67 && endTileNum == currentTileNum + spaces) ||
+             (endTileNum > 67 &&
+              endTileNum == jump(currentTileNum, spaces, activePlayer))) &&
             !rectangleTile->isBlockaded() &&
             (!(rectangleTile->isSafe && rectangleTile->isOccupied()))) { // end tile can be moved to
 
-            RectangleTile ignoreThis;
             bool blockadePresent = false;
             function<void(RectangleTile *)> findBlockades = [&](RectangleTile *recTile) {
-                if (recTile->getNumber() > currentTileNum && rectangleTile->getNumber() < currentTileNum + spaces) {
+                if (recTile->getNumber() > currentTileNum && endTileNum < currentTileNum + spaces) {
                     if (!recTile->isBlockaded()) {
                         blockadePresent = true;
                     }
                 }
             };
-            iterateThroughLayout(ignoreThis, findBlockades); // make sure tiles in between aren't blockaded
+            iterateThroughLayout(findBlockades); // make sure tiles in between aren't blockaded
 
             if (!blockadePresent) {
                 cout << "Found!" << endl; // TODO not tested in the slightest
                 moveIsPossible = true;
             }
         }
-        if (rectangleTile->getNumber() > 67) {
-
-        }
     };
 
-    iterateThroughLayout(ignoreThis, findMatchingTile);
+    iterateThroughLayout(findMatchingTile);
 
     return moveIsPossible;
 }

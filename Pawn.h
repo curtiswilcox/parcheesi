@@ -21,7 +21,6 @@ struct Dimensions {
 
     void operator*=(double multiplier);
     void operator/=(int multiplier);
-    void operator^=(int multiplier);
 };
 
 ///////////////////////////////////////////////////////////////////////////
