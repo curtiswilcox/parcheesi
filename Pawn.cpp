@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <QSettings>
 
 #include "Pawn.h"
 
@@ -28,16 +29,33 @@ void Dimensions::operator/=(int multiplier) {
 
 #pragma clang diagnostic pop
 
+
+
 ///////////////////////////////////////////////////////////////////////////
 // Pawn methods
 ///////////////////////////////////////////////////////////////////////////
 
 Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
-                                                             QWidget(parent) {
+            MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
+                                               ? 25 : c == Qt::GlobalColor::darkGreen
+                                               ? 42 : 8),
+                                                             QWidget(parent) {}
+
+Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
+            MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
+                                               ? 25 : c == Qt::GlobalColor::darkGreen
+                                               ? 42 : 8),
+                                               currentTileNum(currentTileNum),
+                                               id(id),
+                                               QWidget(parent) {
+
 }
 
 void Pawn::mouseReleaseEvent(QMouseEvent *event) {
-    cout << "Pressed Pawn color (" << color.red() << ", " << color.green() << ", " << color.blue() << ")!" << endl;
+    QSettings settings("CS205", "Parcheesi");
+    cout << "Pressed ";
+    cout << team << " number " << id << endl;
+    this->lambda(this);
 }
 
 void Pawn::paintEvent(QPaintEvent *event) {

@@ -58,6 +58,10 @@ Q_OBJECT
 private:
     std::vector<std::optional<QPointer<Pawn>>> pawns;
 public:
+    static const int Blue_Start_Num = 12;
+    static const int Red_Start_Num = 63;
+    static const int Green_Start_Num = 46;
+    static const int Yellow_Start_Num = 29;
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
@@ -93,10 +97,10 @@ public:
 class RectangleTile : public Tile {
 Q_OBJECT
 private:
-    const int number;
     std::optional<QPointer<Pawn>> occupyingPawn = std::nullopt;
     std::optional<QPointer<Pawn>> secondPawn = std::nullopt;
 public:
+    const int number;
     explicit RectangleTile(QWidget *parent = nullptr);
     explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
                            QWidget *parent = nullptr);
