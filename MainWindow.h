@@ -8,6 +8,8 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <list>
+#include <tuple>
 #include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QGridLayout>
@@ -28,6 +30,7 @@ class MainWindow : public QWidget {
 Q_OBJECT
 
 private:
+    std::map<std::string, std::tuple<int, int>> pawnLocations;
     QWidget *rulesWindow;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTiles(QPointer<QGridLayout> &layout);
@@ -38,6 +41,8 @@ private:
     QColor getPathColor(int i) const;
 
 public:
+//    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
+    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
     explicit MainWindow(QWidget *parent = nullptr);
 //    ~MainWindow();
     QString readRules();
