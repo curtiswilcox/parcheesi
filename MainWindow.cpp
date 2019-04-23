@@ -337,7 +337,7 @@ void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
     this->layout()->removeWidget(pawn);
     string tileType = "NormalTile";
     //TODO if tile is occupied
-    pawn->currentTileNum++;
+    pawn->currentTileNum = (pawn->currentTileNum + 1)% 68;
     tuple<int, int> pawnLocationToMove = this->pawnLocations[tileType + to_string(pawn->currentTileNum) + "a"];
     auto gridLayout = dynamic_cast<QGridLayout*>(this->layout());
     gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 2);
