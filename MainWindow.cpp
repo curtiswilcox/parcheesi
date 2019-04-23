@@ -311,22 +311,20 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     case 3:
                         if (j == 0) {
                             layout->addWidget(tile, 10 * 2, (k + 11) * 2, 2, 2);
-                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] = make_tuple(10 * 2,
-                                                                                                          (k +
-                                                                                                           11) *
-                                                                                                          2);
-                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] = make_tuple(
-                                    10 * 2 + 1, (k + 11) * 2);
+
+                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] =
+                                    make_tuple(10 * 2, (k + 11) * 2);
+
+                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] =
+                                    make_tuple(10 * 2 + 1, (k + 11) * 2);
                         } else {
                             layout->addWidget(tile, 8 * 2, ((int) (14.5 * 2 - (k + 11)) * 2), 2, 2);
-                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] = make_tuple(8 * 2,
-                                                                                                          ((int) (14.5 *
-                                                                                                                  2 -
-                                                                                                                  (k +
-                                                                                                                   11)) *
-                                                                                                           2));
-                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] = make_tuple(
-                                    8 * 2 + 1, ((int) (14.5 * 2 - (k + 11)) * 2));
+
+                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] =
+                                    make_tuple(8 * 2, ((int) (14.5 * 2 - (k + 11)) * 2));
+
+                            this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] =
+                                    make_tuple(8 * 2 + 1, ((int) (14.5 * 2 - (k + 11)) * 2));
                         }
                         break;
                     default:
