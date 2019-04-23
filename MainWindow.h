@@ -43,7 +43,8 @@ private:
 
 public:
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
-    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
+//    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
+    void movePawn(QPointer<Pawn> &pawn);
     explicit MainWindow(QWidget *parent = nullptr);
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
