@@ -39,19 +39,19 @@ private:
     void addDice(QPointer<QGridLayout> &layout);
     void addDialogueBox(QPointer<QGridLayout> &layout);
     QColor getPathColor(int i) const;
+    int jump(int startNum, int spaces, const Player &player) const;
 
 public:
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
     void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
     explicit MainWindow(QWidget *parent = nullptr);
-//    ~MainWindow();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
-    void play(const std::vector<Player> &players);
-    bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces);
+    void play(const Player &player);
+    bool canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) const;
 
     template<typename T>
-    void iterateThroughLayout(const T &toCast, const std::function<void(T *)> &func) {
+    void iterateThroughLayout(const std::function<void(T *)> &func) const {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
             if (auto widItem = dynamic_cast<QWidgetItem *>(item)) {
@@ -61,7 +61,6 @@ public:
             }
         }
     }
-
 };
 
 

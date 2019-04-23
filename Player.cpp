@@ -13,12 +13,26 @@
 using namespace std;
 using Qt::GlobalColor;
 
-Player::Player(QColor color) : color(move(color)) {}
+Player::Player(const QColor &color) : color(color),
+                                      MAX_TILE((color == QColor(231, 0, 48)) ? 59 : color == GlobalColor::yellow
+                                                                                    ? 25 : color ==
+                                                                                           GlobalColor::darkGreen
+                                                                                           ? 42 : 8),
+                                      START_TILE_NUM(
+                                              MAX_TILE == 59 ? 95 : MAX_TILE == 25 ? 81 : MAX_TILE == 42 ? 88 : 74) {
+    if (this->color == QColor(0, 0, 153)) this->colorString = "blue";
+    else if (this->color == QColor(153, 0, 0)) this->colorString = "red";
+    else if (this->color == QColor(153, 153, 0)) this->colorString = "yellow";
+    else this->colorString = "green";
+}
 
-Player::Player(vector<QPointer<Pawn>> pawns) : pawns(move(pawns)) {}
 
 void Player::addPawn(const QPointer<Pawn> &pawn) {
     this->pawns.push_back(pawn);
+}
+
+string Player::getColorString() const {
+    return this->colorString;
 }
 
 int Player::numPawnsStart() const {

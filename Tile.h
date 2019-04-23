@@ -111,7 +111,7 @@ public:
 
     inline bool isOccupied() const { return this->getOccupyingPawn() != std::nullopt; }
 
-    inline int getNumber() { return this->number; }
+    inline int getNumber() const { return this->number; }
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 

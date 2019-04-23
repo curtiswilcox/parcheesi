@@ -26,11 +26,6 @@ void Dimensions::operator/=(int multiplier) {
     this->width *= ((double) 1 / multiplier);
 }
 
-void Dimensions::operator^=(int multiplier) {
-    int tmpHeight = height;
-    height = width;
-    width = tmpHeight;
-}
 
 #pragma clang diagnostic pop
 
@@ -40,6 +35,12 @@ void Dimensions::operator^=(int multiplier) {
 // Pawn methods
 ///////////////////////////////////////////////////////////////////////////
 
+Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
+            MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
+                                               ? 25 : c == Qt::GlobalColor::darkGreen
+                                               ? 42 : 8),
+                                                             QWidget(parent) {}
+
 Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
             MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
                                                ? 25 : c == Qt::GlobalColor::darkGreen
@@ -47,6 +48,7 @@ Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, QColor c, QWidget *p
                                                currentTileNum(currentTileNum),
                                                id(id),
                                                QWidget(parent) {
+
 }
 
 void Pawn::mouseReleaseEvent(QMouseEvent *event) {
@@ -63,4 +65,12 @@ void Pawn::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(QBrush(Qt::black), 1));
     painter.drawRect(rect);
     painter.fillRect(rect, color);
+}
+
+bool operator==(const Pawn &lhs, const Pawn &rhs) {
+    return lhs.color == rhs.color; // also know position?
+}
+
+bool operator!=(const Pawn &lhs, const Pawn &rhs) {
+    return !(lhs == rhs);
 }
