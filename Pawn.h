@@ -47,6 +47,7 @@ public:
     std::string team;
     int id;
     int currentTileNum;
+    std::function<void(QPointer<Pawn>)> lambda;
     const int MAX_TILE;
 
     explicit Pawn(const Dimensions &d, int currentTileNum, int id, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);

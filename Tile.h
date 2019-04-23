@@ -58,10 +58,10 @@ Q_OBJECT
 private:
     std::vector<std::optional<QPointer<Pawn>>> pawns;
 public:
-    static const int Blue_Start_Num = -1;
-    static const int Green_Start_Num = -2;
-    static const int Red_Start_Num = -3;
-    static const int Yellow_Start_Num = -4;
+    static const int Blue_Start_Num = 12;
+    static const int Red_Start_Num = 63;
+    static const int Green_Start_Num = 46;
+    static const int Yellow_Start_Num = 29;
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
