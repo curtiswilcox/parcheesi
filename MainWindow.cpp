@@ -231,23 +231,23 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                 switch (i) {
                     case 0:
                         layout->addWidget(tile, 0, 18, 2, 2); // 0, 18
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] = make_tuple(0, 18);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] = make_tuple(1, 18);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "a"] = make_tuple(0, 18);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "b"] = make_tuple(1, 18);
                         break;
                     case 1:
                         layout->addWidget(tile, 18, 0, 2, 2); // 18, 0
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] = make_tuple(18, 0);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] = make_tuple(19, 0);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "a"] = make_tuple(18, 0);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "b"] = make_tuple(19, 0);
                         break;
                     case 2:
                         layout->addWidget(tile, 36, 18, 2, 2); // 36, 18
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] = make_tuple(36, 18);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] = make_tuple(37, 18);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "a"] = make_tuple(36, 18);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "b"] = make_tuple(37, 18);
                         break;
                     case 3:
                         layout->addWidget(tile, 18, 36, 2, 2); // 18, 36
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "a"] = make_tuple(18, 36);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter) + "b"] = make_tuple(19, 36);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "a"] = make_tuple(18, 36);
+                        this->pawnLocations["NormalTile" + to_string(tileCounter-1) + "b"] = make_tuple(19, 36);
                         break;
                     default:
                         break;
