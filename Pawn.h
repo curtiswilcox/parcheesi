@@ -64,9 +64,9 @@ public:
 
     void paintEvent(QPaintEvent *event) override;
 
-    friend bool operator==(const Pawn &lhs, const Pawn &rhs);
+    inline friend bool operator==(const Pawn &lhs, const Pawn &rhs);
 
-    friend bool operator!=(const Pawn &lhs, const Pawn &rhs);
+    inline friend bool operator!=(const Pawn &lhs, const Pawn &rhs);
 };
 
 #endif //PARCHEESI_PAWN_H

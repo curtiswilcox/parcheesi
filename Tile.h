@@ -57,12 +57,15 @@ class StartTile : public Tile {
 Q_OBJECT
 private:
     std::vector<std::optional<QPointer<Pawn>>> pawns;
+    std::string colorString;
 public:
-    static const int Blue_Start_Num = 12;
-    static const int Red_Start_Num = 63;
-    static const int Green_Start_Num = 46;
-    static const int Yellow_Start_Num = 29;
+    static const int BLUE_START_NUM = 12;
+    static const int RED_START_NUM = 63;
+    static const int GREEN_START_NUM = 46;
+    static const int YELLOW_START_NUM = 29;
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+
+    inline std::string getColorString() { return this->colorString; }
 
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 

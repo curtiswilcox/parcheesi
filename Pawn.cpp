@@ -68,7 +68,7 @@ void Pawn::paintEvent(QPaintEvent *event) {
 }
 
 bool operator==(const Pawn &lhs, const Pawn &rhs) {
-    return lhs.color == rhs.color; // also know position?
+    return lhs.color == rhs.color && lhs.currentTileNum == rhs.currentTileNum; // also know position?
 }
 
 bool operator!=(const Pawn &lhs, const Pawn &rhs) {

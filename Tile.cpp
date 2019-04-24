@@ -29,6 +29,11 @@ StartTile::StartTile(const Dimensions &d, const QColor &c, QWidget *parent) : Ti
     for (int i = 0; i < 4; ++i) {
         pawns.emplace_back(nullopt);
     }
+
+    if (c == QColor(0, 143, 229)) this->colorString = "Blue";
+    else if (c == QColor(231, 0, 48)) colorString = "Red";
+    else if (c == GlobalColor::yellow) colorString = "Yellow";
+    else colorString = "Green";
 }
 
 optional<QPointer<Pawn>> StartTile::getOccupyingPawn() const {
@@ -156,7 +161,7 @@ optional<QPointer<Pawn>> RectangleTile::getOccupyingPawn() const {
 void RectangleTile::mouseReleaseEvent(QMouseEvent *event) {
     QSettings settings("CS205", "Parcheesi");
 //    cout << "Previous Rectangle Tile: " << settings.value("currentTileNumber", -2).toInt() << endl;
-    cout << "Clicked Rectangle Tile #" << number << "!" << endl;
+    cout << "Clicked Rectangle Tile #" << number << "! " << (this->isOccupied() ? "true" : "false") << endl;
     settings.setValue("currentTileNumber", number);
 }
 

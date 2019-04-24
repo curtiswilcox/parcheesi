@@ -40,7 +40,9 @@ private:
     void addDialogueBox(QPointer<QGridLayout> &layout);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
-    void movePawn(const QPointer<Pawn> &pawn);
+    void movePawn(const QPointer<Pawn> &pawn, bool backToStart = false);
+    inline void updateLabelText(const std::string &text) {this->updateLabelText(QString::fromStdString(text)); }
+    void updateLabelText(const QString &text);
     QColor getPathColor(int i) const;
     int jump(int startNum, int spaces, const Player &player) const;
 
