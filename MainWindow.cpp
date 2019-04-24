@@ -374,8 +374,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player yellowPlayer(QColor(153, 153, 0));
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            QPointer<Pawn> yellowOne = new Pawn({10, 10}, StartTile::Yellow_Start_Num, (2 * i) + j,
-                                                QColor(153, 153, 0),
+            QPointer<Pawn> yellowOne = new Pawn({10, 10}, StartTile::Yellow_Start_Num, (2 * i) + j, QColor(153, 153, 0),
                                                 this);
             yellowOne->team = "Yellow";
             this->pawnLocations["YellowStart" + to_string(yellowOne->id)] = make_tuple((i + 13) * 2, (j + 2) * 2);
@@ -404,18 +403,6 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     }
 
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
-}
-
-//void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position) {
-//void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
-void MainWindow::movePawn(QPointer<Pawn> &pawn) {
-    this->layout()->removeWidget(pawn);
-    string tileType = "NormalTile";
-    //TODO if tile is occupied
-    pawn->currentTileNum = (pawn->currentTileNum + 1) % 68;
-    tuple<int, int> pawnLocationToMove = this->pawnLocations[tileType + to_string(pawn->currentTileNum) + "a"];
-    auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
-    gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 2);
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
@@ -451,6 +438,19 @@ void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
     label->setText("Welcome!");
     label->setStyleSheet("background-color: white; color: black;");
     layout->addWidget(label, 10, 39, 28, 10);
+}
+
+
+//void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position) {
+//void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
+void MainWindow::movePawn(const QPointer<Pawn> &pawn) {
+    this->layout()->removeWidget(pawn);
+    string tileType = "NormalTile";
+    //TODO if tile is occupied
+    pawn->currentTileNum = (pawn->currentTileNum + 1) % 68;
+    tuple<int, int> pawnLocationToMove = this->pawnLocations[tileType + to_string(pawn->currentTileNum) + "a"];
+    auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
+    gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 2);
 }
 
 
