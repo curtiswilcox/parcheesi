@@ -348,14 +348,15 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int row = (i + 3) * 2;
             int column = (j + 3) * 2;
 
-            QPointer<Pawn> blueOne = new Pawn({10, 10}, StartTile::BLUE_START_NUM, (2 * i) + j, QColor(0, 0, 153),
+            QPointer<Pawn> blueOne = new Pawn({10, 10}, StartTile::BLUE_START_NUM, (2 * i) + j, "Blue", movePawnLambda,
+                                              QColor(0, 0, 153),
                                               this);
-            blueOne->team = "Blue";
+//            blueOne->team = "Blue";
             this->pawnLocations["BlueStart" + to_string(blueOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["BlueStart" + to_string(blueOne->id)];
             settings.setValue(QString::fromStdString("blue" + to_string(blueOne->id)), StartTile::BLUE_START_NUM);
             layout->addWidget(blueOne, row, column, 1, 2);
-            blueOne->lambda = movePawnLambda;
+//            blueOne->lambda = movePawnLambda;
             bluePlayer.addPawn(blueOne);
         }
     }
@@ -366,14 +367,15 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int row = (i + 3) * 2;
             int column = (j + 14) * 2;
 
-            QPointer<Pawn> redOne = new Pawn({10, 10}, StartTile::RED_START_NUM, (2 * i) + j, QColor(153, 0, 0),
+            QPointer<Pawn> redOne = new Pawn({10, 10}, StartTile::RED_START_NUM, (2 * i) + j, "Red", movePawnLambda,
+                                             QColor(153, 0, 0),
                                              this);
-            redOne->team = "Red";
+//            redOne->team = "Red";
             this->pawnLocations["RedStart" + to_string(redOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["RedStart" + to_string(redOne->id)];
             settings.setValue(QString::fromStdString("red" + to_string(redOne->id)), StartTile::RED_START_NUM);
             layout->addWidget(redOne, row, column, 1, 2);
-            redOne->lambda = movePawnLambda;
+//            redOne->lambda = movePawnLambda;
             redPlayer.addPawn(redOne);
         }
     }
@@ -384,15 +386,16 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int row = (i + 14) * 2;
             int column = (j + 3) * 2;
 
-            QPointer<Pawn> yellowOne = new Pawn({10, 10}, StartTile::YELLOW_START_NUM, (2 * i) + j, QColor(153, 153, 0),
+            QPointer<Pawn> yellowOne = new Pawn({10, 10}, StartTile::YELLOW_START_NUM, (2 * i) + j, "Yellow",
+                                                movePawnLambda, QColor(153, 153, 0),
                                                 this);
-            yellowOne->team = "Yellow";
+//            yellowOne->team = "Yellow";
             this->pawnLocations["YellowStart" + to_string(yellowOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["YellowStart" + to_string(yellowOne->id)];
             settings.setValue(QString::fromStdString("yellow" + to_string(yellowOne->id)),
                               StartTile::YELLOW_START_NUM);
             layout->addWidget(yellowOne, row, column, 1, 2);
-            yellowOne->lambda = movePawnLambda;
+//            yellowOne->lambda = movePawnLambda;
             yellowPlayer.addPawn(yellowOne);
         }
     }
@@ -403,14 +406,15 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int row = (i + 14) * 2;
             int column = (j + 14) * 2;
 
-            QPointer<Pawn> greenOne = new Pawn({10, 10}, StartTile::GREEN_START_NUM, (2 * i) + j, QColor(0, 102, 0),
+            QPointer<Pawn> greenOne = new Pawn({10, 10}, StartTile::GREEN_START_NUM, (2 * i) + j, "Green",
+                                               movePawnLambda, QColor(0, 102, 0),
                                                this);
-            greenOne->team = "Green";
+//            greenOne->team = "Green";
             this->pawnLocations["GreenStart" + to_string(greenOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["GreenStart" + to_string(greenOne->id)];
             settings.setValue(QString::fromStdString("green" + to_string(greenOne->id)), StartTile::GREEN_START_NUM);
             layout->addWidget(greenOne, row, column, 1, 2);
-            greenOne->lambda = movePawnLambda;
+//            greenOne->lambda = movePawnLambda;
             greenPlayer.addPawn(greenOne);
         }
     }
@@ -457,7 +461,7 @@ void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
 //void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position) {
 //void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
 void MainWindow::movePawn(const QPointer<Pawn> &pawn, bool backToStart) {
-    if (backToStart) { // TODO when pawn moves back to start, make sure the pawn knows about it
+    if (backToStart) {
         function<void(Tile *)> lambda = [&, this](Tile *tile) {
             if (auto start = dynamic_cast<StartTile *>(tile)) { // find the pawn's start tile
                 if (start->getColorString() == pawn->team) {
@@ -471,7 +475,7 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, bool backToStart) {
                         pawn->currentTileNum = StartTile::GREEN_START_NUM;
                     }
 
-                    string capitalizedTeam = (char) toupper(pawn->team[0]) + (pawn->team.erase(0, 1));
+                    string capitalizedTeam = (char) toupper(pawn->team[0]) + (string(pawn->team).erase(0, 1));
                     tuple<int, int> initialStart = this->pawnLocations[capitalizedTeam + "Start" + to_string(pawn->id)];
 //                    cout << get<0>(initialStart) << ", " << get<1>(initialStart) << endl;
                     this->layout()->removeWidget(pawn);

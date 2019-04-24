@@ -43,14 +43,16 @@ private:
     PawnStatus status = START;
 
 public:
-    std::string team;
+    const std::string team;
     int id;
     int currentTileNum;
-    std::function<void(QPointer<Pawn>)> lambda;
+    const std::function<void(QPointer<Pawn>)> lambda;
     const int MAX_TILE;
 
     explicit Pawn(const Dimensions &d, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
-    explicit Pawn(const Dimensions &d, int currentTileNum, int id, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+    explicit Pawn(const Dimensions &d, int currentTileNum, int id, const std::string &team,
+                  const std::function<void(QPointer<Pawn>)> &lambda, QColor c = Qt::GlobalColor::white,
+                  QWidget *parent = nullptr);
 
     inline const Dimensions &getDimensions() const { return this->dimensions; }
 

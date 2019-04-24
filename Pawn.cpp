@@ -41,12 +41,15 @@ Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), colo
                                                ? 42 : 8),
                                                              QWidget(parent) {}
 
-Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
+Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, const std::string &team,
+           const std::function<void(QPointer<Pawn>)> &lambda, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
             MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
                                                ? 25 : c == Qt::GlobalColor::darkGreen
                                                ? 42 : 8),
                                                currentTileNum(currentTileNum),
                                                id(id),
+                                               team(team),
+                                               lambda(lambda),
                                                QWidget(parent) {
 
 }
