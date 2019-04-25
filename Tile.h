@@ -57,12 +57,15 @@ class StartTile : public Tile {
 Q_OBJECT
 private:
     std::vector<std::optional<QPointer<Pawn>>> pawns;
+    std::string colorString;
 public:
-    static const int Blue_Start_Num = 12;
-    static const int Red_Start_Num = 63;
-    static const int Green_Start_Num = 46;
-    static const int Yellow_Start_Num = 29;
+    static const int BLUE_START_NUM = 2;
+    static const int RED_START_NUM = 53;
+    static const int GREEN_START_NUM = 36;
+    static const int YELLOW_START_NUM = 19; // TODO add 10 to all
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+
+    inline std::string getColorString() { return this->colorString; }
 
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 
@@ -111,7 +114,7 @@ public:
 
     inline bool isOccupied() const { return this->getOccupyingPawn() != std::nullopt; }
 
-    inline int getNumber() { return this->number; }
+    inline int getNumber() const { return this->number; }
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 

@@ -21,7 +21,6 @@ struct Dimensions {
 
     void operator*=(double multiplier);
     void operator/=(int multiplier);
-    void operator^=(int multiplier);
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -42,25 +41,38 @@ private:
     Dimensions dimensions = {0, 0};
     const QColor color;
     PawnStatus status = START;
-
+    bool passedZeroTile = true; // TODO false
 public:
-    std::string team;
+    const std::string team;
     int id;
     int currentTileNum;
-    std::function<void(QPointer<Pawn>)> lambda;
+    const std::function<void(QPointer<Pawn>)> lambda;
     const int MAX_TILE;
 
-    explicit Pawn(const Dimensions &d, int currentTileNum, int id, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+    explicit Pawn(const Dimensions &d, QColor c = Qt::GlobalColor::white, QWidget *parent = nullptr);
+    explicit Pawn(const Dimensions &d, int currentTileNum, int id, const std::string &team,
+                  const std::function<void(QPointer<Pawn>)> &lambda, QColor c = Qt::GlobalColor::white,
+                  QWidget *parent = nullptr);
 
     inline const Dimensions &getDimensions() const { return this->dimensions; }
+
     inline const PawnStatus &getStatus() const { return this->status; }
+
     inline const QColor &getColor() const { return this->color; }
 
+    inline bool hasPassedZeroTile() const { return this->passedZeroTile; }
+
     inline void setStatus(PawnStatus status) { this->status = status; }
+
+    inline void setPassedZeroTile(bool pass) { this->passedZeroTile = pass; }
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
+
+    inline friend bool operator==(const Pawn &lhs, const Pawn &rhs);
+
+    inline friend bool operator!=(const Pawn &lhs, const Pawn &rhs);
 };
 
 #endif //PARCHEESI_PAWN_H

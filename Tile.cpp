@@ -29,6 +29,11 @@ StartTile::StartTile(const Dimensions &d, const QColor &c, QWidget *parent) : Ti
     for (int i = 0; i < 4; ++i) {
         pawns.emplace_back(nullopt);
     }
+
+    if (c == QColor(0, 143, 229)) this->colorString = "Blue";
+    else if (c == QColor(231, 0, 48)) colorString = "Red";
+    else if (c == GlobalColor::yellow) colorString = "Yellow";
+    else colorString = "Green";
 }
 
 optional<QPointer<Pawn>> StartTile::getOccupyingPawn() const {
@@ -98,8 +103,8 @@ void HomeTile::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(QBrush(Qt::black), TILE_SPACING));
     painter.drawRect(rect);
     painter.fillRect(rect, {148, 0, 211});
-    painter.setFont(QFont("Arial", 30, 5));
-    painter.drawText(5, 55, "Home");
+    painter.setFont(QFont("Arial", 25, 5));
+    painter.drawText(10, 55, "Home");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -156,7 +161,7 @@ optional<QPointer<Pawn>> RectangleTile::getOccupyingPawn() const {
 void RectangleTile::mouseReleaseEvent(QMouseEvent *event) {
     QSettings settings("CS205", "Parcheesi");
 //    cout << "Previous Rectangle Tile: " << settings.value("currentTileNumber", -2).toInt() << endl;
-    cout << "Clicked Rectangle Tile #" << number << "!" << endl;
+    cout << "Clicked Rectangle Tile #" << number << "! " << (this->isOccupied() ? "O" : "Not o") << "ccupied." << endl;
     settings.setValue("currentTileNumber", number);
 }
 
