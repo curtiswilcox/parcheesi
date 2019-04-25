@@ -1,6 +1,3 @@
-#include <utility>
-
-
 //
 // Created by Curtis Wilcox on 2019-03-04.
 //
@@ -14,10 +11,10 @@ using namespace std;
 using Qt::GlobalColor;
 
 Player::Player(const QColor &color) : color(color),
-                                      MAX_TILE((color == QColor(231, 0, 48)) ? 59 : color == GlobalColor::yellow
-                                                                                    ? 25 : color ==
-                                                                                           GlobalColor::darkGreen
-                                                                                           ? 42 : 8),
+                                      MAX_TILE((color == QColor(153, 0, 0)) ? 59 : color == QColor(153, 153, 0)
+                                                                                   ? 25 : color ==
+                                                                                          QColor(0, 102, 0)
+                                                                                          ? 42 : 8),
                                       START_TILE_NUM(
                                               MAX_TILE == 59 ? 95 : MAX_TILE == 25 ? 81 : MAX_TILE == 42 ? 88 : 74) {
     if (this->color == QColor(0, 0, 153)) this->colorString = "blue";

@@ -33,17 +33,18 @@ private:
     std::map<std::string, std::tuple<int, int>> pawnLocations;
     QWidget *rulesWindow;
     void addStartTiles(QPointer<QGridLayout> &layout);
-    void addHomeTiles(QPointer<QGridLayout> &layout);
+    void addHomeTile(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
     void addDice(QPointer<QGridLayout> &layout);
     void addDialogueBox(QPointer<QGridLayout> &layout);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
-    void movePawn(const QPointer<Pawn> &pawn, bool backToStart = false);
+    void movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart = false);
     inline void updateLabelText(const std::string &text) {this->updateLabelText(QString::fromStdString(text)); }
     void updateLabelText(const QString &text);
     QColor getPathColor(int i) const;
+    int jump(const QPointer<Pawn> &pawn) const;
     int jump(int startNum, int spaces, const Player &player) const;
 
 public:
@@ -52,6 +53,7 @@ public:
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     void play(const Player &player);
     bool canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) const;
+    std::string tolower(const std::string &s) const;
 
     template<typename T>
     void iterateThroughLayout(const std::function<void(T *)> &func) const {

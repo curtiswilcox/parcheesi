@@ -41,7 +41,7 @@ private:
     Dimensions dimensions = {0, 0};
     const QColor color;
     PawnStatus status = START;
-
+    bool passedZeroTile = false;
 public:
     const std::string team;
     int id;
@@ -60,7 +60,11 @@ public:
 
     inline const QColor &getColor() const { return this->color; }
 
+    inline bool hasPassedZeroTile() const { return this->passedZeroTile; }
+
     inline void setStatus(PawnStatus status) { this->status = status; }
+
+    inline void setPassedZeroTile(bool pass) { this->passedZeroTile = pass; }
 
     void mouseReleaseEvent(QMouseEvent *event) override;
 
