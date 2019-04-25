@@ -103,8 +103,8 @@ void HomeTile::paintEvent(QPaintEvent *event) {
     painter.setPen(QPen(QBrush(Qt::black), TILE_SPACING));
     painter.drawRect(rect);
     painter.fillRect(rect, {148, 0, 211});
-    painter.setFont(QFont("Arial", 30, 5));
-    painter.drawText(5, 55, "Home");
+    painter.setFont(QFont("Arial", 25, 5));
+    painter.drawText(10, 55, "Home");
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -41,7 +41,7 @@ private:
     Dimensions dimensions = {0, 0};
     const QColor color;
     PawnStatus status = START;
-    bool passedZeroTile = false;
+    bool passedZeroTile = true; // TODO false
 public:
     const std::string team;
     int id;
