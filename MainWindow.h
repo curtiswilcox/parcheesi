@@ -46,6 +46,7 @@ private:
     QColor getPathColor(int i) const;
     int jump(const QPointer<Pawn> &pawn) const;
     int jump(int startNum, int spaces, const Player &player) const;
+    void cpuTurn(QPointer<QGridLayout> &layout, const Player &player);
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

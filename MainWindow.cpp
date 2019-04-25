@@ -718,6 +718,20 @@ int MainWindow::jump(int startNum, int spaces, const Player &player) const {
     }
 }
 
+void MainWindow::cpuTurn(QPointer<QGridLayout> &layout, const Player &player) {
+    string playerTeam = player.colorString;
+    vector<QPointer<Pawn>> playerPawns = player.pawns;
+
+    // TODO get the last dice roll
+    int dieOneValue = 3;
+    int dieTwoValue = 4;
+
+
+    // get the locations of all the player's pawns
+
+
+}
+
 string MainWindow::tolower(const std::string &s) const {
     string lowered;
     for (char c : s) {
