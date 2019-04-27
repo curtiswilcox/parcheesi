@@ -62,7 +62,7 @@ public:
     static const int BLUE_START_NUM = 2;
     static const int RED_START_NUM = 53;
     static const int GREEN_START_NUM = 36;
-    static const int YELLOW_START_NUM = 19; // TODO add 10 to all
+    static const int YELLOW_START_NUM = 19;
     explicit StartTile(const Dimensions &d, const QColor &c = Qt::GlobalColor::white, QWidget *parent = nullptr);
 
     inline std::string getColorString() { return this->colorString; }
