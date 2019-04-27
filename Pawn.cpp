@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by Curtis Wilcox on 2019-04-05.
 //
@@ -41,15 +43,15 @@ Pawn::Pawn(const Dimensions &d, QColor c, QWidget *parent) : dimensions(d), colo
                                                ? 42 : 8),
                                                              QWidget(parent) {}
 
-Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, const std::string &team,
-           const std::function<void(QPointer<Pawn>)> &lambda, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
-            MAX_TILE((c == QColor(231, 0, 48)) ? 59 : c == Qt::GlobalColor::yellow
-                                               ? 25 : c == Qt::GlobalColor::darkGreen
+Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, string team,
+           function<void(QPointer<Pawn>)> lambda, QColor c, QWidget *parent) : dimensions(d), color(std::move(c)),
+            MAX_TILE((c == QColor(153, 0, 0)) ? 59 : c == QColor(153, 153, 0)
+                                               ? 25 : c == QColor(0, 102, 0)
                                                ? 42 : 8),
                                                currentTileNum(currentTileNum),
                                                id(id),
-                                               team(team),
-                                               lambda(lambda),
+                                               team(std::move(team)),
+                                               lambda(std::move(lambda)),
                                                QWidget(parent) {
 
 }

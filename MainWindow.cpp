@@ -95,6 +95,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 QString MainWindow::readRules() {
     ifstream infile;
     infile.open("../rules.txt");
+    if (!infile.is_open()) {
+        infile.open("rules.txt");
+    }
     string rules;
 
     while (infile && !infile.eof()) {
@@ -140,25 +143,40 @@ void MainWindow::addStartTiles(QPointer<QGridLayout> &layout) {
 void MainWindow::addHomeTile(QPointer<QGridLayout> &layout) {
     QPointer<HomeTile> home = new HomeTile({240, 240}, this);
     layout->addWidget(home, 16, 16, 6, 6);
-    this->pawnLocations["HomeTileBlue0"] = make_tuple(16, 17);
-    this->pawnLocations["HomeTileBlue1"] = make_tuple(16, 18);
-    this->pawnLocations["HomeTileBlue2"] = make_tuple(16, 19);
-    this->pawnLocations["HomeTileBlue3"] = make_tuple(16, 20);
+    for (int i = 0; i < 4; ++i) {
+        this->pawnLocations["HomeTileBlue" + to_string(i)] = make_tuple(16, 17 + i);
+    }
 
-    this->pawnLocations["HomeTileRed0"] = make_tuple(17, 21);
-    this->pawnLocations["HomeTileRed1"] = make_tuple(18, 21);
-    this->pawnLocations["HomeTileRed2"] = make_tuple(19, 21);
-    this->pawnLocations["HomeTileRed3"] = make_tuple(20, 21);
+    for (int i = 0; i < 4; ++i) {
+        this->pawnLocations["HomeTileRed" + to_string(i)] = make_tuple(17 + i, 21);
+    }
 
-    this->pawnLocations["HomeTileYellow0"] = make_tuple(17, 16);
-    this->pawnLocations["HomeTileYellow1"] = make_tuple(18, 16);
-    this->pawnLocations["HomeTileYellow2"] = make_tuple(19, 16);
-    this->pawnLocations["HomeTileYellow3"] = make_tuple(20, 16);
+    for (int i = 0; i < 4; ++i) {
+        this->pawnLocations["HomeTileYellow" + to_string(i)] = make_tuple(17 + i, 16);
+    }
 
-    this->pawnLocations["HomeTileGreen0"] = make_tuple(21, 17);
-    this->pawnLocations["HomeTileGreen1"] = make_tuple(21, 18);
-    this->pawnLocations["HomeTileGreen2"] = make_tuple(21, 19);
-    this->pawnLocations["HomeTileGreen3"] = make_tuple(21, 20);
+    for (int i = 0; i < 4; ++i) {
+        this->pawnLocations["HomeTileGreen" + to_string(i)] = make_tuple(21, 17 + i);
+    }
+//    this->pawnLocations["HomeTileBlue0"] = make_tuple(16, 17);
+//    this->pawnLocations["HomeTileBlue1"] = make_tuple(16, 18);
+//    this->pawnLocations["HomeTileBlue2"] = make_tuple(16, 19);
+//    this->pawnLocations["HomeTileBlue3"] = make_tuple(16, 20);
+
+//    this->pawnLocations["HomeTileRed0"] = make_tuple(17, 21);
+//    this->pawnLocations["HomeTileRed1"] = make_tuple(18, 21);
+//    this->pawnLocations["HomeTileRed2"] = make_tuple(19, 21);
+//    this->pawnLocations["HomeTileRed3"] = make_tuple(20, 21);
+
+//    this->pawnLocations["HomeTileYellow0"] = make_tuple(17, 16);
+//    this->pawnLocations["HomeTileYellow1"] = make_tuple(18, 16);
+//    this->pawnLocations["HomeTileYellow2"] = make_tuple(19, 16);
+//    this->pawnLocations["HomeTileYellow3"] = make_tuple(20, 16);
+
+//    this->pawnLocations["HomeTileGreen0"] = make_tuple(21, 17);
+//    this->pawnLocations["HomeTileGreen1"] = make_tuple(21, 18);
+//    this->pawnLocations["HomeTileGreen2"] = make_tuple(21, 19);
+//    this->pawnLocations["HomeTileGreen3"] = make_tuple(21, 20);
 }
 
 void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
@@ -200,32 +218,7 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     break;
                 }
                 case 2: {
-                    int use;
-                    switch (j) {
-                        case 0:
-                            use = 6;
-                            break;
-                        case 1:
-                            use = 5;
-                            break;
-                        case 2:
-                            use = 4;
-                            break;
-                        case 3:
-                            use = 3;
-                            break;
-                        case 4:
-                            use = 2;
-                            break;
-                        case 5:
-                            use = 1;
-                            break;
-                        case 6:
-                            use = 0;
-                            break;
-                        default:
-                            use = 0;
-                    }
+                    int use = 6 - j;
                     int row = (use + 11) * 2;
                     int column = 18;
 
@@ -236,35 +229,10 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     break;
                 }
                 case 3: {
-                    int use;
-                    switch (j) {
-                        case 0:
-                            use = 6; // because scope is special in switch statements
-                            break;
-                        case 1:
-                            use = 5;
-                            break;
-                        case 2:
-                            use = 4;
-                            break;
-                        case 3:
-                            use = 3;
-                            break;
-                        case 4:
-                            use = 2;
-                            break;
-                        case 5:
-                            use = 1;
-                            break;
-                        case 6:
-                            use = 0;
-                            break;
-                        default:
-                            use = 0;
-                    }
-
+                    int use = 6 - j;
                     int row = 18;
                     int column = (use + 11) * 2;
+
                     layout->addWidget(tile, row, column, 2, 2); // red
                     this->pawnLocations["RedHome" + to_string(j) + "a"] = make_tuple(row, column);
                     this->pawnLocations["RedHome" + to_string(j) + "b"] = make_tuple(row + 1, column);
@@ -280,29 +248,22 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
             if (j == 1) {
                 QPointer<Tile> tile = new RectangleTile(tileCounter++, i % 2 == 0 ? horizontal : vertical,
                                                         GlobalColor::cyan, this);
-                switch (i) { // these are safe tiles around the edge (at the bottom of each "home stretch"
-                    case 0:
-                        layout->addWidget(tile, 0, 18, 2, 2); // 0, 18
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(0, 18);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(0 + 1, 18);
-                        break;
-                    case 1:
-                        layout->addWidget(tile, 18, 0, 2, 2); // 18, 0
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(18, 0);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(18 + 1, 0);
-                        break;
-                    case 2:
-                        layout->addWidget(tile, 36, 18, 2, 2); // 36, 18
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(36, 18);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(36 + 1, 18);
-                        break;
-                    case 3:
-                        layout->addWidget(tile, 18, 36, 2, 2); // 18, 36
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(18, 36);
-                        this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(18 + 1, 36);
-                        break;
-                    default:
-                        break;
+                if (i == 0) { // these are safe tiles around the edge (at the bottom of each "home stretch"
+                    layout->addWidget(tile, 0, 18, 2, 2); // 0, 18
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(0, 18);
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(0, 18 + 1);
+                } else if (i == 1) {
+                    layout->addWidget(tile, 18, 0, 2, 2); // 18, 0
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(18, 0);
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(18 + 1, 0);
+                } else if (i == 2) {
+                    layout->addWidget(tile, 36, 18, 2, 2); // 36, 18
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(36, 18);
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(36, 18 + 1);
+                } else if (i == 3) {
+                    layout->addWidget(tile, 18, 36, 2, 2); // 18, 36
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "a"] = make_tuple(18, 36);
+                    this->pawnLocations["NormalTile" + to_string(tileCounter - 1) + "b"] = make_tuple(18 + 1, 36);
                 }
             }
 
@@ -386,17 +347,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player greenPlayer(QColor(0, 102, 0), 3); // green
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
-//        cout << "moving" << endl;
-        if (tolower(pawn->team) == "blue") {
-            this->movePawn(pawn, 1,
-                           8); // accessing the constants from the Player instances isn't working for some reason
-        } else if (tolower(pawn->team) == "red") {
-            this->movePawn(pawn, 1, 59);
-        } else if (tolower(pawn->team) == "yellow") {
-            this->movePawn(pawn, 1, 25);
-        } else { // green
-            this->movePawn(pawn, 1, 42);
-        }
+        this->movePawn(pawn, 1, pawn->MAX_TILE);
     };
 
     for (int i = 0; i < 2; i++) {
@@ -576,8 +527,6 @@ void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
 }
 
 
-//void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position) {
-//void MainWindow::movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn) {
 void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart) {
     if (backToStart) {
         function<void(Tile *)> lambda = [&, this](Tile *tile) {
@@ -615,25 +564,25 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
     if (pawn->hasPassedZeroTile() && pawn->currentTileNum <= pawnMax && tileToMoveTo > pawnMax) {
         tileToMoveTo = (pawn->currentTileNum) + jump(pawn) + (spaces - (pawnMax - pawn->currentTileNum)) - 1;
         tileType = pawn->team + "Home";
-        cout << tileType << endl;
+      
+//        cout << tileType << endl;
 //        cerr << "first" << endl;
     } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
-               spaces < pawnMax + jump(pawn) + 7 - pawn->currentTileNum) { // seven home stretch tiles
+               pawn->currentTileNum + spaces < pawnMax + jump(pawn) + 7) { // seven home stretch tiles
 
         tileToMoveTo = (pawn->currentTileNum) + spaces;
         tileType = pawn->team + "Home";
+
 //        cerr << "second" << endl;
     } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
-               spaces == pawnMax + jump(pawn) + 7 - pawn->currentTileNum) { // home tile
+               pawn->currentTileNum + spaces == pawnMax + jump(pawn) + 7) { // home tile
 
-        tileToMoveTo = (pawn->currentTileNum) + spaces;
+//        tileToMoveTo = (pawn->currentTileNum) + spaces;
+        tileToMoveTo = -5; // because moving to the home tile
         tileType = "HomeTile";
-//        cerr << "third" << endl;
-    } else if (/*pawn->currentTileNum > pawnMax &&*/ spaces > pawnMax + jump(pawn) + 7 - pawn->currentTileNum - 1) {
-//        cerr << "fourth" << endl;
+    } else if (pawn->currentTileNum + spaces > pawnMax + jump(pawn) + 7) { // past the home tile
         return; // can't move up the home stretch
     } else {
-//        cerr << "fifth" << endl;
         tileType = "NormalTile";
     }
 
@@ -648,16 +597,35 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
                 nextTile = recTile;
             }
         } else if (auto homeTile = dynamic_cast<HomeTile *>(t)) {
-            if (pawn->currentTileNum == pawnMax + jump(pawn) + 6) { // currently on the last home stretch space
+            if (pawn->currentTileNum + spaces == pawnMax + jump(pawn) + 7) { // to get to the home tile
                 home = homeTile;
             }
         }
     };
     iterateThroughLayout(lambda);
 
+    bool bumpPlayerOffStart = nextTile ? (nextTile->isOccupied() && !nextTile->isBlockaded() &&
+                                          // determine if an incoming pawn can
+                                          (*nextTile->getOccupyingPawn())->team != pawn->team &&
+                                          // knock an enemy pawn off of its
+                                          ((nextTile->getNumber() - 1 == StartTile::BLUE_START_NUM && // first tile
+                                            tolower(pawn->team) == "blue") ||
+                                           (nextTile->getNumber() - 1 == StartTile::RED_START_NUM &&
+                                            tolower(pawn->team) == "red") ||
+                                           (nextTile->getNumber() - 1 == StartTile::YELLOW_START_NUM &&
+                                            tolower(pawn->team) == "yellow") ||
+                                           (nextTile->getNumber() - 1 == StartTile::GREEN_START_NUM &&
+                                            tolower(pawn->team) == "green")))
+
+                                       : false;
+
     if ((nextTile && (!nextTile->isOccupied() ||
-                      (nextTile->isOccupied() && (*nextTile->getOccupyingPawn())->team == pawn->team &&
-                       !nextTile->isBlockaded()))) || (home)) {
+
+                      (nextTile->isOccupied() &&
+                       (*nextTile->getOccupyingPawn())->team == pawn->team &&
+                       !nextTile->isBlockaded()) ||
+                      bumpPlayerOffStart)) || (home)) {
+
         this->layout()->removeWidget(pawn);
 
         pawn->currentTileNum = tileToMoveTo;
@@ -669,11 +637,11 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
 
         if (pawn->hasPassedZeroTile() && pawn->currentTileNum > pawnMax &&
             pawn->currentTileNum != pawnMax + jump(pawn) + 7) { // not the home tile
-            cout << tileType + to_string(nextTile->getNumber() - pawnMax - jump(pawn)) + aOrBPosition << endl;
+//            cout << tileType + to_string(nextTile->getNumber() - pawnMax - jump(pawn)) + aOrBPosition << endl;
             pawnLocationToMove = this->pawnLocations[
                     tileType + to_string(nextTile->getNumber() - pawnMax - jump(pawn)) + aOrBPosition
             ];
-        } else if (home /*pawn->hasPassedZeroTile() && pawn->currentTileNum == pawnMax + jump(pawn) + 7*/) { // get to home tile
+        } else if (home) { // get to home tile
             pawnLocationToMove = this->pawnLocations[tileType + pawn->team + to_string(pawn->id)];
         } else {
             pawnLocationToMove = this->pawnLocations[tileType + to_string(pawn->currentTileNum) + aOrBPosition];
@@ -681,12 +649,21 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
 
         auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
         gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 1);
+        if (bumpPlayerOffStart) {
+            QPointer<Pawn> occupyingPawn = *(nextTile->getOccupyingPawn());
+            movePawn(occupyingPawn, 0, pawnMax, true);
+            nextTile->removePawn(); // guaranteed to not be nullptr
+        }
+
         prevTile->removePawn();
         pawn->setStatus(PLAYING);
-        if (nextTile) {
+
+        if (nextTile && !home) {
             nextTile->addPawn(pawn);
         }
-    } else if (nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->isSafe) {
+    } else if ((nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->isSafe) ||
+               (nextTile && !nextTile->isBlockaded() && pawn->getStatus() == PawnStatus::START && bumpPlayerOffStart)) {
+
         this->layout()->removeWidget(pawn);
 
         pawn->currentTileNum = tileToMoveTo;
