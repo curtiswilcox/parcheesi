@@ -20,7 +20,8 @@ public:
     const int START_TILE_NUM;
     std::vector<QPointer<Pawn>> pawns;
     std::string colorString;
-    explicit Player(const QColor &color);
+    const int id;
+    explicit Player(const QColor &color, const int id);
 
     std::string getColorString() const;
 

@@ -65,23 +65,28 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
     QPointer<QGridLayout> layout = new QGridLayout(this);
-    vector<Player> players = createBoard(layout);
+    this->players = createBoard(layout);
     this->setLayout(layout);
+
+    settings.setValue("currentPlayer", players[0].color);
+//    for (int i = 0; i < 20; i++) {
+//        this->play(players[0]);
+//        this->play(players[1]);
+//        this->play(players[2]);
+//        this->play(players[3]);
+//    }
 }
 
-void MainWindow::mainLoop(QPointer<QGridLayout> &layout, vector<Player> players) {
-    settings.setValue("currentPlayer", players.at(0).color);
-    for (int i = 0; i < 50; i++) {
-        this->play(players[0]);
-        this->play(players[1]);
-        this->play(players[2]);
-        this->play(players[3]);
-    }
-}
+//void MainWindow::mainLoop(QPointer<QGridLayout> &layout, vector<Player> players) {
+//    settings.setValue("currentPlayer", players.at(0).color);
+//    for (int i = 0; i < 50; i++) {
+//        this->play(players[0]);
+//        this->play(players[1]);
+//        this->play(players[2]);
+//        this->play(players[3]);
+//    }
+//}
 
-vector<Player> getPlayers() {
-    return MainWindow::players;
-}
 
 
 #pragma clang diagnostic push
@@ -112,6 +117,7 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addGeneralTiles(layout);
     vector<Player> players = addPawns(layout);
     addDice(layout);
+    addNextButton(layout);
     addDialogueBox(layout);
 
     return players;
@@ -374,10 +380,10 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 }
 
 vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
-    Player bluePlayer(QColor(0, 0, 153)); // blue
-    Player redPlayer(QColor(153, 0, 0)); // red
-    Player yellowPlayer(QColor(153, 153, 0)); // yellow
-    Player greenPlayer(QColor(0, 102, 0)); // green
+    Player bluePlayer(QColor(0, 0, 153), 0); // blue
+    Player redPlayer(QColor(153, 0, 0), 1); // red
+    Player yellowPlayer(QColor(153, 153, 0), 2); // yellow
+    Player greenPlayer(QColor(0, 102, 0), 3); // green
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
 //        cout << "moving" << endl;
@@ -529,10 +535,28 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
             settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
         };
         iterateThroughLayout(rollDice);
-        // TODO cpuTurn(players.at(settings.value("currentPlayer")));
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
+}
+
+void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
+    QPointer<QPushButton> nextButton = new QPushButton("Next turn", this);
+    nextButton->setStyleSheet("background-color: white; color: black;");
+
+    connect(nextButton, &QPushButton::released, [&, this]() {
+        int currId;
+        for (const Player &player : this->players) {
+            if (player.color == settings.value("currentPlayer").value<QColor>()) {
+                this->play(player);
+                currId = player.id;
+            }
+        }
+        settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
+
+    });
+
+    layout->addWidget(nextButton, 9, 39, 1, 10);
 }
 
 void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
@@ -587,7 +611,7 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
     if (pawn->currentTileNum + spaces > 67) pawn->setPassedZeroTile(true);
 
     string tileType;
-    cout << pawn->currentTileNum << ", " << pawnMax << ", " << tileToMoveTo << endl;
+    cout << "Moving " << *pawn << " from " << pawn->currentTileNum << " to " << tileToMoveTo << endl;
     if (pawn->hasPassedZeroTile() && pawn->currentTileNum <= pawnMax && tileToMoveTo > pawnMax) {
         tileToMoveTo = (pawn->currentTileNum) + jump(pawn) + (spaces - (pawnMax - pawn->currentTileNum)) - 1;
         tileType = pawn->team + "Home";
@@ -658,6 +682,7 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
         auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
         gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 1);
         prevTile->removePawn();
+        pawn->setStatus(PLAYING);
         if (nextTile) {
             nextTile->addPawn(pawn);
         }
@@ -686,6 +711,10 @@ void MainWindow::updateLabelText(const QString &text) {
     iterateThroughLayout(lambda);
 }
 
+void MainWindow::updateScroll() {
+
+}
+
 
 QColor MainWindow::getPathColor(int i) const {
     switch (i) {
@@ -705,6 +734,7 @@ QColor MainWindow::getPathColor(int i) const {
 void MainWindow::play(const Player &player) {
     this->updateLabelText("It is " + QString(std::toupper(player.getColorString()[0])) +
                           QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
+//    this->updateScroll();
     cpuTurn(player);
 }
 
@@ -852,7 +882,7 @@ void MainWindow::cpuTurn(const Player &player) {
                     this->movePawn(pawn, 1, pawnMax);
                     dieTwoUsed = true;
                 }
-            } else if (dieOneValue + dieTwoValue == 5) {
+            } else if (dieOneValue + dieTwoValue == 5 && !dieOneUsed && !dieTwoUsed) {
                 if (canMove(player, firstFromStart, 1)) {
                     this->movePawn(pawn, 1, pawnMax);
                     dieOneUsed = true;
@@ -860,23 +890,23 @@ void MainWindow::cpuTurn(const Player &player) {
                 }
             }
         } else if (pawn->getStatus() == PLAYING) {
+            moveHereNum = (pawn->currentTileNum + dieOneValue + dieTwoValue) % 68;
+            iterateThroughLayout(lambda);
+            if (canMove(player, moveHere, dieOneValue + dieTwoValue) && !dieOneUsed && !dieTwoUsed) {
+                this->movePawn(pawn, dieOneValue + dieTwoValue, pawnMax);
+                dieOneUsed = true;
+                dieTwoUsed = true;
+            }
             moveHereNum = (pawn->currentTileNum + dieOneValue) % 68;
             iterateThroughLayout(lambda);
-            if (canMove(player, moveHere, dieOneValue)) {
+            if (canMove(player, moveHere, dieOneValue) && !dieOneUsed) {
                 this->movePawn(pawn, dieOneValue, pawnMax);
                 dieOneUsed = true;
             }
             moveHereNum = (pawn->currentTileNum + dieTwoValue) % 68;
             iterateThroughLayout(lambda);
-            if (canMove(player, moveHere, dieTwoValue)) {
+            if (canMove(player, moveHere, dieTwoValue) && !dieTwoUsed) {
                 this->movePawn(pawn, dieTwoValue, pawnMax);
-                dieOneUsed = true;
-            }
-            moveHereNum = (pawn->currentTileNum + dieOneValue + dieTwoValue) % 68;
-            iterateThroughLayout(lambda);
-            if (canMove(player, moveHere, dieOneValue + dieTwoValue)) {
-                this->movePawn(pawn, dieOneValue + dieTwoValue, pawnMax);
-                dieOneUsed = true;
                 dieTwoUsed = true;
             }
 
@@ -884,9 +914,6 @@ void MainWindow::cpuTurn(const Player &player) {
             cout << " we home safe and sound " << endl;
         }
     }
-
-    // bool pawnOneCanMove = canMove(player, toTile, dieOneValue + dieTwoValue)
-
 }
 
 string MainWindow::tolower(const std::string &s) const {

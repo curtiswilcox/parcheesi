@@ -39,12 +39,14 @@ private:
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
     void cpuTest();
     void addDice(QPointer<QGridLayout> &layout);
+    void addNextButton(QPointer<QGridLayout> &layout);
     void addDialogueBox(QPointer<QGridLayout> &layout);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
     void movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart = false);
     inline void updateLabelText(const std::string &text) {this->updateLabelText(QString::fromStdString(text)); }
     void updateLabelText(const QString &text);
+    void updateScroll();
     QColor getPathColor(int i) const;
     int jump(const QPointer<Pawn> &pawn) const;
     int jump(int startNum, int spaces, const Player &player) const;
@@ -52,7 +54,7 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    void mainLoop(QPointer<QGridLayout> &layout, vector<Player> players);
+//    void mainLoop(QPointer<QGridLayout> &layout, vector<Player> players);
     std::vector<Player> getPlayers();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);

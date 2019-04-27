@@ -19,7 +19,8 @@ int main(int argc, char **argv) {
 
     mainWindow.show();
 
-    MainWindow::mainLoop(mainWindow->)
+//    auto gridLayout = dynamic_cast<QPointer<QGridLayout>>(mainWindow.layout());
+//    mainWindow.mainLoop(gridLayout, mainWindow.getPlayers());
 //    settings.setValue("currentPlayer", players.at(0).color);
 //    for (int i = 0; i < 50; i++) {
 //        this->play(players[0]);

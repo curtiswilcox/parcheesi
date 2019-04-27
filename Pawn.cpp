@@ -79,6 +79,6 @@ bool operator!=(const Pawn &lhs, const Pawn &rhs) {
 }
 
 ostream &operator <<(ostream &outs, const Pawn &pawn) {
-    outs << pawn.team << " " << pawn.id << " " << pawn.status << " space " << pawn.currentTileNum;
+    outs << pawn.team << " " << pawn.id;
     return outs;
 }
