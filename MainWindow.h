@@ -31,6 +31,7 @@ Q_OBJECT
 
 private:
     std::map<std::string, std::tuple<int, int>> pawnLocations;
+    std::vector<Player> players;
     QWidget *rulesWindow;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTile(QPointer<QGridLayout> &layout);
@@ -51,6 +52,8 @@ private:
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    void mainLoop(QPointer<QGridLayout> &layout, vector<Player> players);
+    std::vector<Player> getPlayers();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     void play(const Player &player);

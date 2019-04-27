@@ -67,15 +67,22 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     vector<Player> players = createBoard(layout);
     this->setLayout(layout);
-//    cpuTest();
+}
+
+void MainWindow::mainLoop(QPointer<QGridLayout> &layout, vector<Player> players) {
     settings.setValue("currentPlayer", players.at(0).color);
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 50; i++) {
         this->play(players[0]);
         this->play(players[1]);
         this->play(players[2]);
         this->play(players[3]);
     }
 }
+
+vector<Player> getPlayers() {
+    return MainWindow::players;
+}
+
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemberFunctionCanBeStaticInspection"
@@ -522,7 +529,7 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
             settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
         };
         iterateThroughLayout(rollDice);
-//        cpuTurn(settings.value("currentPlayer"));
+        // TODO cpuTurn(players.at(settings.value("currentPlayer")));
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
@@ -831,7 +838,7 @@ void MainWindow::cpuTurn(const Player &player) {
 
     iterateThroughLayout(lambda);
 
-    cout << playerTeam << endl;
+    cout << playerTeam <<  " rolled " << dieOneValue << ", " << dieTwoValue << endl;
 
     for (const QPointer<Pawn> &pawn : playerPawns) {
         if (pawn->getStatus() == START) {
@@ -853,19 +860,19 @@ void MainWindow::cpuTurn(const Player &player) {
                 }
             }
         } else if (pawn->getStatus() == PLAYING) {
-            moveHereNum = pawn->currentTileNum + dieOneValue;
+            moveHereNum = (pawn->currentTileNum + dieOneValue) % 68;
             iterateThroughLayout(lambda);
             if (canMove(player, moveHere, dieOneValue)) {
                 this->movePawn(pawn, dieOneValue, pawnMax);
                 dieOneUsed = true;
             }
-            moveHereNum = pawn->currentTileNum + dieTwoValue;
+            moveHereNum = (pawn->currentTileNum + dieTwoValue) % 68;
             iterateThroughLayout(lambda);
             if (canMove(player, moveHere, dieTwoValue)) {
                 this->movePawn(pawn, dieTwoValue, pawnMax);
                 dieOneUsed = true;
             }
-            moveHereNum = pawn->currentTileNum + dieOneValue + dieTwoValue;
+            moveHereNum = (pawn->currentTileNum + dieOneValue + dieTwoValue) % 68;
             iterateThroughLayout(lambda);
             if (canMove(player, moveHere, dieOneValue + dieTwoValue)) {
                 this->movePawn(pawn, dieOneValue + dieTwoValue, pawnMax);
