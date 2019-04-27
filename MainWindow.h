@@ -33,6 +33,7 @@ private:
     std::map<std::string, std::tuple<int, int>> pawnLocations;
     std::vector<Player> players;
     QWidget *rulesWindow;
+    QWidget *startWindow;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTile(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
@@ -43,7 +44,7 @@ private:
     void addDialogueBox(QPointer<QGridLayout> &layout);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn, int tileNum, char position);
 //    void movePawn(QPointer<QGridLayout> &layout, QPointer<Pawn> &pawn);
-    void movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart = false);
+    bool movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart = false);
     inline void updateLabelText(const std::string &text) {this->updateLabelText(QString::fromStdString(text)); }
     void updateLabelText(const QString &text);
     void updateScroll();
@@ -59,10 +60,10 @@ public:
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     void play(const Player &player);
-    bool canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces) const;
+    bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     std::string tolower(const std::string &s) const;
     std::string toupper(const std::string &s) const;
-
+    bool movePawnTest(QPointer<Pawn> &, int);
     template<typename T>
     void iterateThroughLayout(const std::function<void(T *)> &func) const {
         for (int i = 0; i < this->layout()->count(); ++i) {
