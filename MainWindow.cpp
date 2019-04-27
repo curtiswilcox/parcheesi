@@ -343,8 +343,8 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player bluePlayer(QColor(0, 0, 153), 0); // blue
     Player redPlayer(QColor(153, 0, 0), 1); // red
-    Player yellowPlayer(QColor(153, 153, 0), 2); // yellow
-    Player greenPlayer(QColor(0, 102, 0), 3); // green
+    Player yellowPlayer(QColor(153, 153, 0), 3); // yellow
+    Player greenPlayer(QColor(0, 102, 0), 2); // green
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
         this->movePawn(pawn, 1, pawn->MAX_TILE);
@@ -415,7 +415,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         }
     }
 
-    return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
+    return {bluePlayer, redPlayer, greenPlayer, yellowPlayer};
 }
 
 
