@@ -79,3 +79,8 @@ bool operator==(const Pawn &lhs, const Pawn &rhs) {
 bool operator!=(const Pawn &lhs, const Pawn &rhs) {
     return !(lhs == rhs);
 }
+
+ostream &operator <<(ostream &outs, const Pawn &pawn) {
+    outs << pawn.team << " " << pawn.id;
+    return outs;
+}
