@@ -41,7 +41,7 @@ private:
     Dimensions dimensions = {0, 0};
     const QColor color;
     PawnStatus status = START;
-    bool passedZeroTile = true; // TODO false
+    bool passedZeroTile = false; // TODO false
 public:
     const std::string team;
     int id;
@@ -73,6 +73,8 @@ public:
     inline friend bool operator==(const Pawn &lhs, const Pawn &rhs);
 
     inline friend bool operator!=(const Pawn &lhs, const Pawn &rhs);
+
+    friend std::ostream &operator <<(std::ostream &outs, const Pawn &pawn);
 };
 
 #endif //PARCHEESI_PAWN_H

@@ -4,9 +4,11 @@
 
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 #include <QAction>
 #include <QLabel>
 #include <QPushButton>
+#include <QTime>
 #include <QScrollArea>
 #include <QSettings>
 #include <QShortcut>
@@ -65,8 +67,14 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     QPointer<QGridLayout> layout = new QGridLayout(this);
     vector<Player> players = createBoard(layout);
     this->setLayout(layout);
-
-    this->play(players[1]);
+//    cpuTest();
+    settings.setValue("currentPlayer", players.at(0).color);
+    for (int i = 0; i < 20; i++) {
+        this->play(players[0]);
+        this->play(players[1]);
+        this->play(players[2]);
+        this->play(players[3]);
+    }
 }
 
 #pragma clang diagnostic push
@@ -166,7 +174,7 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     layout->addWidget(tile, row, column, 2, 2); // blue
                     this->pawnLocations["BlueHome" + to_string(j - 1) + "a"] = make_tuple(row, column);
                     this->pawnLocations["BlueHome" + to_string(j - 1) + "b"] = make_tuple(row, column + 1);
-                    cout << "BlueHome" + to_string(j - 1) + "a" << endl;
+//                    cout << "BlueHome" + to_string(j - 1) + "a" << endl;
                     break;
                 }
                 case 1: {
@@ -175,7 +183,7 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     layout->addWidget(tile, row, column, 2, 2); // yellow
                     this->pawnLocations["YellowHome" + to_string(j - 1) + "a"] = make_tuple(row, column);
                     this->pawnLocations["YellowHome" + to_string(j - 1) + "b"] = make_tuple(row + 1, column);
-                    cout << "YellowHome" + to_string(j - 1) + "a" << endl;
+//                    cout << "YellowHome" + to_string(j - 1) + "a" << endl;
                     break;
                 }
                 case 2: {
@@ -446,6 +454,57 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     return {bluePlayer, redPlayer, yellowPlayer, greenPlayer};
 }
 
+
+//void MainWindow::cpuTest() {
+//    QPointer<QPushButton> cpuTurnButton = new QPushButton("Test CPU turn", this);
+//    cpuTurnButton->setStyleSheet("background-color: white; color: black;");
+//
+//    Player bluePlayer(QColor(0, 0, 153)); // blue
+//
+//    function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
+//        // cout << "moving" << endl;
+//        if (tolower(pawn->team) == "blue") {
+//            this->movePawn(pawn, 1,
+//                           8); // accessing the constants from the Player instances isn't working for some reason
+//        } else if (tolower(pawn->team) == "red") {
+//            this->movePawn(pawn, 1, 59);
+//        } else if (tolower(pawn->team) == "yellow") {
+//            this->movePawn(pawn, 1, 25);
+//        } else { // green
+//            this->movePawn(pawn, 1, 42);
+//        }
+//    };
+//
+//
+//
+//    for (int i = 0; i < 2; i++) {
+//        for (int j = 0; j < 2; j++) {
+//            int row = (i + 3) * 2;
+//            int column = (j + 3) * 2;
+//
+//            QPointer<Pawn> blueOne = new Pawn({10, 10}, StartTile::BLUE_START_NUM, (2 * i) + j, "Blue", movePawnLambda,
+//                                              QColor(0, 0, 153),
+//                                              this);
+//            this->pawnLocations["BlueStart" + to_string(blueOne->id)] = make_tuple(row, column);
+//            tuple<int, int> location = this->pawnLocations["BlueStart" + to_string(blueOne->id)];
+//            settings.setValue(QString::fromStdString("blue" + to_string(blueOne->id)), StartTile::BLUE_START_NUM);
+//            dynamic_cast<QGridLayout*>(this->layout())->addWidget(blueOne, row, column, 1, 1);
+//            bluePlayer.addPawn(blueOne);
+//        }
+//    }
+//
+////    for (const QPointer<Pawn> &pawn : bluePlayer.pawns) {
+////        cout << *pawn << endl;
+////    }
+//
+//    connect(cpuTurnButton, &QPushButton::released, [&]() {
+//        // create new player to test
+//        cpuTurn(bluePlayer);
+//    });
+//
+//    dynamic_cast<QGridLayout*>(this->layout())->addWidget(cpuTurnButton, 9, 39, 1, 10);
+//}
+
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     QPointer<Die> die = new Die("first", this);
     layout->addWidget(die, 0, 38, 6, 6);
@@ -457,28 +516,32 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     rollButton->setStyleSheet("background-color: white; color: black;");
 
     connect(rollButton, &QPushButton::released, [&]() {
-        function<void(Die *)> lambda = [&](Die *die) {
+        function<void(Die *)> rollDice = [&](Die *die) {
             die->roll();
             die->repaint();
             settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
         };
-        iterateThroughLayout(lambda);
+        iterateThroughLayout(rollDice);
+//        cpuTurn(settings.value("currentPlayer"));
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
 }
 
 void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
-    QPointer<QLabel> label = new QLabel(this);
+    QPointer<QScrollArea> scroll = new QScrollArea(this);
+    QPointer<QLabel> gameOutput = new QLabel(scroll);
 
-    label->setWordWrap(true);
-    label->setContentsMargins(5, label->contentsMargins().top(), 5, label->contentsMargins().bottom());
-    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
-    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
+    gameOutput->setWordWrap(true);
+    gameOutput->setContentsMargins(5, gameOutput->contentsMargins().top(), 5, gameOutput->contentsMargins().bottom());
+    gameOutput->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
+    gameOutput->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
 
-    label->setText("Welcome!");
-    label->setStyleSheet("background-color: white; color: black;");
-    layout->addWidget(label, 10, 39, 28, 10);
+    gameOutput->setText("Welcome!");
+    gameOutput->setStyleSheet("background-color: white; color: black;");
+    scroll->setStyleSheet("background-color: white; color: black;");
+    scroll->setWidget(gameOutput);
+    layout->addWidget(scroll, 12, 39, 26, 10);
 }
 
 
@@ -499,7 +562,7 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
                         pawn->currentTileNum = StartTile::GREEN_START_NUM;
                     }
 
-                    string capitalizedTeam = (char) toupper(pawn->team[0]) + (string(pawn->team).erase(0, 1));
+                    string capitalizedTeam = (char) std::toupper(pawn->team[0]) + (string(pawn->team).erase(0, 1));
                     tuple<int, int> initialStart = this->pawnLocations[capitalizedTeam + "Start" + to_string(pawn->id)];
                     this->layout()->removeWidget(pawn);
                     pawn->setPassedZeroTile(false);
@@ -522,24 +585,24 @@ void MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, b
         tileToMoveTo = (pawn->currentTileNum) + jump(pawn) + (spaces - (pawnMax - pawn->currentTileNum)) - 1;
         tileType = pawn->team + "Home";
         cout << tileType << endl;
-        cerr << "first" << endl;
+//        cerr << "first" << endl;
     } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
                spaces < pawnMax + jump(pawn) + 7 - pawn->currentTileNum) { // seven home stretch tiles
 
         tileToMoveTo = (pawn->currentTileNum) + spaces;
         tileType = pawn->team + "Home";
-        cerr << "second" << endl;
+//        cerr << "second" << endl;
     } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
                spaces == pawnMax + jump(pawn) + 7 - pawn->currentTileNum) { // home tile
 
         tileToMoveTo = (pawn->currentTileNum) + spaces;
         tileType = "HomeTile";
-        cerr << "third" << endl;
+//        cerr << "third" << endl;
     } else if (/*pawn->currentTileNum > pawnMax &&*/ spaces > pawnMax + jump(pawn) + 7 - pawn->currentTileNum - 1) {
-        cerr << "fourth" << endl;
+//        cerr << "fourth" << endl;
         return; // can't move up the home stretch
     } else {
-        cerr << "fifth" << endl;
+//        cerr << "fifth" << endl;
         tileType = "NormalTile";
     }
 
@@ -633,19 +696,20 @@ QColor MainWindow::getPathColor(int i) const {
 }
 
 void MainWindow::play(const Player &player) {
-    this->updateLabelText("It is " + QString(toupper(player.getColorString()[0])) +
+    this->updateLabelText("It is " + QString(std::toupper(player.getColorString()[0])) +
                           QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
+    cpuTurn(player);
 }
 
 
-bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPointer<Tile> &tile, int spaces) const {
+bool MainWindow::canMove(const Player &activePlayer, const QPointer<Tile> &tile, int spaces) const {
     int currentTileNum = qobject_cast<RectangleTile *>(tile)->getNumber();
 
     if (qobject_cast<HomeTile *>(tile)) {
-        return !firstClick && jump(currentTileNum, spaces, activePlayer) - 1 == activePlayer.MAX_TILE;
+        return !jump(currentTileNum, spaces, activePlayer) - 1 == activePlayer.MAX_TILE;
     }
     if (qobject_cast<StartTile *>(tile)) {
-        return firstClick && spaces == 5;
+        return spaces == 5;
     }
 
     bool moveIsPossible = false;
@@ -678,7 +742,7 @@ bool MainWindow::canMove(bool firstClick, const Player &activePlayer, const QPoi
             iterateThroughLayout(findBlockades); // make sure tiles in between aren't blockaded
 
             if (!blockadePresent) {
-                cout << "Success!" << endl; // TODO not tested in the slightest
+//                cout << "Success!" << endl; // TODO not tested in the slightest
                 moveIsPossible = true;
             }
         }
@@ -718,17 +782,103 @@ int MainWindow::jump(int startNum, int spaces, const Player &player) const {
     }
 }
 
-void MainWindow::cpuTurn(QPointer<QGridLayout> &layout, const Player &player) {
+void MainWindow::cpuTurn(const Player &player) {
+
+    function<void(Die *)> rollDice = [&](Die *die) {
+        die->roll();
+        die->repaint();
+        settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
+    };
+    iterateThroughLayout(rollDice);
+
+    int dieOneValue = settings.value("firstRoll").toInt();
+    bool dieOneUsed = false;
+    int dieTwoValue = settings.value("secondRoll").toInt();
+    bool dieTwoUsed = false;
+
     string playerTeam = player.colorString;
     vector<QPointer<Pawn>> playerPawns = player.pawns;
+    int firstTileNum;
+    int moveHereNum;
+    int pawnMax;
 
-    // TODO get the last dice roll
-    int dieOneValue = 3;
-    int dieTwoValue = 4;
+    // declare initial tiles to move to from start
+    if (tolower(playerTeam) == "blue") {
+        firstTileNum = StartTile::BLUE_START_NUM + 1;
+        pawnMax = 8;
+    } else if (tolower(playerTeam) == "red") {
+        firstTileNum = StartTile::RED_START_NUM + 1;
+        pawnMax = 59;
+    } else if (tolower(playerTeam) == "green") {
+        firstTileNum = StartTile::GREEN_START_NUM + 1;
+        pawnMax = 42;
+    } else { // yellow
+        firstTileNum = StartTile::YELLOW_START_NUM + 1;
+        pawnMax = 25;
+    }
 
+    RectangleTile *firstFromStart;
+    RectangleTile *moveHere;
 
-    // get the locations of all the player's pawns
+    function<void(RectangleTile *)> lambda = [&](RectangleTile *tile) {
+        if (tile->getNumber() == firstTileNum) {
+            firstFromStart = tile;
+        }
+        if (tile->getNumber() == moveHereNum) {
+            moveHere = tile;
+        }
+    };
 
+    iterateThroughLayout(lambda);
+
+    cout << playerTeam << endl;
+
+    for (const QPointer<Pawn> &pawn : playerPawns) {
+        if (pawn->getStatus() == START) {
+            if (dieOneValue == 5) {
+                if (canMove(player, firstFromStart, 1) && !dieOneUsed) {
+                    this->movePawn(pawn, 1, pawnMax);
+                    dieOneUsed = true;
+                }
+            } else if (dieTwoValue == 5) {
+                if (canMove(player, firstFromStart, 1) && !dieTwoUsed) {
+                    this->movePawn(pawn, 1, pawnMax);
+                    dieTwoUsed = true;
+                }
+            } else if (dieOneValue + dieTwoValue == 5) {
+                if (canMove(player, firstFromStart, 1)) {
+                    this->movePawn(pawn, 1, pawnMax);
+                    dieOneUsed = true;
+                    dieTwoUsed = true;
+                }
+            }
+        } else if (pawn->getStatus() == PLAYING) {
+            moveHereNum = pawn->currentTileNum + dieOneValue;
+            iterateThroughLayout(lambda);
+            if (canMove(player, moveHere, dieOneValue)) {
+                this->movePawn(pawn, dieOneValue, pawnMax);
+                dieOneUsed = true;
+            }
+            moveHereNum = pawn->currentTileNum + dieTwoValue;
+            iterateThroughLayout(lambda);
+            if (canMove(player, moveHere, dieTwoValue)) {
+                this->movePawn(pawn, dieTwoValue, pawnMax);
+                dieOneUsed = true;
+            }
+            moveHereNum = pawn->currentTileNum + dieOneValue + dieTwoValue;
+            iterateThroughLayout(lambda);
+            if (canMove(player, moveHere, dieOneValue + dieTwoValue)) {
+                this->movePawn(pawn, dieOneValue + dieTwoValue, pawnMax);
+                dieOneUsed = true;
+                dieTwoUsed = true;
+            }
+
+        } else {
+            cout << " we home safe and sound " << endl;
+        }
+    }
+
+    // bool pawnOneCanMove = canMove(player, toTile, dieOneValue + dieTwoValue)
 
 }
 
@@ -738,4 +888,12 @@ string MainWindow::tolower(const std::string &s) const {
         lowered += (char) std::tolower(c);
     }
     return lowered;
+}
+
+string MainWindow::toupper(const std::string &s) const {
+    string uppered;
+    for (char c : s) {
+        uppered += (char) std::toupper(c);
+    }
+    return uppered;
 }

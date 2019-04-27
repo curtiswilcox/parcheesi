@@ -33,9 +33,12 @@ string Player::getColorString() const {
 }
 
 int Player::numPawnsStart() const {
-    function<bool(int, QPointer<Pawn>)> lambda =
-            [&](int total, const QPointer<Pawn> &pawn) { return pawn->getStatus() == PawnStatus::START; };
-    return accumulate(pawns.begin(), pawns.end(), 0, lambda);
+//    function<bool(int, QPointer<Pawn>)> lambda =
+//            [&](int total, const QPointer<Pawn> &pawn) { return pawn->getStatus() == PawnStatus::START; };
+//    return accumulate(pawns.begin(), pawns.end(), 0, lambda);
+    int total = 0;
+    for (const QPointer<Pawn> &pawn : pawns) if (pawn->getStatus() == PawnStatus::START) ++total;
+    return total;
 }
 
 int Player::numPawnsHome() const {
