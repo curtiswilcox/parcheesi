@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPointer>
+#include <QSettings>
 #include <QWidget>
 #include <QWindow>
 
@@ -34,10 +35,12 @@ private:
     std::vector<Player> players;
     QWidget *rulesWindow;
     QWidget *startWindow;
+    QSettings settings;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTile(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
+    std::vector<QString> gameOutput;
     void cpuTest();
     void addDice(QPointer<QGridLayout> &layout);
     void addNextButton(QPointer<QGridLayout> &layout);
@@ -59,12 +62,15 @@ public:
     std::vector<Player> getPlayers();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
+    std::vector<Player> resetBoard();
+    void showMenu();
     void play(const Player &player);
     bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     std::string tolower(const std::string &s) const;
     std::string toupper(const std::string &s) const;
     bool movePawnTest(QPointer<Pawn> &, int);
     template<typename T>
+
     void iterateThroughLayout(const std::function<void(T *)> &func) const {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
