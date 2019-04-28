@@ -1083,6 +1083,9 @@ int MainWindow::jump(const QPointer<Pawn> &pawn) const {
 
 void MainWindow::cpuTurn(const Player &player) {
 
+    int doubleCount = 0;
+    bool doubles;
+
     function<void(Die *)> rollDice = [&](Die *die) {
         die->roll();
         die->repaint();
@@ -1094,6 +1097,10 @@ void MainWindow::cpuTurn(const Player &player) {
     int smaller = min(settings.value("firstRoll").toInt(), settings.value("secondRoll").toInt());
 //    int bigger = 5;
 //    int smaller = 5;
+    if (bigger == smaller && player.numPawnsStart() == 0) {
+        doubles = true;
+        doubleCount += 1;
+    }
 
     bool biggerUsed = false;
     bool smallerUsed = false;
