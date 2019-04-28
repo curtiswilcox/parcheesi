@@ -112,6 +112,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
             iterateThroughLayout(lambda);
             settings.setValue("playerColor", colorChoiceId);
             settings.setValue("numPlayers", val);
+            this->players = this->resetBoard();
+
+            if (colorChoiceId == 0) { // blue
+                settings.setValue("currentPlayer", QColor(0, 0, 153));
+            } else if (colorChoiceId == 1) { // red
+                settings.setValue("currentPlayer", QColor(153, 0, 0));
+            } else if (colorChoiceId == 2) { // yellow
+                settings.setValue("currentPlayer", QColor(153, 153, 0));
+            } else {
+                settings.setValue("currentPlayer", QColor(0, 102, 0));
+            }
+
             this->show();
             startWindow->hide();
         });
@@ -163,25 +175,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setLayout(layout);
 
     settings.setValue("currentPlayer", players[0].color);
-//    for (int i = 0; i < 20; i++) {
-//        this->play(players[0]);
-//        this->play(players[1]);
-//        this->play(players[2]);
-//        this->play(players[3]);
-//    }
+
 }
-
-//void MainWindow::mainLoop(QPointer<QGridLayout> &layout, vector<Player> players) {
-//    settings.setValue("currentPlayer", players.at(0).color);
-//    for (int i = 0; i < 50; i++) {
-//        this->play(players[0]);
-//        this->play(players[1]);
-//        this->play(players[2]);
-//        this->play(players[3]);
-//    }
-//}
-
-
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "MemberFunctionCanBeStaticInspection"
@@ -216,6 +211,15 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addDice(layout);
     addNextButton(layout);
     addDialogueBox(layout);
+
+    return players;
+}
+
+vector<Player> MainWindow::resetBoard() {
+    QPointer<QGridLayout> layout = new QGridLayout(this);
+    vector<Player> players = createBoard(layout);
+    delete this->layout();
+    this->setLayout(layout);
 
     return players;
 }
@@ -510,7 +514,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         }
     }
 
-    return {bluePlayer, redPlayer/*, greenPlayer, yellowPlayer*/};
+    return {bluePlayer, redPlayer, greenPlayer, yellowPlayer};
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
@@ -541,13 +545,16 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
 
     connect(nextButton, &QPushButton::released, [&, this]() {
         int currId;
-        for (const Player &player : this->players) {
-            if (player.color == settings.value("currentPlayer").value<QColor>()) {
-                this->play(player);
-                currId = player.id;
+        // loop set to 1 for normal play, or higher for testing
+        for (int i = 0; i < 4; i++) {
+            for (const Player &player : this->players) {
+                if (player.color == settings.value("currentPlayer").value<QColor>()) {
+                    this->play(player);
+                    currId = player.id;
+                }
             }
+            settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
         }
-        settings.setValue("currentPlayer", players[(currId + 1) % 2].color);
 
     });
 
@@ -921,6 +928,26 @@ void MainWindow::cpuTurn(const Player &player) {
 //    iterateThroughLayout(findNextMove);
 
     cout << playerTeam << " rolled " << dieOneValue << ", " << dieTwoValue << endl;
+
+    // first check for 5s to try to move out of start
+    if (dieOneValue == 5) {
+        for (const QPointer<Pawn> &pawn : playerPawns) {
+            if (canMove(pawn, 5) && !dieOneUsed) {
+                if (this->movePawn(pawn, 1, pawnMax)) {
+                    dieOneUsed = true;
+                }
+            }
+        }
+    }
+    if (dieTwoValue == 5) {
+        for (const QPointer<Pawn> &pawn : playerPawns) {
+            if (canMove(pawn, 5) && !dieTwoUsed) {
+                if (this->movePawn(pawn, 1, pawnMax)) {
+                    dieTwoUsed = true;
+                }
+            }
+        }
+    }
 
     for (const QPointer<Pawn> &pawn : playerPawns) {
         if (pawn->getStatus() == START) {

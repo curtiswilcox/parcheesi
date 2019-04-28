@@ -59,6 +59,7 @@ public:
     std::vector<Player> getPlayers();
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
+    std::vector<Player> resetBoard();
     void play(const Player &player);
     bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     std::string tolower(const std::string &s) const;
