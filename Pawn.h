@@ -41,7 +41,7 @@ private:
     Dimensions dimensions = {0, 0};
     const QColor color;
     PawnStatus status = START;
-    bool passedZeroTile = false; // TODO false
+    bool passedZeroTile = false;
 public:
     const std::string team;
     int id;
@@ -69,6 +69,8 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
+
+    friend bool operator<(const Pawn &lhs, const Pawn &rhs);
 
     inline friend bool operator==(const Pawn &lhs, const Pawn &rhs);
 

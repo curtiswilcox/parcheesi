@@ -158,6 +158,7 @@ optional<QPointer<Pawn>> RectangleTile::getOccupyingPawn() const {
     return nullopt;
 }
 
+
 void RectangleTile::mouseReleaseEvent(QMouseEvent *event) {
     QSettings settings("CS205", "Parcheesi");
 //    cout << "Previous Rectangle Tile: " << settings.value("currentTileNumber", -2).toInt() << endl;

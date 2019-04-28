@@ -19,16 +19,6 @@ int main(int argc, char **argv) {
 
     mainWindow.show();
 
-//    auto gridLayout = dynamic_cast<QPointer<QGridLayout>>(mainWindow.layout());
-//    mainWindow.mainLoop(gridLayout, mainWindow.getPlayers());
-//    settings.setValue("currentPlayer", players.at(0).color);
-//    for (int i = 0; i < 50; i++) {
-//        this->play(players[0]);
-//        this->play(players[1]);
-//        this->play(players[2]);
-//        this->play(players[3]);
-//    }
-    exitCode = app.exec();
+    return app.exec();
 
-    return exitCode;
-};
+}
