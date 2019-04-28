@@ -223,13 +223,16 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
 
 vector<Player> MainWindow::resetBoard() {
 
-    QLayoutItem * item;
-    QLayout * sublayout;
-    QWidget * widget;
+    QLayoutItem *item;
+    QLayout *sublayout;
+    QWidget *widget;
     while ((item = this->layout()->takeAt(0))) {
         if ((sublayout = item->layout()) != 0) {/* do the same for sublayout*/}
-        else if ((widget = item->widget()) != 0) {widget->hide(); delete widget;}
-        else {delete item;}
+        else if ((widget = item->widget()) != 0) {
+            widget->hide();
+            delete widget;
+        }
+        else { delete item; }
     }
 
     QPointer<QGridLayout> layout = new QGridLayout(this);
@@ -547,8 +550,9 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
         iterateThroughLayout(rollDice);
 
         gameOutput.push_back(QString::fromStdString("You rolled ") +
-        QString::fromStdString(to_string(settings.value("firstRoll").toInt())) + QString::fromStdString(", ") +
-        QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
+                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
+                             QString::fromStdString(", ") +
+                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
         updateScroll();
     });
 
@@ -942,7 +946,7 @@ void MainWindow::updateScroll() {
     function<void(QLabel *)> lambda = [&](QLabel *info) {
         info->setText("");
         int max = 20;
-        if (gameOutput.size()  >= max) {
+        if (gameOutput.size() >= max) {
             for (int i = gameOutput.size() - max; i < gameOutput.size(); i++) {
 
                 info->setText(info->text() + "\n" + gameOutput[i]);
@@ -979,14 +983,15 @@ void MainWindow::play(const Player &player) {
     QSettings settings("CS205", "Parcheesi");
 
     if (player.color == players[settings.value("playerColor").toInt()].color) {
-        this->gameOutput.push_back("Please move "  + QString(std::toupper(player.getColorString()[0])) +
-        QString::fromStdString(player.getColorString().erase(0, 1)));
+        this->gameOutput.push_back("Please move " + QString(std::toupper(player.getColorString()[0])) +
+                                   QString::fromStdString(player.getColorString().erase(0, 1)));
 //        this->updateLabelText("Please move "  + QString(std::toupper(player.getColorString()[0])) +
 //                              QString::fromStdString(player.getColorString().erase(0, 1)));
-          updateScroll();
+        updateScroll();
 //        playerTurn(player);
     } else {
-        this->gameOutput.push_back("It is " + QString(std::toupper(player.getColorString()[0])) + QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
+        this->gameOutput.push_back("It is " + QString(std::toupper(player.getColorString()[0])) +
+                                   QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
 //        this->updateLabelText("It is " + QString(std::toupper(player.getColorString()[0])) +
 //                              QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
         updateScroll();
@@ -1094,28 +1099,30 @@ void MainWindow::cpuTurn(const Player &player) {
     bool smallerUsed = false;
 
     gameOutput.push_back(QString(std::toupper(player.getColorString()[0])) +
-    QString::fromStdString(player.getColorString().erase(0, 1)) +
-    QString::fromStdString(" rolled ") +
-    QString::fromStdString(to_string(dieOneValue)) +
-    QString::fromStdString(", ") +
-    QString::fromStdString(to_string(dieTwoValue)));
+                         QString::fromStdString(player.getColorString().erase(0, 1)) +
+                         QString::fromStdString(" rolled ") +
+                         QString::fromStdString(to_string(bigger)) +
+                         QString::fromStdString(", ") +
+                         QString::fromStdString(to_string(smaller)));
     updateScroll();
 
     // first check for 5s to try to move out of start
-    if (dieOneValue == 5) {
-        for (const QPointer<Pawn> &pawn : playerPawns) {
-            if (canMove(pawn, 5) && !dieOneUsed) {
-                if (this->movePawn(pawn, 1, pawnMax)) {
-                    dieOneUsed = true;
+    if (bigger == 5) {
+        for (const QPointer<Pawn> &pawn : player.pawns) {
+            if (canMove(pawn, 5) && !biggerUsed) {
+//                if (this->movePawn(pawn, 1, pawnMax)) {
+                if (this->movePawnTest(pawn, 1)) {
+                    biggerUsed = true;
                 }
             }
         }
     }
-    if (dieTwoValue == 5) {
-        for (const QPointer<Pawn> &pawn : playerPawns) {
-            if (canMove(pawn, 5) && !dieTwoUsed) {
-                if (this->movePawn(pawn, 1, pawnMax)) {
-                    dieTwoUsed = true;
+    if (smaller == 5) {
+        for (const QPointer<Pawn> &pawn : player.pawns) {
+            if (canMove(pawn, 5) && !smallerUsed) {
+//                if (this->movePawn(pawn, 1, pawnMax)) {
+                if (this->movePawnTest(pawn, 1)) {
+                    smallerUsed = true;
                 }
             }
         }
