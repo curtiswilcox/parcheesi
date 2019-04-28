@@ -40,8 +40,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
     gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
     QPointer<QAction> gameMenu = fileMenu->addAction("&New Game");
     gameMenu->setShortcut(Qt::CTRL + Qt::Key_N);
-    gameMenu->setShortcut(Qt::Key_Space);
-
 
     auto newGame = [&, this]() {
         startWindow = new QWidget(this, Qt::Window);
@@ -834,7 +832,7 @@ void MainWindow::play(const Player &player) {
 //        this->updateLabelText("Please move "  + QString(std::toupper(player.getColorString()[0])) +
 //                              QString::fromStdString(player.getColorString().erase(0, 1)));
           updateScroll();
-//        playerTurn(player);
+        playerTurn(player);
     } else {
         this->gameOutput.push_back("It is " + QString(std::toupper(player.getColorString()[0])) + QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
 //        this->updateLabelText("It is " + QString(std::toupper(player.getColorString()[0])) +
@@ -908,6 +906,36 @@ int MainWindow::jump(int startNum, int spaces, const Player &player) const {
         return startNum + spaces;
     }
 }
+
+void MainWindow::playerTurn(const Player &player) {
+    // roll the dice
+    function<void(Die *)> rollDice = [&](Die *die) {
+        die->roll();
+        die->repaint();
+        settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
+    };
+    iterateThroughLayout(rollDice);
+    gameOutput.push_back(QString::fromStdString("You rolled ") +
+                         QString::fromStdString(to_string(settings.value("firstRoll").toInt())) + QString::fromStdString(", ") +
+                         QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
+    updateScroll();
+
+    // get current dice values
+    int dieOneValue = settings.value("firstRoll").toInt();
+    bool dieOneUsed = false;
+    int dieTwoValue = settings.value("secondRoll").toInt();
+    bool dieTwoUsed = false;
+
+    // find and display possible moves
+    function<void(Tile *)> checkForMoves = [&](Tile *tile) {
+
+    };
+    iterateThroughLayout(checkForMoves);
+
+    // wait for player to click on tile they want to move to
+
+}
+
 
 void MainWindow::cpuTurn(const Player &player) {
 
