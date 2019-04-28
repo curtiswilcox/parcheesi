@@ -59,8 +59,8 @@ private:
     std::vector<std::optional<QPointer<Pawn>>> pawns;
     std::string colorString;
 public:
-    static const int BLUE_START_NUM = 2;
-    static const int RED_START_NUM = 53; // fixme add 10 to blue and red
+    static const int BLUE_START_NUM = 12;
+    static const int RED_START_NUM = 63;
     static const int GREEN_START_NUM = 46;
     static const int YELLOW_START_NUM = 29;
 
@@ -112,6 +112,10 @@ public:
     PlayerAddition addPawn(const QPointer<Pawn> &pawn);
     std::optional<QPointer<Pawn>> removePawn();
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
+
+    inline bool occupiedSpaceA() const { return (occupyingPawn ? true : false); }
+
+    inline bool occupiedSpaceB() const { return (secondPawn ? true : false); }
 
     inline bool isOccupied() const { return this->getOccupyingPawn() != std::nullopt; }
 

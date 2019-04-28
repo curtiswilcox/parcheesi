@@ -72,8 +72,14 @@ void Pawn::paintEvent(QPaintEvent *event) {
     painter.fillRect(rect, color);
 }
 
+bool operator<(const Pawn &lhs, const Pawn &rhs) {
+    if (lhs.getStatus() == PawnStatus::START) return true;
+    if (rhs.getStatus() == PawnStatus::HOME) return true;
+    return lhs.getStatus() == rhs.getStatus() == PawnStatus::PLAYING;
+}
+
 bool operator==(const Pawn &lhs, const Pawn &rhs) {
-    return lhs.color == rhs.color && lhs.currentTileNum == rhs.currentTileNum; // also know position?
+    return lhs.color == rhs.color && lhs.currentTileNum == rhs.currentTileNum;
 }
 
 bool operator!=(const Pawn &lhs, const Pawn &rhs) {

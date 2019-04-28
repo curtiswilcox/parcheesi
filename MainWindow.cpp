@@ -2,6 +2,7 @@
 // Created by Curtis Wilcox on 2019-03-04.
 //
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
@@ -163,24 +164,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     this->setLayout(layout);
 
     settings.setValue("currentPlayer", players[0].color);
-//    for (int i = 0; i < 20; i++) {
-//        this->play(players[0]);
-//        this->play(players[1]);
-//        this->play(players[2]);
-//        this->play(players[3]);
-//    }
 }
-
-//void MainWindow::mainLoop(QPointer<QGridLayout> &layout, vector<Player> players) {
-//    settings.setValue("currentPlayer", players.at(0).color);
-//    for (int i = 0; i < 50; i++) {
-//        this->play(players[0]);
-//        this->play(players[1]);
-//        this->play(players[2]);
-//        this->play(players[3]);
-//    }
-//}
-
 
 
 #pragma clang diagnostic push
@@ -252,25 +236,6 @@ void MainWindow::addHomeTile(QPointer<QGridLayout> &layout) {
     for (int i = 0; i < 4; ++i) {
         this->pawnLocations["HomeTileGreen" + to_string(i)] = make_tuple(21, 17 + i);
     }
-//    this->pawnLocations["HomeTileBlue0"] = make_tuple(16, 17);
-//    this->pawnLocations["HomeTileBlue1"] = make_tuple(16, 18);
-//    this->pawnLocations["HomeTileBlue2"] = make_tuple(16, 19);
-//    this->pawnLocations["HomeTileBlue3"] = make_tuple(16, 20);
-
-//    this->pawnLocations["HomeTileRed0"] = make_tuple(17, 21);
-//    this->pawnLocations["HomeTileRed1"] = make_tuple(18, 21);
-//    this->pawnLocations["HomeTileRed2"] = make_tuple(19, 21);
-//    this->pawnLocations["HomeTileRed3"] = make_tuple(20, 21);
-
-//    this->pawnLocations["HomeTileYellow0"] = make_tuple(17, 16);
-//    this->pawnLocations["HomeTileYellow1"] = make_tuple(18, 16);
-//    this->pawnLocations["HomeTileYellow2"] = make_tuple(19, 16);
-//    this->pawnLocations["HomeTileYellow3"] = make_tuple(20, 16);
-
-//    this->pawnLocations["HomeTileGreen0"] = make_tuple(21, 17);
-//    this->pawnLocations["HomeTileGreen1"] = make_tuple(21, 18);
-//    this->pawnLocations["HomeTileGreen2"] = make_tuple(21, 19);
-//    this->pawnLocations["HomeTileGreen3"] = make_tuple(21, 20);
 }
 
 void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
@@ -441,7 +406,18 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player greenPlayer(QColor(0, 102, 0), 2); // green
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
-        this->movePawn(pawn, 1, pawn->MAX_TILE);
+//        this->movePawn(pawn, 1, pawn->MAX_TILE);
+
+        if (pawn->getStatus() == PawnStatus::PLAYING) {
+            if (this->canMove(pawn, 1)) {
+                this->movePawnTest(pawn, 1);
+            }
+        } else if (pawn->getStatus() == PawnStatus::START) {
+            if (this->canMove(pawn, 5)) {
+                this->movePawnTest(pawn, 1);
+            }
+        }
+
     };
 
     for (int i = 0; i < 2; i++) {
@@ -452,7 +428,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             QPointer<Pawn> blueOne = new Pawn({10, 10}, StartTile::BLUE_START_NUM, (2 * i) + j, "Blue", movePawnLambda,
                                               QColor(0, 0, 153),
                                               this);
-            blueOne->setPassedZeroTile(true);
+//            blueOne->setPassedZeroTile(true);
             this->pawnLocations["BlueStart" + to_string(blueOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["BlueStart" + to_string(blueOne->id)];
             settings.setValue(QString::fromStdString("blue" + to_string(blueOne->id)), StartTile::BLUE_START_NUM);
@@ -469,6 +445,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             QPointer<Pawn> redOne = new Pawn({10, 10}, StartTile::RED_START_NUM, (2 * i) + j, "Red", movePawnLambda,
                                              QColor(153, 0, 0),
                                              this);
+//            redOne->setPassedZeroTile(true);
             this->pawnLocations["RedStart" + to_string(redOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["RedStart" + to_string(redOne->id)];
             settings.setValue(QString::fromStdString("red" + to_string(redOne->id)), StartTile::RED_START_NUM);
@@ -510,7 +487,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         }
     }
 
-    return {bluePlayer, redPlayer/*, greenPlayer, yellowPlayer*/};
+    return {bluePlayer, redPlayer, greenPlayer, yellowPlayer};
 }
 
 void MainWindow::addDice(QPointer<QGridLayout> &layout) {
@@ -536,19 +513,18 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
 }
 
 void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
-    QPointer<QPushButton> nextButton = new QPushButton("Next turn", this);
+    QPointer<QPushButton> nextButton = new QPushButton("Next Turn", this);
     nextButton->setStyleSheet("background-color: white; color: black;");
 
     connect(nextButton, &QPushButton::released, [&, this]() {
-        int currId;
+        int currId = 0;
         for (const Player &player : this->players) {
             if (player.color == settings.value("currentPlayer").value<QColor>()) {
                 this->play(player);
                 currId = player.id;
             }
         }
-        settings.setValue("currentPlayer", players[(currId + 1) % 2].color);
-
+        settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
     });
 
     layout->addWidget(nextButton, 9, 39, 1, 10);
@@ -571,203 +547,341 @@ void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
 }
 
 
-bool MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart) {
-    if (backToStart) {
-        function<void(Tile *)> lambda = [&, this](Tile *tile) {
-            if (auto start = dynamic_cast<StartTile *>(tile)) { // find the pawn's start tile
-                if (tolower(start->getColorString()) == tolower(pawn->team)) {
-                    if (tolower(pawn->team) == "blue") {
-                        pawn->currentTileNum = StartTile::BLUE_START_NUM;
-                    } else if (tolower(pawn->team) == "red") {
-                        pawn->currentTileNum = StartTile::RED_START_NUM;
-                    } else if (tolower(pawn->team) == "yellow") {
-                        pawn->currentTileNum = StartTile::YELLOW_START_NUM;
-                    } else {
-                        pawn->currentTileNum = StartTile::GREEN_START_NUM;
-                    }
-
-                    string capitalizedTeam = (char) std::toupper(pawn->team[0]) + (string(pawn->team).erase(0, 1));
-                    tuple<int, int> initialStart = this->pawnLocations[capitalizedTeam + "Start" + to_string(pawn->id)];
-                    this->layout()->removeWidget(pawn);
-                    pawn->setPassedZeroTile(false);
-                    dynamic_cast<QGridLayout *>(this->layout())->addWidget(pawn, get<0>(initialStart),
-                                                                           get<1>(initialStart), 1, 1);
-                }
-            }
-        };
-        iterateThroughLayout(lambda);
-
-        return true;
-    }
-    // else...
-    int tileToMoveTo = (pawn->currentTileNum + spaces) % 68;
-    if (pawn->currentTileNum + spaces > 67) pawn->setPassedZeroTile(true);
-
-    string tileType;
-
-    if (pawn->hasPassedZeroTile() && pawn->currentTileNum <= pawnMax && tileToMoveTo > pawnMax) {
-        int used = pawnMax - pawn->currentTileNum;
-//        tileToMoveTo = (pawn->currentTileNum) + jump(pawn) + (spaces - (pawnMax - pawn->currentTileNum)) - 1;
-        tileToMoveTo = used + jump(pawn) + (spaces - used) + pawn->currentTileNum - 1;
-
-        tileType = pawn->team + "Home" + to_string(tileToMoveTo - jump(pawn)); // note: please?
-
-        cout << tileType << endl;
-        cerr << "first" << endl;
-    } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
-               pawn->currentTileNum + spaces < pawnMax + jump(pawn) + 7) { // seven home stretch tiles
-
-        tileToMoveTo = (pawn->currentTileNum) + spaces;
-        tileType = pawn->team + "Home" + to_string(tileToMoveTo);
-
-        cerr << "second" << endl;
-    } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
-               pawn->currentTileNum + spaces == pawnMax + jump(pawn) + 7) { // home tile
-
+//bool MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart) {
+//    if (backToStart) {
+//        function<void(StartTile *)> lambda = [&, this](StartTile *start) {
+//            if (tolower(start->getColorString()) == tolower(pawn->team)) {
+//                if (tolower(pawn->team) == "blue") {
+//                    pawn->currentTileNum = StartTile::BLUE_START_NUM;
+//                } else if (tolower(pawn->team) == "red") {
+//                    pawn->currentTileNum = StartTile::RED_START_NUM;
+//                } else if (tolower(pawn->team) == "yellow") {
+//                    pawn->currentTileNum = StartTile::YELLOW_START_NUM;
+//                } else {
+//                    pawn->currentTileNum = StartTile::GREEN_START_NUM;
+//                }
+//
+//                string capitalizedTeam = (char) std::toupper(pawn->team[0]) + (string(pawn->team).erase(0, 1));
+//                tuple<int, int> initialStart = this->pawnLocations[capitalizedTeam + "Start" + to_string(pawn->id)];
+//                this->layout()->removeWidget(pawn);
+//                pawn->setPassedZeroTile(false);
+//                dynamic_cast<QGridLayout *>(this->layout())->addWidget(pawn, get<0>(initialStart), get<1>(initialStart),
+//                                                                       1, 1);
+//            }
+//        };
+//        iterateThroughLayout(lambda);
+//
+//        return true;
+//    }
+//    // else...
+//    int tileToMoveTo = (pawn->currentTileNum + spaces);// % 68;
+//    if (pawn->currentTileNum + spaces > 67) pawn->setPassedZeroTile(true);
+//
+//    string tileType;
+//
+//    if (pawn->hasPassedZeroTile() && pawn->currentTileNum <= pawnMax && tileToMoveTo > pawnMax) {
+//        int used = pawnMax - pawn->currentTileNum;
+//        tileToMoveTo = used + jump(pawn) + (spaces - used) + pawn->currentTileNum - 1;
+//
+//        tileType = pawn->team + "Home" + to_string(tileToMoveTo - jump(pawn) - pawnMax);
+//
+//        cout << tileType << endl;
+////        cout << "first" << endl;
+//    } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
+//               pawn->currentTileNum + spaces < pawnMax + jump(pawn) + 7) { // seven home stretch tiles
+//
 //        tileToMoveTo = (pawn->currentTileNum) + spaces;
-        tileToMoveTo = -5; // because moving to the home tile
-        cerr << "third" << endl;
-        tileType = "HomeTile";
-    } else if (pawn->currentTileNum + spaces > pawnMax + jump(pawn) + 7) { // past the home tile
-        cerr << "fourth" << endl;
-        return false; // can't move up the home stretch
-    } else {
-        tileType = "NormalTile" + to_string(tileToMoveTo);
-        cerr << "fifth" << endl;
-    }
+//        tileType = pawn->team + "Home" + to_string(tileToMoveTo - jump(pawn) - pawnMax);
+//
+//        cout << tileType << endl;
+////        cout << "second" << endl;
+//    } else if (pawn->hasPassedZeroTile() && pawn->currentTileNum >= pawnMax + jump(pawn) &&
+//               pawn->currentTileNum + spaces == pawnMax + jump(pawn) + 7) { // home tile
+//
+//        tileToMoveTo = -5; // because moving to the home tile
+////        cout << "third" << endl;
+//        tileType = "HomeTile" + pawn->team + to_string(pawn->id);
+//    } else if (pawn->currentTileNum + spaces > pawnMax + jump(pawn) + 7) { // past the home tile
+////        cout << "fourth" << endl;
+//        return false; // can't move up the home stretch
+//    } else {
+//        tileToMoveTo %= 68;
+//        tileType = "NormalTile" + to_string(tileToMoveTo);
+//        cout << "fifth" << endl;
+//    }
+//
+//    RectangleTile *prevTile = nullptr;
+//    RectangleTile *nextTile = nullptr;
+//    HomeTile *home = nullptr;
+//    function<void(Tile *)> lambda = [&, this](Tile *t) {
+//        if (auto recTile = dynamic_cast<RectangleTile *>(t)) {
+//            if (recTile->getNumber() == pawn->currentTileNum) {
+//                prevTile = recTile;
+//            } else if (recTile->getNumber() == tileToMoveTo) {
+//                nextTile = recTile;
+//            }
+//        } else if (auto homeTile = dynamic_cast<HomeTile *>(t)) {
+//            if (pawn->currentTileNum + spaces == pawnMax + jump(pawn) + 7) { // to get to the home tile
+//                home = homeTile;
+//            }
+//        }
+//    };
+//    iterateThroughLayout(lambda);
+//
+//    bool bumpPlayerOffStart = nextTile ? (nextTile->isOccupied() && !nextTile->isBlockaded() &&
+//                                          // determine if an incoming pawn can
+//                                          (*nextTile->getOccupyingPawn())->team != pawn->team &&
+//                                          // knock an enemy pawn off of its
+//                                          ((nextTile->getNumber() - 1 == StartTile::BLUE_START_NUM && // first tile
+//                                            tolower(pawn->team) == "blue") ||
+//                                           (nextTile->getNumber() - 1 == StartTile::RED_START_NUM &&
+//                                            tolower(pawn->team) == "red") ||
+//                                           (nextTile->getNumber() - 1 == StartTile::YELLOW_START_NUM &&
+//                                            tolower(pawn->team) == "yellow") ||
+//                                           (nextTile->getNumber() - 1 == StartTile::GREEN_START_NUM &&
+//                                            tolower(pawn->team) == "green")))
+//
+//                                       : false;
+//    bool moveSuccessful = false;
+//    if ((nextTile && (!nextTile->isOccupied() ||
+//                      (nextTile->isOccupied() &&
+//                       (*nextTile->getOccupyingPawn())->team == pawn->team &&
+//                       !nextTile->isBlockaded()) ||
+//                      bumpPlayerOffStart)) || home) {
+//
+//        this->layout()->removeWidget(pawn);
+//
+//        cout << "Tile to move from: " << pawn->currentTileNum << endl;
+//        cout << "Tile to move to: " << tileToMoveTo << endl;
+//        tuple<int, int> pawnLocationToMove;
+//
+//        string aOrBPosition = (nextTile && nextTile->isOccupied() ? "b" : "a");
+//        // TODO move pawn from b to a if it's now alone
+//
+//        if (((pawn->getStatus() != PawnStatus::HOME && tileToMoveTo >= pawnMax + jump(pawn) && // ends on home stretch
+//              tileToMoveTo < pawnMax + jump(pawn) + 7) ||
+//             (pawn->currentTileNum <= pawnMax &&
+//              tileToMoveTo >= pawnMax + jump(pawn)))) {
+//
+//            pawnLocationToMove = this->pawnLocations[tileType + aOrBPosition];
+//            cout << tileType + aOrBPosition << endl;
+////            cout << "first move" << endl;
+////            moveSuccessful = true;
+//        } else if (home) { // get to home tile
+//            pawnLocationToMove = this->pawnLocations[tileType];
+//            pawn->setStatus(HOME);
+//            cout << tileType << endl;
+////            moveSuccessful = true;
+////            cout << "second move" << endl;
+//        } else {//} if (tileToMoveTo <= pawnMax || tileToMoveTo > pawnMax) {
+//            pawnLocationToMove = this->pawnLocations[tileType + aOrBPosition];
+//            cout << tileType + aOrBPosition << endl;
+////            moveSuccessful = true;
+////            cout << "third move" << endl;
+//        }
+//
+//        pawn->currentTileNum = tileToMoveTo;
+//        auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
+//        gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 1);
+//
+//        if (bumpPlayerOffStart) {
+//            QPointer<Pawn> occupyingPawn = *(nextTile->getOccupyingPawn());
+//            movePawn(occupyingPawn, 0, pawnMax, true);
+//            nextTile->removePawn(); // guaranteed to not be nullptr
+//        }
+//
+//        prevTile->removePawn();
+//
+//        if (nextTile && !home) {
+//            nextTile->addPawn(pawn);
+//            pawn->setStatus(PLAYING);
+//        }
+//        moveSuccessful = true;
+//    } else if ((nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->isSafe) ||
+//               (nextTile && !nextTile->isBlockaded() && pawn->getStatus() == PawnStatus::START && bumpPlayerOffStart)) {
+//
+//        this->layout()->removeWidget(pawn);
+//
+//        pawn->currentTileNum = tileToMoveTo;
+//        tuple<int, int> pawnLocationToMove = this->pawnLocations[tileType + to_string(pawn->currentTileNum) + "a"];
+//        auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
+//        gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 1);
+//
+//        QPointer<Pawn> occupyingPawn = *(nextTile->getOccupyingPawn());
+//        movePawn(occupyingPawn, 0, pawnMax, true);
+//        prevTile->removePawn();
+//        nextTile->removePawn();
+//        nextTile->addPawn(pawn);
+//        moveSuccessful = true;
+//    }
+//    return moveSuccessful;
+//}
+
+
+bool MainWindow::movePawnTest(const QPointer<Pawn> &pawn, int spaces) {
+    bool moveSuccessful = false;
+
+    tuple<int, string> nextTileInfo = getTileInformation(pawn, spaces);
+    int tileToMoveTo = get<0>(nextTileInfo);
+    string tileInfo = get<1>(nextTileInfo);
 
     RectangleTile *prevTile = nullptr;
     RectangleTile *nextTile = nullptr;
-    HomeTile *home = nullptr;
-    function<void(Tile *)> lambda = [&, this](Tile *t) {
-        if (auto recTile = dynamic_cast<RectangleTile *>(t)) {
-            if (recTile->getNumber() == pawn->currentTileNum) {
-                prevTile = recTile;
-            } else if (recTile->getNumber() == tileToMoveTo) {
-                nextTile = recTile;
-            }
-        } else if (auto homeTile = dynamic_cast<HomeTile *>(t)) {
-            if (pawn->currentTileNum + spaces == pawnMax + jump(pawn) + 7) { // to get to the home tile
-                home = homeTile;
-            }
+    HomeTile *homeTile = nullptr;
+
+    function<void(Tile *)> findTilesLambda = [&](Tile *tile) {
+        if (auto recTile = dynamic_cast<RectangleTile *>(tile)) {
+            if (recTile->getNumber() == pawn->currentTileNum) prevTile = recTile;
+            else if (recTile->getNumber() == tileToMoveTo) nextTile = recTile;
+        } else if (auto home = dynamic_cast<HomeTile *>(tile)) {
+            if (tileToMoveTo == -5) homeTile = home;
         }
     };
-    iterateThroughLayout(lambda);
+    iterateThroughLayout(findTilesLambda);
 
-    bool bumpPlayerOffStart = nextTile ? (nextTile->isOccupied() && !nextTile->isBlockaded() &&
-                                          // determine if an incoming pawn can
-                                          (*nextTile->getOccupyingPawn())->team != pawn->team &&
-                                          // knock an enemy pawn off of its
-                                          ((nextTile->getNumber() - 1 == StartTile::BLUE_START_NUM && // first tile
-                                            tolower(pawn->team) == "blue") ||
-                                           (nextTile->getNumber() - 1 == StartTile::RED_START_NUM &&
-                                            tolower(pawn->team) == "red") ||
-                                           (nextTile->getNumber() - 1 == StartTile::YELLOW_START_NUM &&
-                                            tolower(pawn->team) == "yellow") ||
-                                           (nextTile->getNumber() - 1 == StartTile::GREEN_START_NUM &&
-                                            tolower(pawn->team) == "green")))
+    bool bumpPlayerOffStart = nextTile && (nextTile->isOccupied() && !nextTile->isBlockaded() &&
+                                           // determine if an incoming pawn can
+                                           (*nextTile->getOccupyingPawn())->team != pawn->team &&
+                                           // knock an enemy pawn off of its
+                                           ((nextTile->getNumber() - 1 == StartTile::BLUE_START_NUM && // first tile
+                                             tolower(pawn->team) == "blue") ||
+                                            (nextTile->getNumber() - 1 == StartTile::RED_START_NUM &&
+                                             tolower(pawn->team) == "red") ||
+                                            (nextTile->getNumber() - 1 == StartTile::YELLOW_START_NUM &&
+                                             tolower(pawn->team) == "yellow") ||
+                                            (nextTile->getNumber() - 1 == StartTile::GREEN_START_NUM &&
+                                             tolower(pawn->team) == "green")));
 
-                                       : false;
-    bool moveSuccessful = false;
-    if ((nextTile && (!nextTile->isOccupied() ||
-                      (nextTile->isOccupied() &&
-                       (*nextTile->getOccupyingPawn())->team == pawn->team &&
-                       !nextTile->isBlockaded()) ||
-                      bumpPlayerOffStart)) || (home)) {
-
-        this->layout()->removeWidget(pawn);
-
-        pawn->currentTileNum = tileToMoveTo;
-//        cerr << "New current tile " << pawn->currentTileNum << endl;
-        tuple<int, int> pawnLocationToMove;
-
-        string aOrBPosition = (nextTile && nextTile->isOccupied() ? "b" : "a");
-        // TODO move pawn from b to a if it's now alone
-
-        if (pawn->hasPassedZeroTile() && ((pawn->currentTileNum > pawnMax &&
-                                           pawn->currentTileNum != pawnMax + jump(pawn) + 7 &&
-                                           pawn->currentTileNum + spaces < pawnMax + jump(pawn) + 7) ||
-                                          (pawn->currentTileNum <= pawnMax && tileToMoveTo > pawnMax)
-        )) { // not the home tile but on the home stretch
-//            cout << tileType + to_string(nextTile->getNumber() - pawnMax - jump(pawn)) + aOrBPosition << endl;
-            pawnLocationToMove = this->pawnLocations[
-//                    tileType + to_string(tileToMoveTo/*nextTile->getNumber() - pawnMax + jump(pawn)*/) + aOrBPosition
-                    tileType + aOrBPosition
-            ];
-//            cout << tileType + to_string(tileToMoveTo/*nextTile->getNumber() - pawnMax + jump(pawn)*/) + aOrBPosition
-//                 << endl;
-            cout << tileType + aOrBPosition << endl;
-            moveSuccessful = true;
-        } else if (home) { // get to home tile
-            pawnLocationToMove = this->pawnLocations[tileType + pawn->team + to_string(pawn->id)];
-            pawn->setStatus(HOME);
-            cout << tileType + pawn->team + to_string(pawn->id) << endl;
-            moveSuccessful = true;
-
-        } else if ((tileToMoveTo < pawnMax) ||
-                   (!pawn->hasPassedZeroTile() && tileToMoveTo > pawnMax)) {
-            pawnLocationToMove = this->pawnLocations[tileType + aOrBPosition];
-            cout << tileType + aOrBPosition << endl;
-            moveSuccessful = true;
-        }
-
-        auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
-        gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 1);
-        if (bumpPlayerOffStart) {
-            QPointer<Pawn> occupyingPawn = *(nextTile->getOccupyingPawn());
-            movePawn(occupyingPawn, 0, pawnMax, true);
-            nextTile->removePawn(); // guaranteed to not be nullptr
-        }
-
-        prevTile->removePawn();
-
-
-        if (nextTile && !home) {
-            nextTile->addPawn(pawn);
-            pawn->setStatus(PLAYING);
-        }
-    } else if ((nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->isSafe) ||
-               (nextTile && !nextTile->isBlockaded() && pawn->getStatus() == PawnStatus::START && bumpPlayerOffStart)) {
-
-        this->layout()->removeWidget(pawn);
-
-        pawn->currentTileNum = tileToMoveTo;
-        tuple<int, int> pawnLocationToMove = this->pawnLocations[tileType + to_string(pawn->currentTileNum) + "a"];
-        auto gridLayout = dynamic_cast<QGridLayout *>(this->layout());
-        gridLayout->addWidget(pawn, get<0>(pawnLocationToMove), get<1>(pawnLocationToMove), 1, 1);
-
-        QPointer<Pawn> occupyingPawn = *(nextTile->getOccupyingPawn());
-        movePawn(occupyingPawn, 0, pawnMax, true);
-        prevTile->removePawn();
-        nextTile->removePawn();
-        nextTile->addPawn(pawn);
-        moveSuccessful = true;
+    string aOrBPosition;
+    if (nextTile && !nextTile->isOccupied()) {
+        aOrBPosition = "a";
+    } else if (nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() &&
+               (*nextTile->getOccupyingPawn())->team != pawn->team) {
+        aOrBPosition = "a";
+    } else if (nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->occupiedSpaceA()) {
+        aOrBPosition = "a";
+    } else if (nextTile && nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->occupiedSpaceB()) {
+        aOrBPosition = "b";
     }
+
+    if (homeTile) {
+        this->layout()->removeWidget(pawn);
+        tuple<int, int> locationToMove = this->pawnLocations[tileInfo];
+        dynamic_cast<QGridLayout *>(this->layout())->addWidget(pawn, get<0>(locationToMove), get<1>(locationToMove));
+        pawn->currentTileNum = tileToMoveTo;
+        pawn->setStatus(PawnStatus::HOME);
+        prevTile->removePawn();
+        moveSuccessful = true;
+    } else if (nextTile) {
+
+        if ((nextTile->isOccupied() && !nextTile->isBlockaded() && !nextTile->isSafe &&
+             (*nextTile->getOccupyingPawn())->team != pawn->team) ||
+            (!nextTile->isBlockaded() && pawn->getStatus() == PawnStatus::START && bumpPlayerOffStart)) {
+            QPointer<Pawn> occupyingPawn = *nextTile->removePawn();
+
+            function<void(StartTile *)> lambda = [&, this](StartTile *start) {
+                if (tolower(start->getColorString()) == tolower(occupyingPawn->team)) {
+                    if (tolower(occupyingPawn->team) == "blue") {
+                        occupyingPawn->currentTileNum = StartTile::BLUE_START_NUM;
+                    } else if (tolower(occupyingPawn->team) == "red") {
+                        occupyingPawn->currentTileNum = StartTile::RED_START_NUM;
+                    } else if (tolower(occupyingPawn->team) == "yellow") {
+                        occupyingPawn->currentTileNum = StartTile::YELLOW_START_NUM;
+                    } else {
+                        occupyingPawn->currentTileNum = StartTile::GREEN_START_NUM;
+                    }
+
+                    string capitalizedTeam =
+                            (char) std::toupper(occupyingPawn->team[0]) + (string(occupyingPawn->team).erase(0, 1));
+
+                    tuple<int, int> initialStart = this->pawnLocations[capitalizedTeam + "Start" +
+                                                                       to_string(occupyingPawn->id)];
+                    this->layout()->removeWidget(occupyingPawn);
+                    dynamic_cast<QGridLayout *>(this->layout())->addWidget(occupyingPawn, get<0>(initialStart),
+                                                                           get<1>(initialStart), 1, 1);
+                    occupyingPawn->setStatus(PawnStatus::START);
+                }
+            };
+            iterateThroughLayout(lambda);
+        }
+
+        this->layout()->removeWidget(pawn);
+        tuple<int, int> locationToMove = this->pawnLocations[tileInfo + aOrBPosition];
+        dynamic_cast<QGridLayout *>(this->layout())->addWidget(pawn, get<0>(locationToMove),
+                                                               get<1>(locationToMove));
+        pawn->currentTileNum = tileToMoveTo;
+
+        if (prevTile) {
+//            QPointer<Pawn> removed = *prevTile->removePawn();
+//            if (removed != pawn) {
+            prevTile->removePawn(); // should be correct pawn
+//                prevTile->addPawn(removed);
+//            nextTile->addPawn(pawn);
+//            }
+        }
+        nextTile->addPawn(pawn);
+        cout << nextTile->occupiedSpaceA() << ", " << nextTile->occupiedSpaceB() << ", " << nextTile->isBlockaded()
+             << endl;
+        moveSuccessful = true;
+
+        if (pawn->getStatus() == PawnStatus::START) {
+            pawn->setStatus(PawnStatus::PLAYING);
+        }
+    }
+
     return moveSuccessful;
 }
 
+tuple<int, string> MainWindow::getTileInformation(const QPointer<Pawn> &pawn, int spaces) const {
+    int tileToMoveTo = pawn->currentTileNum + spaces;
+    string tileInformation;
 
-bool MainWindow::movePawnTest(QPointer<Pawn> &pawn, int spaces) {
-    bool success = false;
+    if (pawn->getStatus() == PawnStatus::PLAYING &&
+        tileToMoveTo == pawn->MAX_TILE + jump(pawn) + 7) { // move to the home tile
+        tileToMoveTo = -5;
+        tileInformation = "HomeTile" + pawn->team + to_string(pawn->id);
+    } else if (pawn->getStatus() == PawnStatus::PLAYING && pawn->currentTileNum >= pawn->MAX_TILE + jump(pawn) &&
+               tileToMoveTo >= pawn->MAX_TILE + jump(pawn) &&
+               tileToMoveTo < pawn->MAX_TILE + jump(pawn) + 7) {
+        // pawn is on home stretch and is moving to home stretch
 
-    int current = pawn->currentTileNum;
-    int initialTileToMoveTo = (current + spaces) % 68;
-    Tile *nextTile = nullptr;
-    function<void(Tile *)> lambda = [&](Tile *tile) {
-        if (dynamic_cast<RectangleTile *>(tile)->getNumber() == initialTileToMoveTo) {
-            nextTile = tile;
+        tileInformation = pawn->team + "Home" + to_string(tileToMoveTo - jump(pawn) - pawn->MAX_TILE);
+        if (tileInformation == pawn->team + "Home7") {
+            tileInformation = "HomeTile" + pawn->team + to_string(pawn->id);
         }
-    };
-    iterateThroughLayout(lambda);
 
-    if (!pawn->hasPassedZeroTile()) {
-        if (!dynamic_cast<RectangleTile *>(nextTile)->isBlockaded()) {
+    } else if (pawn->hasPassedZeroTile() && pawn->getStatus() == PawnStatus::PLAYING &&
+               pawn->currentTileNum <= pawn->MAX_TILE &&
+               tileToMoveTo > pawn->MAX_TILE) {
+        // pawn passed/is on 0, move to home stretch
 
-        }
+        int leftover = (pawn->currentTileNum + spaces) - pawn->MAX_TILE;
+        tileToMoveTo = pawn->MAX_TILE + jump(pawn) + leftover - 1;
+        tileInformation = pawn->team + "Home" + to_string(tileToMoveTo - jump(pawn) - pawn->MAX_TILE);
+    } else if (!pawn->hasPassedZeroTile() && tolower(pawn->team) == "blue" &&
+               pawn->getStatus() == PawnStatus::PLAYING &&
+               pawn->currentTileNum > pawn->MAX_TILE &&
+               pawn->currentTileNum < pawn->MAX_TILE + jump(pawn) &&
+               tileToMoveTo > pawn->MAX_TILE &&
+               tileToMoveTo - pawn->currentTileNum < 0) {
+        // pawn hasn't passed 0, moving to home stretch (probably just for blue)
+
+        int distToZeroTile = 68 - pawn->currentTileNum;
+        spaces -= distToZeroTile;
+        spaces -= pawn->MAX_TILE;
+        tileToMoveTo = pawn->MAX_TILE + jump(pawn) + spaces - 1;
+        tileInformation = pawn->team + "Home" + to_string(tileToMoveTo - jump(pawn) - pawn->MAX_TILE);
+        pawn->setPassedZeroTile(true);
+    } else {
+        // pawn's movement has nothing to do with the home stretch
+
+        if (pawn->currentTileNum + spaces > 67) pawn->setPassedZeroTile(true);
+        tileToMoveTo %= 68;
+        tileInformation = "NormalTile" + to_string(tileToMoveTo);
     }
 
-
-    return success;
+    cout << pawn->team << ": " << pawn->currentTileNum << " -> " << tileToMoveTo << " @" << tileInformation << endl;
+    return make_pair(tileToMoveTo, tileInformation);
 }
 
 
@@ -812,21 +926,40 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
 
     int current = pawn->currentTileNum;
     int max = pawn->MAX_TILE;
-    function<void(RectangleTile *)> blockadeAndSafeLambda = [&](RectangleTile *tile) {
-        if (tile->getNumber() > current && tile->getNumber() <= current + spaces && tile->getNumber() <= max &&
-            tile->isBlockaded()) {
-            good = false;
+    int wantsToMoveTo = get<0>(getTileInformation(pawn, spaces));
+    function<void(RectangleTile *)> blockadeAndSafeLambda = [&](RectangleTile *tile) { // FIXME this doesn't quite work
+        int tileNum = tile->getNumber();
 
-            if (tile->getNumber() == current + spaces &&
-                tile->isSafe &&
-                (tile->isOccupied() &&
-                 (*(tile->getOccupyingPawn()))->team != pawn->team)) {
-
-                good = false;
+        if (tile->isBlockaded()) {
+            cout << "Blockaded: " << tile->getNumber() << endl;
+            cout << "Aiming to get to tile " << wantsToMoveTo << endl;
+            if (wantsToMoveTo != -5) { // magic number for home tile
+                if (wantsToMoveTo < 68 && current > max && current < tileNum && tileNum <= wantsToMoveTo) {
+                    good = false;
+                } else if (current <= max && wantsToMoveTo <= max && current < tileNum && tileNum <= wantsToMoveTo) {
+                    good = false;
+                } else if (wantsToMoveTo >= max + jump(pawn) && wantsToMoveTo < max + jump(pawn) + 7) {
+                    if (current < tileNum && tileNum <= max) {
+                        good = false;
+                    } else if (current < tileNum && tileNum >= max + jump(pawn) && tileNum <= wantsToMoveTo) {
+                        good = false;
+                    }
+                }
+            } else {
+                if (current <= max) {
+                    if (current < tileNum && tileNum <= max) {
+                        good = false;
+                    }
+                } else if (current >= max + jump(pawn)) {
+                    if (current < tileNum && tileNum > max + jump(pawn) && tileNum < max + jump(pawn) + 7) {
+                        good = false;
+                    }
+                }
+//                good = true;
             }
-
-        } else if (tile->getNumber() > current && tile->getNumber() >= max + jump(pawn) &&
-                   tile->getNumber() < max + jump(pawn) + 7 && tile->isBlockaded()) {
+        }
+        if (tileNum == wantsToMoveTo && tile->isSafe &&
+            tile->isOccupied() && (*tile->getOccupyingPawn())->team != pawn->team) {
             good = false;
         }
     };
@@ -834,11 +967,9 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
 
     if (pawn->getStatus() == PawnStatus::START && spaces != 5) good = false;
     else if (pawn->getStatus() == PawnStatus::HOME) good = false;
-    else if (pawn->getStatus() == PawnStatus::PLAYING) {
-        if (current + spaces > max + jump(pawn) + 7) good = false;
-    }
+    else if (pawn->getStatus() == PawnStatus::PLAYING && current + spaces > max + jump(pawn) + 7) good = false;
 
-
+    cout << "Returning " << (good ? "true" : "false") << endl;
     return good;
 }
 
@@ -855,21 +986,21 @@ int MainWindow::jump(const QPointer<Pawn> &pawn) const {
     return 40; // green
 }
 
-int MainWindow::jump(int startNum, int spaces, const Player &player) const {
-    if (startNum + spaces > player.MAX_TILE) {
-        if (tolower(player.getColorString()) == "blue") {
-            return startNum + spaces + 60;
-        } else if (tolower(player.getColorString()) == "red") {
-            return startNum + spaces + 30;
-        } else if (tolower(player.getColorString()) == "yellow") {
-            return startNum + spaces + 50;
-        } else { // green
-            return startNum + spaces + 40;
-        }
-    } else {
-        return startNum + spaces;
-    }
-}
+//int MainWindow::jump(int startNum, int spaces, const Player &player) const {
+//    if (startNum + spaces > player.MAX_TILE) {
+//        if (tolower(player.getColorString()) == "blue") {
+//            return startNum + spaces + 60;
+//        } else if (tolower(player.getColorString()) == "red") {
+//            return startNum + spaces + 30;
+//        } else if (tolower(player.getColorString()) == "yellow") {
+//            return startNum + spaces + 50;
+//        } else { // green
+//            return startNum + spaces + 40;
+//        }
+//    } else {
+//        return startNum + spaces;
+//    }
+//}
 
 void MainWindow::cpuTurn(const Player &player) {
 
@@ -880,107 +1011,65 @@ void MainWindow::cpuTurn(const Player &player) {
     };
     iterateThroughLayout(rollDice);
 
-    int dieOneValue = settings.value("firstRoll").toInt();
-    bool dieOneUsed = false;
-    int dieTwoValue = settings.value("secondRoll").toInt();
-    bool dieTwoUsed = false;
+    int bigger = max(settings.value("firstRoll").toInt(), settings.value("secondRoll").toInt());
+    int smaller = min(settings.value("firstRoll").toInt(), settings.value("secondRoll").toInt());
+//    int bigger = 5;
+//    int smaller = 5;
 
-    string playerTeam = player.colorString;
-    vector<QPointer<Pawn>> playerPawns = player.pawns;
-    int firstTileNum;
-    int moveHereNum;
-    int pawnMax;
+    bool biggerUsed = false;
+    bool smallerUsed = false;
 
-    // declare initial tiles to move to from start
-    if (tolower(playerTeam) == "blue") {
-        firstTileNum = StartTile::BLUE_START_NUM + 1;
-        pawnMax = 8;
-    } else if (tolower(playerTeam) == "red") {
-        firstTileNum = StartTile::RED_START_NUM + 1;
-        pawnMax = 59;
-    } else if (tolower(playerTeam) == "green") {
-        firstTileNum = StartTile::GREEN_START_NUM + 1;
-        pawnMax = 42;
-    } else { // yellow
-        firstTileNum = StartTile::YELLOW_START_NUM + 1;
-        pawnMax = 25;
-    }
+    cout << player.colorString << " rolled " << bigger << ", " << smaller << endl;
 
-//    Tile *firstFromStart;
-//    Tile *moveHere;
-//
-//    function<void(Tile *)> findNextMove = [&](Tile *tile) {
-//        if (dynamic_cast<RectangleTile *>(tile) && dynamic_cast<RectangleTile *>(tile)->getNumber() == firstTileNum) {
-//            firstFromStart = tile;
-//        } else if (dynamic_cast<RectangleTile *>(tile) &&
-//                   dynamic_cast<RectangleTile *>(tile)->getNumber() == moveHereNum) {
-//            moveHere = tile;
-//        }
-//    };
-//
-//    iterateThroughLayout(findNextMove);
-
-    cout << playerTeam << " rolled " << dieOneValue << ", " << dieTwoValue << endl;
-
-    for (const QPointer<Pawn> &pawn : playerPawns) {
-        if (pawn->getStatus() == START) {
-            if (dieOneValue == 5) {
-                if (canMove(pawn, 5) && !dieOneUsed) {
-                    if (this->movePawn(pawn, 1, pawnMax)) {
-                        dieOneUsed = true;
-                    }
+    for (const QPointer<Pawn> &pawn : player.pawns) {
+        if (pawn->getStatus() == PawnStatus::START) {
+            if (!biggerUsed && bigger == 5 && canMove(pawn, 5)) {
+//                if (this->movePawn(pawn, 1, pawn->MAX_TILE)) {
+                if (this->movePawnTest(pawn, 1)) { // just moving off start tile
+                    biggerUsed = true;
                 }
-            } else if (dieTwoValue == 5) {
-                if (canMove(pawn, 5) && !dieTwoUsed) {
-                    if (this->movePawn(pawn, 1, pawnMax)) {
-                        dieTwoUsed = true;
-                    }
+            } else if (!smallerUsed && smaller == 5 && canMove(pawn, 5)) {
+//                if (this->movePawn(pawn, 1, pawn->MAX_TILE)) {
+                if (this->movePawnTest(pawn, 1)) { // just moving off start tile
+                    smallerUsed = true;
                 }
-            } else if (!dieOneUsed && !dieTwoUsed && dieOneValue + dieTwoValue == 5) {
-                if (canMove(pawn, 5)) {
-                    if (this->movePawn(pawn, 1, pawnMax)) {
-                        dieOneUsed = true;
-                        dieTwoUsed = true;
-                    }
+            } else if (!biggerUsed && !smallerUsed && bigger + smaller == 5 && canMove(pawn, 5)) {
+//                if (this->movePawn(pawn, 1, pawn->MAX_TILE)) {
+                if (this->movePawnTest(pawn, 1)) { // just moving off start tile
+                    biggerUsed = true;
+                    smallerUsed = true;
                 }
             }
-        } else if (pawn->getStatus() == PLAYING) {
-//            moveHereNum = (pawn->currentTileNum + dieOneValue + dieTwoValue) % 68;
-//            iterateThroughLayout(findNextMove);
-            if (!dieOneUsed && !dieTwoUsed && canMove(pawn, dieOneValue + dieTwoValue)) {
-                if (this->movePawn(pawn, dieOneValue + dieTwoValue, pawnMax)) {
-                    dieOneUsed = true;
-                    dieTwoUsed = true;
-//                    cout << "Moved " << *pawn << " from " << pawn->currentTileNum - dieTwoValue - dieOneValue << " to "
-//                         << pawn->currentTileNum << endl;
-                }
-            }
-//            moveHereNum = (pawn->currentTileNum + dieOneValue) % 68;
-//            iterateThroughLayout(findNextMove);
-            if (!dieOneUsed && canMove(pawn, dieOneValue)) {
-                if (this->movePawn(pawn, dieOneValue, pawnMax)) {
-                    dieOneUsed = true;
-//                    cout << "Moved " << *pawn << " from " << pawn->currentTileNum - dieOneValue << " to "
-//                         << pawn->currentTileNum << endl;
-                }
-            }
-//            moveHereNum = (pawn->currentTileNum + dieTwoValue) % 68;
-//            iterateThroughLayout(findNextMove);
-            if (!dieTwoUsed && canMove(pawn, dieTwoValue)) {
-                if (this->movePawn(pawn, dieTwoValue, pawnMax)) {
-                    dieTwoUsed = true;
-//                    cout << "Moved " << *pawn << " from " << pawn->currentTileNum - dieTwoValue << " to "
-//                         << pawn->currentTileNum << endl;
-                }
-            }
-
-        } else {
-            cout << " we home safe and sound " << endl;
         }
     }
+    for (const QPointer<Pawn> &pawn : player.pawns) {
+        if (pawn->getStatus() == PawnStatus::PLAYING) {
+            if (!biggerUsed && !smallerUsed && canMove(pawn, bigger + smaller)) {
+//                if (this->movePawn(pawn, bigger + smaller, pawn->MAX_TILE)) {
+                if (this->movePawnTest(pawn, bigger + smaller)) {
+                    biggerUsed = true;
+                    smallerUsed = true;
+                }
+            } else {
+                if (!biggerUsed && canMove(pawn, bigger)) {
+//                    if (this->movePawn(pawn, bigger, pawn->MAX_TILE)) {
+                    if (this->movePawnTest(pawn, bigger)) {
+                        biggerUsed = true;
+                    }
+                }
+                if (!smallerUsed && canMove(pawn, smaller)) {
+//                    if (this->movePawn(pawn, smaller, pawn->MAX_TILE)) {
+                    if (this->movePawnTest(pawn, smaller)) {
+                        smallerUsed = true;
+                    }
+                }
+            }
+        }
+    }
+    cout << endl << endl;
 }
 
-string MainWindow::tolower(const std::string &s) const {
+string MainWindow::tolower(const string &s) const {
     string lowered;
     for (char c : s) {
         lowered += (char) std::tolower(c);
@@ -988,7 +1077,7 @@ string MainWindow::tolower(const std::string &s) const {
     return lowered;
 }
 
-string MainWindow::toupper(const std::string &s) const {
+string MainWindow::toupper(const string &s) const {
     string uppered;
     for (char c : s) {
         uppered += (char) std::toupper(c);
