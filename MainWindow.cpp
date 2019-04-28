@@ -8,12 +8,14 @@
 #include <unistd.h>
 #include <QAction>
 #include <QLabel>
-#include <QPushButton>
-#include <QTime>
-#include <QScrollArea>
+#include <QGroupBox>
 #include <QButtonGroup>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QVBoxLayout>
+#include <QShortcut>
+#include <QScrollArea>
 #include <QSettings>
 #include <QShortcut>
 #include <QSizePolicy>
@@ -23,10 +25,7 @@
 using namespace std;
 using Qt::GlobalColor;
 
-QSettings settings("CS205", "Parcheesi"); // NOLINT(cert-err58-cpp)
-
-
-MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Parcheesi") {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
     this->setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowTitle("Parcheesi");
@@ -40,9 +39,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     menuBar->addMenu(fileMenu);
     QPointer<QAction> gameplayInstructions = fileMenu->addAction("&Rules");
     gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
-
     QPointer<QAction> gameMenu = fileMenu->addAction("&New Game");
     gameMenu->setShortcut(Qt::CTRL + Qt::Key_N);
+    gameMenu->setShortcut(Qt::Key_Space);
 
 
     auto newGame = [&, this]() {
@@ -56,14 +55,14 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 //        QPointer<QGroupBox> menuBox = new QGroupBox(startWindow);
 
         QPointer<QButtonGroup> colorChoice = new QButtonGroup(startWindow);
-        QPointer<QRadioButton> colorRed = new QRadioButton("Red", startWindow);
         QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", startWindow);
+        QPointer<QRadioButton> colorRed = new QRadioButton("Red", startWindow);
         QPointer<QRadioButton> colorGreen = new QRadioButton("Green", startWindow);
         QPointer<QRadioButton> colorYellow = new QRadioButton("Yellow", startWindow);
+        colorChoice->addButton(colorBlue, 0);
         colorChoice->addButton(colorRed, 1);
-        colorChoice->addButton(colorBlue, 2);
-        colorChoice->addButton(colorGreen, 3);
-        colorChoice->addButton(colorYellow, 4);
+        colorChoice->addButton(colorGreen, 2);
+        colorChoice->addButton(colorYellow, 3);
 
         QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
         numPlayers->setStyleSheet("background-color: white; color: black;");
@@ -113,6 +112,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
             iterateThroughLayout(lambda);
             settings.setValue("playerColor", colorChoiceId);
             settings.setValue("numPlayers", val);
+            this->players = this->resetBoard();
+
+            if (colorChoiceId == 0) { // blue
+                settings.setValue("currentPlayer", QColor(0, 0, 153));
+            } else if (colorChoiceId == 1) { // red
+                settings.setValue("currentPlayer", QColor(153, 0, 0));
+            } else if (colorChoiceId == 2) { // yellow
+                settings.setValue("currentPlayer", QColor(153, 153, 0));
+            } else {
+                settings.setValue("currentPlayer", QColor(0, 102, 0));
+            }
+
             this->show();
             startWindow->hide();
         });
@@ -159,10 +170,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showRules);
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
-    QPointer<QGridLayout> layout = new QGridLayout(this);
-    this->players = createBoard(layout);
-    this->setLayout(layout);
 
+    QPointer<QGridLayout> layout = new QGridLayout(this);
+    layout->setSpacing(Tile::TILE_SPACING);
+    QPointer<QLabel> startLabel = new QLabel(this);
+    startLabel->setText("Press CMD+N to start");
+    layout->addWidget(startLabel);
+    this->setLayout(layout);
     settings.setValue("currentPlayer", players[0].color);
 }
 
@@ -193,6 +207,7 @@ QString MainWindow::readRules() {
 vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     layout->setSpacing(Tile::TILE_SPACING);
 
+//    addStartMenu(layout);
     addStartTiles(layout);
     addHomeTile(layout);
     addGeneralTiles(layout);
@@ -200,6 +215,27 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addDice(layout);
     addNextButton(layout);
     addDialogueBox(layout);
+
+    this->hide();
+
+    return players;
+}
+
+vector<Player> MainWindow::resetBoard() {
+
+    QLayoutItem * item;
+    QLayout * sublayout;
+    QWidget * widget;
+    while ((item = this->layout()->takeAt(0))) {
+        if ((sublayout = item->layout()) != 0) {/* do the same for sublayout*/}
+        else if ((widget = item->widget()) != 0) {widget->hide(); delete widget;}
+        else {delete item;}
+    }
+
+    QPointer<QGridLayout> layout = new QGridLayout(this);
+    vector<Player> players = createBoard(layout);
+    delete this->layout();
+    this->setLayout(layout);
 
     return players;
 }
@@ -441,11 +477,10 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
         for (int j = 0; j < 2; j++) {
             int row = (i + 3) * 2;
             int column = (j + 14) * 2;
-
             QPointer<Pawn> redOne = new Pawn({10, 10}, StartTile::RED_START_NUM, (2 * i) + j, "Red", movePawnLambda,
                                              QColor(153, 0, 0),
                                              this);
-//            redOne->setPassedZeroTile(true);
+            redOne->setPassedZeroTile(true);
             this->pawnLocations["RedStart" + to_string(redOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["RedStart" + to_string(redOne->id)];
             settings.setValue(QString::fromStdString("red" + to_string(redOne->id)), StartTile::RED_START_NUM);
@@ -462,6 +497,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             QPointer<Pawn> yellowOne = new Pawn({10, 10}, StartTile::YELLOW_START_NUM, (2 * i) + j, "Yellow",
                                                 movePawnLambda, QColor(153, 153, 0),
                                                 this);
+            yellowOne->setPassedZeroTile(true);
             this->pawnLocations["YellowStart" + to_string(yellowOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["YellowStart" + to_string(yellowOne->id)];
             settings.setValue(QString::fromStdString("yellow" + to_string(yellowOne->id)),
@@ -479,6 +515,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             QPointer<Pawn> greenOne = new Pawn({10, 10}, StartTile::GREEN_START_NUM, (2 * i) + j, "Green",
                                                movePawnLambda, QColor(0, 102, 0),
                                                this);
+            greenOne->setPassedZeroTile(true);
             this->pawnLocations["GreenStart" + to_string(greenOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["GreenStart" + to_string(greenOne->id)];
             settings.setValue(QString::fromStdString("green" + to_string(greenOne->id)), StartTile::GREEN_START_NUM);
@@ -506,7 +543,13 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
             die->repaint();
             settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
         };
+
         iterateThroughLayout(rollDice);
+
+        gameOutput.push_back(QString::fromStdString("You rolled ") +
+        QString::fromStdString(to_string(settings.value("firstRoll").toInt())) + QString::fromStdString(", ") +
+        QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
+        updateScroll();
     });
 
     layout->addWidget(rollButton, 7, 39, 1, 10);
@@ -517,33 +560,34 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
     nextButton->setStyleSheet("background-color: white; color: black;");
 
     connect(nextButton, &QPushButton::released, [&, this]() {
-        int currId = 0;
-        for (const Player &player : this->players) {
-            if (player.color == settings.value("currentPlayer").value<QColor>()) {
-                this->play(player);
-                currId = player.id;
+        int currId;
+        // loop set to 1 for normal play, or higher for testing
+        for (int i = 0; i < 1; i++) {
+            for (const Player &player : this->players) {
+                if (player.color == settings.value("currentPlayer").value<QColor>()) {
+                    this->play(player);
+                    currId = player.id;
+                }
             }
+            settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
         }
-        settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
     });
 
     layout->addWidget(nextButton, 9, 39, 1, 10);
 }
 
 void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
-    QPointer<QScrollArea> scroll = new QScrollArea(this);
-    QPointer<QLabel> gameOutput = new QLabel(scroll);
 
-    gameOutput->setWordWrap(true);
-    gameOutput->setContentsMargins(5, gameOutput->contentsMargins().top(), 5, gameOutput->contentsMargins().bottom());
-    gameOutput->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
-    gameOutput->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
+    QPointer<QLabel> label = new QLabel(this);
 
-    gameOutput->setText("Welcome!");
-    gameOutput->setStyleSheet("background-color: white; color: black;");
-    scroll->setStyleSheet("background-color: white; color: black;");
-    scroll->setWidget(gameOutput);
-    layout->addWidget(scroll, 12, 39, 26, 10);
+    label->setWordWrap(true);
+    label->setContentsMargins(5, label->contentsMargins().top(), 5, label->contentsMargins().bottom());
+    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
+    label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
+    gameOutput.push_back("Welcome!");
+    label->setText("Welcome!");
+    label->setStyleSheet("background-color: white; color: black;");
+    layout->addWidget(label, 12, 39, 26, 10);
 }
 
 
@@ -887,6 +931,7 @@ tuple<int, string> MainWindow::getTileInformation(const QPointer<Pawn> &pawn, in
 
 void MainWindow::updateLabelText(const QString &text) {
     function<void(QLabel *)> lambda = [&](QLabel *info) {
+
         info->setText(info->text() + "\n" + text);
         info->repaint();
     };
@@ -894,7 +939,24 @@ void MainWindow::updateLabelText(const QString &text) {
 }
 
 void MainWindow::updateScroll() {
+    function<void(QLabel *)> lambda = [&](QLabel *info) {
+        info->setText("");
+        int max = 20;
+        if (gameOutput.size()  >= max) {
+            for (int i = gameOutput.size() - max; i < gameOutput.size(); i++) {
 
+                info->setText(info->text() + "\n" + gameOutput[i]);
+                info->repaint();
+            }
+        } else {
+            for (QString text : gameOutput) {
+
+                info->setText(info->text() + "\n" + text);
+                info->repaint();
+            }
+        }
+    };
+    iterateThroughLayout(lambda);
 }
 
 
@@ -914,10 +976,22 @@ QColor MainWindow::getPathColor(int i) const {
 }
 
 void MainWindow::play(const Player &player) {
-    this->updateLabelText("It is " + QString(std::toupper(player.getColorString()[0])) +
-                          QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
-//    this->updateScroll();
-    cpuTurn(player);
+    QSettings settings("CS205", "Parcheesi");
+
+    if (player.color == players[settings.value("playerColor").toInt()].color) {
+        this->gameOutput.push_back("Please move "  + QString(std::toupper(player.getColorString()[0])) +
+        QString::fromStdString(player.getColorString().erase(0, 1)));
+//        this->updateLabelText("Please move "  + QString(std::toupper(player.getColorString()[0])) +
+//                              QString::fromStdString(player.getColorString().erase(0, 1)));
+          updateScroll();
+//        playerTurn(player);
+    } else {
+        this->gameOutput.push_back("It is " + QString(std::toupper(player.getColorString()[0])) + QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
+//        this->updateLabelText("It is " + QString(std::toupper(player.getColorString()[0])) +
+//                              QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
+        updateScroll();
+        cpuTurn(player);
+    }
 }
 
 
@@ -1019,7 +1093,33 @@ void MainWindow::cpuTurn(const Player &player) {
     bool biggerUsed = false;
     bool smallerUsed = false;
 
-    cout << player.colorString << " rolled " << bigger << ", " << smaller << endl;
+    gameOutput.push_back(QString(std::toupper(player.getColorString()[0])) +
+    QString::fromStdString(player.getColorString().erase(0, 1)) +
+    QString::fromStdString(" rolled ") +
+    QString::fromStdString(to_string(dieOneValue)) +
+    QString::fromStdString(", ") +
+    QString::fromStdString(to_string(dieTwoValue)));
+    updateScroll();
+
+    // first check for 5s to try to move out of start
+    if (dieOneValue == 5) {
+        for (const QPointer<Pawn> &pawn : playerPawns) {
+            if (canMove(pawn, 5) && !dieOneUsed) {
+                if (this->movePawn(pawn, 1, pawnMax)) {
+                    dieOneUsed = true;
+                }
+            }
+        }
+    }
+    if (dieTwoValue == 5) {
+        for (const QPointer<Pawn> &pawn : playerPawns) {
+            if (canMove(pawn, 5) && !dieTwoUsed) {
+                if (this->movePawn(pawn, 1, pawnMax)) {
+                    dieTwoUsed = true;
+                }
+            }
+        }
+    }
 
     for (const QPointer<Pawn> &pawn : player.pawns) {
         if (pawn->getStatus() == PawnStatus::START) {
