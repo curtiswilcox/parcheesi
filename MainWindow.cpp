@@ -173,8 +173,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
     QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
     QPointer<QLabel> startLabel = new QLabel(this);
-    startLabel->setText("Press Space to start");
-    layout->addWidget(startLabel, 0, 0, 2, 2);
+    startLabel->setText("Press CMD+N to start");
+    layout->addWidget(startLabel);
     this->setLayout(layout);
     settings.setValue("currentPlayer", players[0].color);
 }
