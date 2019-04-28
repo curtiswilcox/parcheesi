@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPointer>
+#include <QSettings>
 #include <QWidget>
 #include <QWindow>
 
@@ -34,6 +35,7 @@ private:
     std::vector<Player> players;
     QWidget *rulesWindow;
     QWidget *startWindow;
+    QSettings settings;
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTile(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
@@ -66,6 +68,7 @@ public:
     std::string toupper(const std::string &s) const;
     bool movePawnTest(QPointer<Pawn> &, int);
     template<typename T>
+
     void iterateThroughLayout(const std::function<void(T *)> &func) const {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);

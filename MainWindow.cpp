@@ -7,12 +7,14 @@
 #include <unistd.h>
 #include <QAction>
 #include <QLabel>
-#include <QPushButton>
-#include <QTime>
-#include <QScrollArea>
+#include <QGroupBox>
 #include <QButtonGroup>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QVBoxLayout>
+#include <QShortcut>
+#include <QScrollArea>
 #include <QSettings>
 #include <QShortcut>
 #include <QSizePolicy>
@@ -22,10 +24,7 @@
 using namespace std;
 using Qt::GlobalColor;
 
-QSettings settings("CS205", "Parcheesi"); // NOLINT(cert-err58-cpp)
-
-
-MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Parcheesi") {
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(close()));
     this->setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowTitle("Parcheesi");
@@ -39,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     menuBar->addMenu(fileMenu);
     QPointer<QAction> gameplayInstructions = fileMenu->addAction("&Rules");
     gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
-
     QPointer<QAction> gameMenu = fileMenu->addAction("&New Game");
     gameMenu->setShortcut(Qt::CTRL + Qt::Key_N);
 
@@ -170,9 +168,12 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this), &QShortcut::activated, showRules);
     connect(gameplayInstructions, &QAction::triggered, this, showRules);
 
+
     QPointer<QGridLayout> layout = new QGridLayout(this);
     this->players = createBoard(layout);
     this->setLayout(layout);
+//    this->hide();
+//    newGame();
 
     settings.setValue("currentPlayer", players[0].color);
 
@@ -204,6 +205,7 @@ QString MainWindow::readRules() {
 vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     layout->setSpacing(Tile::TILE_SPACING);
 
+//    addStartMenu(layout);
     addStartTiles(layout);
     addHomeTile(layout);
     addGeneralTiles(layout);
@@ -211,6 +213,8 @@ vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     addDice(layout);
     addNextButton(layout);
     addDialogueBox(layout);
+
+    this->hide();
 
     return players;
 }
@@ -533,6 +537,7 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
             die->repaint();
             settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
         };
+
         iterateThroughLayout(rollDice);
     });
 
