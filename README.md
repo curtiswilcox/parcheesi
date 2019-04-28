@@ -15,4 +15,6 @@ if (WIN32)
 ...
 ```
 
-- If you cannot run `C++ 17` on your machine, change the `CMAKE_CXX_STANDARD` from `17` to `14`. You must then go into `Tile.h` and delete the line at the top that says `#include <optional>`, and replace it with `#include <experimental/optional>`. After the last `#include` line, type `using std::experimental::optional;` and `using std::experimental::nullopt;`.
+- If you cannot run `C++ 17` on your machine, change the `CMAKE_CXX_STANDARD` from `17` to `14` (in `CMakeLists.txt`). You must then go into `Tile.h` and delete the line at the top that says `#include <optional>`, and replace it with `#include <experimental/optional>`. After the last `#include` line in the file, type `using std::experimental::optional;` and `using std::experimental::nullopt;`.
+
+- If the program will still not run, we apologize for the inconvenience it is causing. Jason might be able to help (I don't know about his C++ knowledge), and you are certainly welcome to email Curtis (Curtis.Wilcox@uvm.edu) if nothing is going your way.
