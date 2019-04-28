@@ -40,6 +40,7 @@ private:
     void addHomeTile(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
+    std::vector<QString> gameOutput;
     void cpuTest();
     void addDice(QPointer<QGridLayout> &layout);
     void addNextButton(QPointer<QGridLayout> &layout);
@@ -62,6 +63,7 @@ public:
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     std::vector<Player> resetBoard();
+    void showMenu();
     void play(const Player &player);
     bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     std::string tolower(const std::string &s) const;
