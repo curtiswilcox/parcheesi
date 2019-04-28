@@ -42,7 +42,11 @@ int Player::numPawnsStart() const {
 }
 
 int Player::numPawnsHome() const {
-    function<bool(int, QPointer<Pawn>)> lambda =
-            [&](int total, const QPointer<Pawn> &pawn) { return pawn->getStatus() == PawnStatus::HOME; };
-    return accumulate(pawns.begin(), pawns.end(), 0, lambda);
+    int total = 0;
+    for (const QPointer<Pawn> &pawn : pawns) if (pawn->getStatus() == PawnStatus::HOME) ++ total;
+    return total;
+
+//    function<bool(int, QPointer<Pawn>)> lambda =
+//            [&](int total, const QPointer<Pawn> &pawn) { return pawn->getStatus() == PawnStatus::HOME; };
+//    return accumulate(pawns.begin(), pawns.end(), 0, lambda);
 }

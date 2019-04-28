@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type")
 
 if (WIN32)
     # come back to this if it becomes necessary
+    # set(CMAKE_PREFIX_PATH "DIRECTORY_HERE")
 elseif (APPLE)
     set(CMAKE_PREFIX_PATH "/Users/$ENV{USER}/Qt/5.12.1/clang_64")
 endif ()

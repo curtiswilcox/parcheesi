@@ -36,26 +36,25 @@ private:
     QWidget *rulesWindow;
     QWidget *startWindow;
     QSettings settings;
+    std::vector<QString> gameOutput;
+
     void addStartTiles(QPointer<QGridLayout> &layout);
     void addHomeTile(QPointer<QGridLayout> &layout);
     void addGeneralTiles(QPointer<QGridLayout> &layout);
     std::vector<Player> addPawns(QPointer<QGridLayout> &layout);
-    std::vector<QString> gameOutput;
-    void cpuTest();
     void addDice(QPointer<QGridLayout> &layout);
     void addNextButton(QPointer<QGridLayout> &layout);
     void addDialogueBox(QPointer<QGridLayout> &layout);
-    bool movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart = false);
 
-    bool movePawnTest(const QPointer<Pawn> &pawn, int spaces);
+    bool movePawn(const QPointer<Pawn> &pawn, int spaces);
     std::tuple<int, std::string> getTileInformation(const QPointer<Pawn> &pawn, int spaces) const;
 
-    inline void updateLabelText(const std::string &text) {this->updateLabelText(QString::fromStdString(text)); }
+    inline void updateLabelText(const std::string &text) { this->updateLabelText(QString::fromStdString(text)); }
+
     void updateLabelText(const QString &text);
     void updateScroll();
     QColor getPathColor(int i) const;
     int jump(const QPointer<Pawn> &pawn) const;
-//    int jump(int startNum, int spaces, const Player &player) const;
     void cpuTurn(const Player &player);
 
 public:
@@ -63,13 +62,12 @@ public:
     QString readRules();
     std::vector<Player> createBoard(QPointer<QGridLayout> &layout);
     std::vector<Player> resetBoard();
-    void showMenu();
     void play(const Player &player);
     bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     std::string tolower(const std::string &s) const;
     std::string toupper(const std::string &s) const;
-    template<typename T>
 
+    template<typename T>
     void iterateThroughLayout(const std::function<void(T *)> &func) const {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
