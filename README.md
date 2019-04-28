@@ -8,6 +8,7 @@
 - Qt Graphics Library, version 5.12.1 (https://www.qt.io)
   - It is free. You should only need to download the code specific to your machine (in the installer helper, you can choose which parts to download). It should only be one checkbox, if I remember correctly for when I downloaded it. If you download a newer version, you'll have to adjust the `CMAKE_PREFIX_PATH` slightly (in `CMakeLists.txt`).
   - If you have a Mac, please download the files to your `/Users/USERNAME/` directory (if you put it elsewhere, you will have to edit the `CMAKE_PREFIX_PATH` in the aforementioned file to deal with that difference as well).
+  - It is probably important to note that it is approximately a three GB download. If this is not something you wish to do to your computer, please contact one of us and we would be happy to meet with you and show you on our laptop. There is an uninstaller that comes with the download for ease of getting it off if you do put it on your computer.
 ## Important Notes
 - If you are utilizing a non-Mac machine, you will have to slightly update the `CMakeLists.txt` file if you wish to run the program. Replace the `DIRECTORY_HERE` (see the code shown below) note in the file with the location. Keep the quotation marks.
 ```
