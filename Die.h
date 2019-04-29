@@ -20,6 +20,8 @@ public:
 
     int getValue();
 
+    void setValue(int);
+
     void paintEvent(QPaintEvent *event) override;
 
     friend int operator+(const Die &lhs, const Die &rhs);
