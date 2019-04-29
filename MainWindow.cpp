@@ -435,8 +435,8 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
                     settings.setValue("biggerUsed", true);
                     settings.setValue("smallerUsed", true);
                     settings.setValue("isPlayerTurn", false);
-                    gameOutput.emplace_back("Good job!\nYour turn is over.");
-                    updateScroll();
+//                    gameOutput.emplace_back("Good job!\nYour turn is over.");
+//                    updateScroll();
                 } else if (!settings.value("biggerUsed").toBool() && bigger == 5 && this->canMove(pawn, 5)) {
                     this->movePawn(pawn, 1);
                     settings.setValue("biggerUsed", true);
@@ -454,6 +454,10 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
                 settings.setValue("doubleCount", 0);
                 settings.setValue("rollWasDoubles", false);
                 gameOutput.emplace_back("Your turn is over");
+                this->gameOutput.emplace_back(
+                        "It is " + QString(std::toupper(players[settings.value("currentPlayer").toInt()].getColorString()[0])) +
+                        QString::fromStdString(players[settings.value("currentPlayer").toInt()].getColorString().erase(0, 1)) + "'s turn!");
+                updateScroll();
 //                this->gameOutput.push_back("It is " + QString(std::toupper(
 //                        players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
 //                                           QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
@@ -821,9 +825,9 @@ void MainWindow::play(const Player &player) {
             updateScroll();
             playerTurn(player);
         } else {
-            this->gameOutput.push_back("Please move " + QString(std::toupper(player.getColorString()[0])) +
-                                       QString::fromStdString(player.getColorString().erase(0, 1)));
-            updateScroll();
+//            this->gameOutput.push_back("Please move " + QString(std::toupper(player.getColorString()[0])) +
+//                                       QString::fromStdString(player.getColorString().erase(0, 1)));
+//            updateScroll();
             playerTurn(player);
         }
     } else if (player.id == settings.value("currentPlayer").toInt()/*!settings.value("isPlayerTurn").toBool()*/) {
@@ -955,9 +959,20 @@ void MainWindow::playerTurn(const Player &player) {
 
     // see if it can move at all
     bool canMoveAtAll = false;
+    bool canMoveBoth = false;
+    bool canMoveBigger = false;
+    bool canMoveSmaller = false;
     for (const QPointer<Pawn> &pawn : player.pawns) {
-        if (canMove(pawn, settings.value("bigger").toInt()) || canMove(pawn, settings.value("smaller").toInt()) ||
-            canMove(pawn, settings.value("bigger").toInt() + settings.value("smaller").toInt())) {
+        if (canMove(pawn, settings.value("bigger").toInt() + settings.value("smaller").toInt())) {
+            canMoveBoth = true;
+            canMoveAtAll = true;
+        }
+        if (canMove(pawn, settings.value("bigger").toInt())) {
+            canMoveBigger = true;
+            canMoveAtAll = true;
+        }
+        if (canMove(pawn, settings.value("smaller").toInt())) {
+            canMoveSmaller = true;
             canMoveAtAll = true;
         }
     }
@@ -966,11 +981,22 @@ void MainWindow::playerTurn(const Player &player) {
         settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
         settings.setValue("doubleCount", 0);
         settings.setValue("rollWasDoubles", false);
-        gameOutput.emplace_back("you can't move wth that roll");
+        gameOutput.emplace_back("You can't move wth that roll");
 //        this->gameOutput.push_back("It is " + QString(std::toupper(
 //                players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
 //                                   QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
 //                                                                  4].getColorString().erase(0, 1)) + "'s turn!");
+        updateScroll();
+    } else if (!canMoveBoth && canMoveBigger && !canMoveSmaller) {
+        settings.setValue("smallerUsed", true);
+        gameOutput.emplace_back("Choose a pawn to move " + QString::fromStdString(to_string(settings.value("bigger").toInt())));
+        updateScroll();
+    } else if (!canMoveBoth && canMoveSmaller && !canMoveBigger) {
+        settings.setValue("biggerUsed", true);
+        gameOutput.emplace_back("Choose a pawn to move " + QString::fromStdString(to_string(settings.value("smaller").toInt())));
+        updateScroll();
+    } else if (canMoveBigger && canMoveSmaller) {
+        gameOutput.emplace_back("Choose a pawn to move " + QString::fromStdString(to_string(settings.value("bigger").toInt() + settings.value("smaller").toInt())));
         updateScroll();
     }
 }
