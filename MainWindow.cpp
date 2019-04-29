@@ -454,15 +454,6 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
                 settings.setValue("doubleCount", 0);
                 settings.setValue("rollWasDoubles", false);
                 gameOutput.emplace_back("Your turn is over");
-                this->gameOutput.emplace_back(
-                        "It is " + QString(std::toupper(players[settings.value("currentPlayer").toInt()].getColorString()[0])) +
-                        QString::fromStdString(players[settings.value("currentPlayer").toInt()].getColorString().erase(0, 1)) + "'s turn!");
-                updateScroll();
-//                this->gameOutput.push_back("It is " + QString(std::toupper(
-//                        players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
-//                                           QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
-//                                                                          4].getColorString().erase(0, 1)) +
-//                                           "'s turn!");
                 updateScroll();
             }
         } else {
@@ -823,7 +814,6 @@ void MainWindow::play(const Player &player) {
         } else if (settings.value("doubleCount").toInt() > 0 && settings.value("rollWasDoubles").toBool()) {
             this->gameOutput.emplace_back("Doubles! Play and roll again!");
             updateScroll();
-            playerTurn(player);
         } else {
 //            this->gameOutput.push_back("Please move " + QString(std::toupper(player.getColorString()[0])) +
 //                                       QString::fromStdString(player.getColorString().erase(0, 1)));
@@ -847,6 +837,12 @@ void MainWindow::play(const Player &player) {
             updateScroll();
             cpuTurn(player);
         } else {
+            this->gameOutput.push_back("It is " + QString(std::toupper(
+                    players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                       QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
+                                                                      4].getColorString().erase(0, 1)) +
+                                       "'s turn!");
+            updateScroll();
             cpuTurn(player);
         }
     }
@@ -978,14 +974,15 @@ void MainWindow::playerTurn(const Player &player) {
     }
     if (!canMoveAtAll) {
         settings.setValue("isPlayerTurn", false);
-        settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
+//        settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
         settings.setValue("doubleCount", 0);
         settings.setValue("rollWasDoubles", false);
         gameOutput.emplace_back("You can't move wth that roll");
-//        this->gameOutput.push_back("It is " + QString(std::toupper(
-//                players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
-//                                   QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
-//                                                                  4].getColorString().erase(0, 1)) + "'s turn!");
+        this->gameOutput.push_back("It is " + QString(std::toupper(
+                players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                   QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
+                                                                  4].getColorString().erase(0, 1)) +
+                                   "'s turn!");
         updateScroll();
     } else if (!canMoveBoth && canMoveBigger && !canMoveSmaller) {
         settings.setValue("smallerUsed", true);
