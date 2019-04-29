@@ -57,9 +57,6 @@ Pawn::Pawn(const Dimensions &d, int currentTileNum, int id, string team,
 }
 
 void Pawn::mouseReleaseEvent(QMouseEvent *event) {
-//    QSettings settings("CS205", "Parcheesi");
-//    cout << "Pressed ";
-//    cout << team << " number " << id << endl;
     this->lambda(this);
 }
 
