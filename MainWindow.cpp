@@ -576,27 +576,6 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
 
     QPointer<Die> secondDie = new Die("second", this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
-
-//    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
-//    rollButton->setStyleSheet("background-color: white; color: black;");
-//
-//    connect(rollButton, &QPushButton::released, [&]() {
-//        function<void(Die *)> rollDice = [&](Die *die) {
-//            die->roll();
-//            die->repaint();
-//            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
-//        };
-//
-//        iterateThroughLayout(rollDice);
-//
-//        gameOutput.push_back(QString::fromStdString("You rolled ") +
-//                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
-//                             QString::fromStdString(", ") +
-//                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
-//        updateScroll();
-//    });
-
-//    layout->addWidget(rollButton, 7, 39, 1, 10);
 }
 
 void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
@@ -630,7 +609,7 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
 
     });
 
-    layout->addWidget(nextButton, 9, 39, 1, 10);
+    layout->addWidget(nextButton, 7, 39, 4, 10);
 }
 
 void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
