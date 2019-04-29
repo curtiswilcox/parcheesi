@@ -41,8 +41,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
     gameplayInstructions->setShortcut(Qt::CTRL + Qt::Key_R);
     QPointer<QAction> gameMenu = fileMenu->addAction("&New Game");
     gameMenu->setShortcut(Qt::CTRL + Qt::Key_N);
-    gameMenu->setShortcut(Qt::Key_Space);
-
 
     auto newGame = [&, this]() {
         startWindow = new QWidget(this, Qt::Window);
@@ -533,26 +531,26 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     QPointer<Die> secondDie = new Die("second", this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
 
-    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
-    rollButton->setStyleSheet("background-color: white; color: black;");
+//    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
+//    rollButton->setStyleSheet("background-color: white; color: black;");
+//
+//    connect(rollButton, &QPushButton::released, [&]() {
+//        function<void(Die *)> rollDice = [&](Die *die) {
+//            die->roll();
+//            die->repaint();
+//            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
+//        };
+//
+//        iterateThroughLayout(rollDice);
+//
+//        gameOutput.push_back(QString::fromStdString("You rolled ") +
+//                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
+//                             QString::fromStdString(", ") +
+//                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
+//        updateScroll();
+//    });
 
-    connect(rollButton, &QPushButton::released, [&]() {
-        function<void(Die *)> rollDice = [&](Die *die) {
-            die->roll();
-            die->repaint();
-            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
-        };
-
-        iterateThroughLayout(rollDice);
-
-        gameOutput.push_back(QString::fromStdString("You rolled ") +
-                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
-                             QString::fromStdString(", ") +
-                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
-        updateScroll();
-    });
-
-    layout->addWidget(rollButton, 7, 39, 1, 10);
+//    layout->addWidget(rollButton, 7, 39, 1, 10);
 }
 
 void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
@@ -842,7 +840,7 @@ void MainWindow::play(const Player &player) {
             this->gameOutput.push_back("Please move " + QString(std::toupper(player.getColorString()[0])) +
                                        QString::fromStdString(player.getColorString().erase(0, 1)));
             updateScroll();
-//        playerTurn(player);
+            playerTurn(player);
         } else {
             this->gameOutput.push_back("Too many doubles");
             updateScroll();
@@ -861,6 +859,7 @@ void MainWindow::play(const Player &player) {
             updateScroll();
             moveFarthestToStart(player);
         } else if (settings.value("doubleCount").toInt() > 0 && settings.value("rollWasDoubles").toBool()) {
+            cpuTurn(player);
             this->gameOutput.push_back("Doubles, roll again!");
             updateScroll();
         } else {
@@ -961,6 +960,36 @@ int MainWindow::jump(const QPointer<Pawn> &pawn) const {
 //        return startNum + spaces;
 //    }
 //}
+
+void MainWindow::playerTurn(const Player &player) {
+    // roll the dice
+    function<void(Die *)> rollDice = [&](Die *die) {
+        die->roll();
+        die->repaint();
+        settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
+    };
+    iterateThroughLayout(rollDice);
+    gameOutput.push_back(QString::fromStdString("You rolled ") +
+                         QString::fromStdString(to_string(settings.value("firstRoll").toInt())) + QString::fromStdString(", ") +
+                         QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
+    updateScroll();
+
+    // get current dice values
+    int dieOneValue = settings.value("firstRoll").toInt();
+    bool dieOneUsed = false;
+    int dieTwoValue = settings.value("secondRoll").toInt();
+    bool dieTwoUsed = false;
+
+    // find and display possible moves
+    function<void(Tile *)> checkForMoves = [&](Tile *tile) {
+
+    };
+    iterateThroughLayout(checkForMoves);
+
+    // wait for player to click on tile they want to move to
+
+}
+
 
 void MainWindow::cpuTurn(const Player &player) {
 

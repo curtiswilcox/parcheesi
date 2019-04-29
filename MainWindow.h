@@ -55,7 +55,8 @@ private:
     void updateScroll();
     QColor getPathColor(int i) const;
     int jump(const QPointer<Pawn> &pawn) const;
-//    int jump(int startNum, int spaces, const Player &player) const;
+    int jump(int startNum, int spaces, const Player &player) const;
+    void playerTurn(const Player &player);
     void cpuTurn(const Player &player);
     void moveFarthestToStart(const Player &player);
 
