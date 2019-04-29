@@ -1045,6 +1045,17 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
     int current = pawn->currentTileNum;
     int max = pawn->MAX_TILE;
     int wantsToMoveTo = get<0>(getTileInformation(pawn, spaces));
+    string homeStart = toupper(pawn->team + "_START_NUM");
+    if (pawn->team == "Blue" && spaces == 5 && pawn->getStatus() == START) {
+        wantsToMoveTo = StartTile::BLUE_START_NUM + 1;
+    } else if (pawn->team == "Red" && spaces == 5 && pawn->getStatus() == START) {
+        wantsToMoveTo = StartTile::RED_START_NUM + 1;
+    } else if (pawn->team == "Green" && spaces == 5 && pawn->getStatus() == START) {
+        wantsToMoveTo = StartTile::GREEN_START_NUM + 1;
+    } else if (spaces == 5 && pawn->getStatus() == START) {
+        wantsToMoveTo = StartTile::YELLOW_START_NUM + 1;
+    }
+
     function<void(RectangleTile *)> blockadeAndSafeLambda = [&](RectangleTile *tile) { // FIXME this doesn't quite work
         int tileNum = tile->getNumber();
 
