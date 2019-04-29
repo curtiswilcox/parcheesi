@@ -59,18 +59,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         colorChoice->addButton(colorGreen, 2);
         colorChoice->addButton(colorYellow, 3);
 
-        QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
-        numPlayers->setStyleSheet("background-color: white; color: black;");
-        numPlayers->setMinimum(2);
-        numPlayers->setMaximum(4);
-        numPlayers->setSingleStep(1);
-        numPlayers->setValue(4);
-
-
         QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
         startButton->setStyleSheet("background-color: white; color: black;");
-
-        QPointer<QButtonGroup> startGroup = new QButtonGroup(startWindow);
 
         QPointer<QVBoxLayout> vbox = new QVBoxLayout(startWindow);
         QPointer<QLabel> colorLabel = new QLabel(startWindow);
@@ -86,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         vbox->addWidget(colorYellow);
 
         vbox->addWidget(playersLabel);
-        vbox->addWidget(numPlayers);
 
         vbox->addWidget(startButton);
         vbox->addStretch(1);
@@ -95,18 +84,20 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
 
         connect(startButton, &QPushButton::released, this, [colorChoice, this]() {
             int colorChoiceId = colorChoice->checkedId();
-            settings.setValue("currentPlayer", colorChoiceId);
-            settings.setValue("humanPlayer", colorChoiceId);
-            this->resetBoard();
+            if (colorChoiceId != -1) {
+                settings.setValue("currentPlayer", colorChoiceId);
+                settings.setValue("humanPlayer", colorChoiceId);
+                this->resetBoard();
 
-            this->gameOutput.push_back(
-                    "It is " + QString(std::toupper(players[colorChoiceId].getColorString()[0])) +
-                    QString::fromStdString(players[colorChoiceId].getColorString().erase(0, 1)) + "'s turn!");
-            updateScroll();
+                this->gameOutput.push_back(
+                        "It is " + QString(std::toupper(players[colorChoiceId].getColorString()[0])) +
+                        QString::fromStdString(players[colorChoiceId].getColorString().erase(0, 1)) + "'s turn!");
+                updateScroll();
 
 
-            this->show();
-            startWindow->hide();
+                this->show();
+                startWindow->hide();
+            }
         });
 
         startWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing the window
@@ -885,11 +876,15 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
         int tileNum = tile->getNumber();
 
         if (tile->isBlockaded()) {
-//            cout << "Blockaded: " << tile->getNumber() << endl;
-//            cout << "Aiming to get to tile " << wantsToMoveTo << endl;
             if (wantsToMoveTo != -5) { // magic number for home tile
                 if (wantsToMoveTo < 68 && current > max && current < tileNum && tileNum <= wantsToMoveTo) {
                     good = false;
+                } else if (wantsToMoveTo >= 0 && current < 68) {
+                    if (current < tileNum && tileNum < 68) {
+                        good = false;
+                    } else if (tileNum >= 0 && tileNum <= wantsToMoveTo) {
+                        good = false;
+                    }
                 } else if (current <= max && wantsToMoveTo <= max && current < tileNum && tileNum <= wantsToMoveTo) {
                     good = false;
                 } else if (wantsToMoveTo >= max + jump(pawn) && wantsToMoveTo < max + jump(pawn) + 7) {
