@@ -989,7 +989,7 @@ void MainWindow::play(const Player &player) {
     function<void(Die *)> rollDice = [&](Die *die) {
         die->roll();
         die->repaint();
-        settings.setValue(QString::fromStdString(die->name) + "Roll", 5/*die->getValue()*/);
+        settings.setValue(QString::fromStdString(die->name) + "Roll", /*5*/die->getValue());
     };
     iterateThroughLayout(rollDice);
 
@@ -1015,6 +1015,7 @@ void MainWindow::play(const Player &player) {
         } else {
             this->gameOutput.push_back("Too many doubles");
             updateScroll();
+            moveFarthestToStart(player);
         }
     } else {
         this->gameOutput.push_back("It is " + QString(std::toupper(player.getColorString()[0])) +
