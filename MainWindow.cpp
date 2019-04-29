@@ -66,16 +66,11 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         QPointer<QLabel> colorLabel = new QLabel(startWindow);
         colorLabel->setText("Choose your color:");
 
-        QPointer<QLabel> playersLabel = new QLabel(startWindow);
-        playersLabel->setText("Choose your number of players:");
-
         vbox->addWidget(colorLabel);
         vbox->addWidget(colorBlue);
         vbox->addWidget(colorRed);
         vbox->addWidget(colorGreen);
         vbox->addWidget(colorYellow);
-
-        vbox->addWidget(playersLabel);
 
         vbox->addWidget(startButton);
         vbox->addStretch(1);
@@ -84,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
 
         connect(startButton, &QPushButton::released, this, [colorChoice, this]() {
             int colorChoiceId = colorChoice->checkedId();
-            if (colorChoiceId != -1) {
+            if (colorChoiceId != -1) { // Qt's magic number if no button is marked
                 settings.setValue("currentPlayer", colorChoiceId);
                 settings.setValue("humanPlayer", colorChoiceId);
                 this->resetBoard();
@@ -93,7 +88,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
                         "It is " + QString(std::toupper(players[colorChoiceId].getColorString()[0])) +
                         QString::fromStdString(players[colorChoiceId].getColorString().erase(0, 1)) + "'s turn!");
                 updateScroll();
-
 
                 this->show();
                 startWindow->hide();
