@@ -20,6 +20,8 @@ void Die::roll() {
 
 int Die::getValue() { return this->value; }
 
+void Die::setValue(int value) { this->value = value; }
+
 void Die::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setBrush(QBrush(QColor(GlobalColor::white)));

@@ -132,7 +132,9 @@ PlayerAddition RectangleTile::addPawn(const QPointer<Pawn> &pawn, bool toB) {
     if (this->occupyingPawn && (*occupyingPawn)->getColor() != pawn->getColor()) { // capture current pawn
         (*occupyingPawn)->setStatus(PawnStatus::START);
 
+
         occupyingPawn = make_optional(pawn);
+
         return CAPTURE;
     }
 

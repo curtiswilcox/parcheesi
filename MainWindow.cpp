@@ -49,9 +49,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         startWindow->resize(780, 600);
         startWindow->setWindowTitle("New Game of Parcheesi");
 
-
-//        QPointer<QGroupBox> menuBox = new QGroupBox(startWindow);
-
         QPointer<QButtonGroup> colorChoice = new QButtonGroup(startWindow);
         QPointer<QRadioButton> colorBlue = new QRadioButton("Blue", startWindow);
         QPointer<QRadioButton> colorRed = new QRadioButton("Red", startWindow);
@@ -62,25 +59,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         colorChoice->addButton(colorGreen, 2);
         colorChoice->addButton(colorYellow, 3);
 
-//        QPointer<QSpinBox> numPlayers = new QSpinBox(startWindow);
-//        numPlayers->setStyleSheet("background-color: white; color: black;");
-//        numPlayers->setMinimum(2);
-//        numPlayers->setMaximum(4);
-//        numPlayers->setSingleStep(1);
-//        numPlayers->setValue(4);
-
-
         QPointer<QPushButton> startButton = new QPushButton("Start Game", startWindow);
         startButton->setStyleSheet("background-color: white; color: black;");
-
-//        QPointer<QButtonGroup> startGroup = new QButtonGroup(startWindow);
 
         QPointer<QVBoxLayout> vbox = new QVBoxLayout(startWindow);
         QPointer<QLabel> colorLabel = new QLabel(startWindow);
         colorLabel->setText("Choose your color:");
 
-//        QPointer<QLabel> playersLabel = new QLabel(startWindow);
-//        playersLabel->setText("Choose your number of players:");
 
         vbox->addWidget(colorLabel);
         vbox->addWidget(colorBlue);
@@ -88,40 +73,32 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         vbox->addWidget(colorGreen);
         vbox->addWidget(colorYellow);
 
-//        vbox->addWidget(playersLabel);
-//        vbox->addWidget(numPlayers);
-
         vbox->addWidget(startButton);
         vbox->addStretch(1);
         vbox->setAlignment(Qt::AlignCenter);
         startWindow->setLayout(vbox);
 
         connect(startButton, &QPushButton::released, this, [colorChoice, this]() {
-            int val;
             int colorChoiceId = colorChoice->checkedId();
-            QSpinBox ignoreThis;
-            function<void(QSpinBox *)> lambda = [&](QSpinBox *box) {
-                val = box->value();
-                cout << val << endl;
-                cout << colorChoiceId << endl;
-            };
+            if (colorChoiceId != -1) { // Qt's magic number if no button is marked
+                settings.setValue("currentPlayer", colorChoiceId);
+                settings.setValue("humanPlayer", colorChoiceId);
+                settings.setValue("isPlayerTurn", true);
+                this->resetBoard();
 
-            iterateThroughLayout(lambda);
-            settings.setValue("playerColor", colorChoiceId);
-            settings.setValue("numPlayers", val);
-            this->players = this->resetBoard();
+                this->gameOutput.push_back(
+                        "It is " + QString(std::toupper(players[colorChoiceId].getColorString()[0])) +
+                        QString::fromStdString(players[colorChoiceId].getColorString().erase(0, 1)) + "'s turn!");
+                updateScroll();
 
-            settings.setValue("currentPlayer", QColor(0, 0, 153));
-            this->gameOutput.push_back("It is " + QString(std::toupper(players[0].getColorString()[0])) +
-                                       QString::fromStdString(players[0].getColorString().erase(0, 1)) + "'s turn!");
-            updateScroll();
-
-
-            this->show();
-            startWindow->hide();
+                this->show();
+                startWindow->hide();
+            }
         });
 
+
         startWindow->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // disable user resizing
+
         startWindow->setFixedSize(startWindow->width(), startWindow->height());
         startWindow->show();
 
@@ -161,14 +138,17 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
     QPointer<QGridLayout> layout = new QGridLayout(this);
     layout->setSpacing(Tile::TILE_SPACING);
     QPointer<QLabel> startLabel = new QLabel(this);
+#ifdef __APPLE__
     startLabel->setText("Press CMD+N to start");
+#elif _WIN32
+    startLabel->setText("Press CTRL+N to start");
+#endif
     layout->addWidget(startLabel);
     this->setLayout(layout);
-    settings.setValue("currentPlayer", players[0].color);
 }
 
 
-#pragma clang diagnostic push
+#pragma clang diagnostic push // suppress IDE inspection
 #pragma ide diagnostic ignored "MemberFunctionCanBeStaticInspection"
 
 QString MainWindow::readRules() {
@@ -191,42 +171,37 @@ QString MainWindow::readRules() {
 #pragma clang diagnostic pop
 
 
-vector<Player> MainWindow::createBoard(QPointer<QGridLayout> &layout) {
+void MainWindow::createBoard(QPointer<QGridLayout> &layout) {
     layout->setSpacing(Tile::TILE_SPACING);
 
-//    addStartMenu(layout);
     addStartTiles(layout);
     addHomeTile(layout);
     addGeneralTiles(layout);
-    vector<Player> players = addPawns(layout);
+    this->players = addPawns(layout);
     addDice(layout);
     addNextButton(layout);
     addDialogueBox(layout);
 
     this->hide();
-
-    return players;
 }
 
-vector<Player> MainWindow::resetBoard() {
-
+void MainWindow::resetBoard() {
     QLayoutItem *item;
-    QLayout *sublayout;
     QWidget *widget;
     while ((item = this->layout()->takeAt(0))) {
-        if ((sublayout = item->layout()) != nullptr) {/* do the same for sublayout*/}
-        else if ((widget = item->widget()) != nullptr) {
+        if (item->layout()) {/* do the same for sublayout*/}
+        else if ((widget = item->widget())) { // if not nullptr
             widget->hide();
             delete widget;
-        } else { delete item; }
+        } else {
+            delete item;
+        }
     }
 
     QPointer<QGridLayout> layout = new QGridLayout(this);
-    vector<Player> players = createBoard(layout);
+    createBoard(layout);
     delete this->layout();
     this->setLayout(layout);
-
-    return players;
 }
 
 void MainWindow::addStartTiles(QPointer<QGridLayout> &layout) {
@@ -289,7 +264,6 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     layout->addWidget(tile, row, column, 2, 2); // blue
                     this->pawnLocations["BlueHome" + to_string(j - 1) + "a"] = make_tuple(row, column);
                     this->pawnLocations["BlueHome" + to_string(j - 1) + "b"] = make_tuple(row, column + 1);
-//                    cout << "BlueHome" + to_string(j - 1) + "a" << endl;
                     break;
                 }
                 case 1: {
@@ -298,7 +272,6 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
                     layout->addWidget(tile, row, column, 2, 2); // yellow
                     this->pawnLocations["YellowHome" + to_string(j - 1) + "a"] = make_tuple(row, column);
                     this->pawnLocations["YellowHome" + to_string(j - 1) + "b"] = make_tuple(row + 1, column);
-//                    cout << "YellowHome" + to_string(j - 1) + "a" << endl;
                     break;
                 }
                 case 2: {
@@ -308,7 +281,6 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 
                     layout->addWidget(tile, row, column, 2, 2); // green
                     this->pawnLocations["GreenHome" + to_string(j) + "a"] = make_tuple(row, column);
-//                    cout << "GreenHome" + to_string(j) + "a" << endl;
                     this->pawnLocations["GreenHome" + to_string(j) + "b"] = make_tuple(row, column);
                     break;
                 }
@@ -427,22 +399,103 @@ void MainWindow::addGeneralTiles(QPointer<QGridLayout> &layout) {
 vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player bluePlayer(QColor(0, 0, 153), 0); // blue
     Player redPlayer(QColor(153, 0, 0), 1); // red
-    Player yellowPlayer(QColor(153, 153, 0), 3); // yellow
     Player greenPlayer(QColor(0, 102, 0), 2); // green
+    Player yellowPlayer(QColor(153, 153, 0), 3); // yellow
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
-//        this->movePawn(pawn, 1, pawn->MAX_TILE);
+        cout << "curr " << settings.value("currentPlayer").toInt() << settings.value("isPlayerTurn").toBool() << endl;
+        int currentPlayer;
+        if (settings.value("doubleCount").toInt() > 0 && !settings.value("isPlayerTurn").toBool()
+                && settings.value("currentPlayer").toInt() == settings.value("humanPlayer").toInt()) {
+            currentPlayer = settings.value("currentPlayer").toInt() - 1;
+        } else {
+            currentPlayer = settings.value("currentPlayer").toInt();
+        }
+        if (settings.value("isPlayerTurn").toBool() &&
+            tolower(players[currentPlayer].getColorString()) == tolower(pawn->team)) {
+            int bigger = settings.value("bigger").toInt();
+            int smaller = settings.value("smaller").toInt();
+            if (pawn->getStatus() == PawnStatus::PLAYING) {
+                bool startTileBlockaded = false;
+                function<void(RectangleTile *)> testStartBlockade = [&](RectangleTile *tile) {
+                    if ((tolower(pawn->team) == "blue" && tile->getNumber() == StartTile::BLUE_START_NUM + 1) ||
+                        (tolower(pawn->team) == "red" && tile->getNumber() == StartTile::RED_START_NUM + 1) ||
+                        (tolower(pawn->team) == "green" && tile->getNumber() == StartTile::GREEN_START_NUM + 1) ||
+                        (tolower(pawn->team) == "yellow" && tile->getNumber() == StartTile::YELLOW_START_NUM + 1)) {
+                        startTileBlockaded = tile->isBlockaded();
+                    }
+                };
+                iterateThroughLayout(testStartBlockade);
+                if (players[settings.value("currentPlayer").toInt()].numPawnsStart() > 0 &&
+                    ((bigger + smaller == 5 && !settings.value("biggerUsed").toBool() &&
+                      !settings.value("smallerUsed").toBool()) ||
+                     (bigger == 5 && !settings.value("biggerUsed").toBool()) ||
+                     (smaller == 5 && !settings.value("smallerUsed").toBool())) && !startTileBlockaded) {
 
-        if (pawn->getStatus() == PawnStatus::PLAYING) {
-            if (this->canMove(pawn, 1)) {
-                this->movePawn(pawn, 1);
+                    gameOutput.emplace_back("You must move a pawn out of Start.");
+                } else if (!settings.value("biggerUsed").toBool() && !settings.value("smallerUsed").toBool() &&
+                           this->canMove(pawn, bigger + smaller)) {
+                    movePawn(pawn, bigger + smaller);
+                    settings.setValue("smallerUsed", true);
+                    settings.setValue("biggerUsed", true);
+                    gameOutput.push_back("Used " + QString::fromStdString(to_string(smaller)) + " + " +
+                                         QString::fromStdString(to_string(bigger)));
+                } else if (!settings.value("smallerUsed").toBool() && this->canMove(pawn, smaller)) {
+                    movePawn(pawn, smaller);
+                    settings.setValue("smallerUsed", true);
+                    gameOutput.push_back("Used " + QString::fromStdString(to_string(smaller)));
+                } else if (!settings.value("biggerUsed").toBool() && this->canMove(pawn, bigger)) {
+                    movePawn(pawn, bigger);
+                    settings.setValue("biggerUsed", true);
+                    gameOutput.push_back("Used " + QString::fromStdString(to_string(bigger)));
+                } else {
+                    gameOutput.emplace_back("You can't move that one legally.");
+                }
+                updateScroll();
+            } else if (pawn->getStatus() == PawnStatus::START) {
+                if (!settings.value("biggerUsed").toBool() && !settings.value("smallerUsed").toBool() &&
+                    bigger + smaller == 5 && this->canMove(pawn, 5)) {
+                    this->movePawn(pawn, 1);
+                    settings.setValue("biggerUsed", true);
+                    settings.setValue("smallerUsed", true);
+                    settings.setValue("isPlayerTurn", false);
+                } else if (!settings.value("biggerUsed").toBool() && bigger == 5 && this->canMove(pawn, 5)) {
+                    this->movePawn(pawn, 1);
+                    settings.setValue("biggerUsed", true);
+                } else if (!settings.value("smallerUsed").toBool() && smaller == 5 && this->canMove(pawn, 5)) {
+                    this->movePawn(pawn, 1);
+                    settings.setValue("smallerUsed", true);
+                } else {
+                    gameOutput.emplace_back("That pawn can't move");
+                    updateScroll();
+                }
             }
-        } else if (pawn->getStatus() == PawnStatus::START) {
-            if (this->canMove(pawn, 5)) {
-                this->movePawn(pawn, 1);
+            if (settings.value("biggerUsed").toBool() && settings.value("smallerUsed").toBool() &&
+                settings.value("doubleCount") == 0) {
+
+                settings.setValue("isPlayerTurn", false);
+                settings.setValue("doubleCount", 0);
+                settings.setValue("rollWasDoubles", false);
+                gameOutput.emplace_back("Your turn is over");
+                gameOutput.emplace_back(
+                        "It is " +
+                        QString(std::toupper(players[settings.value("currentPlayer").toInt()].getColorString()[0])) +
+                        QString::fromStdString(
+                                players[settings.value("currentPlayer").toInt()].getColorString().erase(0, 1)) +
+                        "'s turn!");
+                updateScroll();
+            }
+        } else {
+            if (tolower(players[settings.value("humanPlayer").toInt()].getColorString()) != tolower(pawn->team)) {
+                gameOutput.emplace_back(QString::fromStdString(
+                        "You are " + players[settings.value("humanPlayer").toInt()].getColorString() +
+                        ", don't try to move " + tolower(pawn->team)));
+                updateScroll();
+            } else {
+                gameOutput.emplace_back("It's not your turn");
+                updateScroll();
             }
         }
-
     };
 
     for (int i = 0; i < 2; i++) {
@@ -451,9 +504,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int column = (j + 3) * 2;
 
             QPointer<Pawn> blueOne = new Pawn({10, 10}, StartTile::BLUE_START_NUM, (2 * i) + j, "Blue", movePawnLambda,
-                                              QColor(0, 0, 153),
-                                              this);
-//            blueOne->setPassedZeroTile(true);
+                                              QColor(0, 0, 153), this);
             this->pawnLocations["BlueStart" + to_string(blueOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["BlueStart" + to_string(blueOne->id)];
             settings.setValue(QString::fromStdString("blue" + to_string(blueOne->id)), StartTile::BLUE_START_NUM);
@@ -467,9 +518,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int row = (i + 3) * 2;
             int column = (j + 14) * 2;
             QPointer<Pawn> redOne = new Pawn({10, 10}, StartTile::RED_START_NUM, (2 * i) + j, "Red", movePawnLambda,
-                                             QColor(153, 0, 0),
-                                             this);
-            redOne->setPassedZeroTile(true);
+                                             QColor(153, 0, 0), this);
             this->pawnLocations["RedStart" + to_string(redOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["RedStart" + to_string(redOne->id)];
             settings.setValue(QString::fromStdString("red" + to_string(redOne->id)), StartTile::RED_START_NUM);
@@ -484,9 +533,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int column = (j + 3) * 2;
 
             QPointer<Pawn> yellowOne = new Pawn({10, 10}, StartTile::YELLOW_START_NUM, (2 * i) + j, "Yellow",
-                                                movePawnLambda, QColor(153, 153, 0),
-                                                this);
-            yellowOne->setPassedZeroTile(true);
+                                                movePawnLambda, QColor(153, 153, 0), this);
             this->pawnLocations["YellowStart" + to_string(yellowOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["YellowStart" + to_string(yellowOne->id)];
             settings.setValue(QString::fromStdString("yellow" + to_string(yellowOne->id)),
@@ -502,9 +549,7 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
             int column = (j + 14) * 2;
 
             QPointer<Pawn> greenOne = new Pawn({10, 10}, StartTile::GREEN_START_NUM, (2 * i) + j, "Green",
-                                               movePawnLambda, QColor(0, 102, 0),
-                                               this);
-            greenOne->setPassedZeroTile(true);
+                                               movePawnLambda, QColor(0, 102, 0), this);
             this->pawnLocations["GreenStart" + to_string(greenOne->id)] = make_tuple(row, column);
             tuple<int, int> location = this->pawnLocations["GreenStart" + to_string(greenOne->id)];
             settings.setValue(QString::fromStdString("green" + to_string(greenOne->id)), StartTile::GREEN_START_NUM);
@@ -522,27 +567,6 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
 
     QPointer<Die> secondDie = new Die("second", this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
-
-//    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
-//    rollButton->setStyleSheet("background-color: white; color: black;");
-//
-//    connect(rollButton, &QPushButton::released, [&]() {
-//        function<void(Die *)> rollDice = [&](Die *die) {
-//            die->roll();
-//            die->repaint();
-//            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
-//        };
-//
-//        iterateThroughLayout(rollDice);
-//
-//        gameOutput.push_back(QString::fromStdString("You rolled ") +
-//                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
-//                             QString::fromStdString(", ") +
-//                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
-//        updateScroll();
-//    });
-
-//    layout->addWidget(rollButton, 7, 39, 1, 10);
 }
 
 void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
@@ -552,29 +576,30 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
     settings.setValue("rollWasDoubles", false);
 
     connect(nextButton, &QPushButton::released, [&, this]() {
-        int currId = 0;
-
         for (const Player &player : this->players) {
-            if (player.color == settings.value("currentPlayer").value<QColor>()) {
-
+            if (player.id == settings.value("currentPlayer").toInt()) {
+                cout << player.colorString << ", " << player.id << " " << settings.value("currentPlayer").toInt() << endl;
                 updateScroll();
                 this->play(player);
-                currId = player.id;
+                break;
             }
         }
-        if (!settings.value("rollWasDoubles").toBool() || settings.value("doubleCount").toInt() >= 3) {
-            settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
+        if (settings.value("doubleCount", 0) == 0 || settings.value("doubleCount", 0) == 3 /*&&
+            settings.value("enteredHomeBonus", 0) == 0 &&
+            settings.value("capturedBonus", 0) == 0*/) {
+
+            settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
+            if (settings.value("currentPlayer") == settings.value("humanPlayer")) {
+                settings.setValue("isPlayerTurn", true);
+            }
             settings.setValue("doubleCount", 0);
             settings.setValue("rollWasDoubles", false);
-            this->gameOutput.push_back("It is " + QString(std::toupper(players[(currId + 1) % 4].getColorString()[0])) +
-                                       QString::fromStdString(players[(currId + 1) % 4].getColorString().erase(0, 1)) +
-                                       "'s turn!");
             updateScroll();
         }
 
     });
 
-    layout->addWidget(nextButton, 9, 39, 1, 10);
+    layout->addWidget(nextButton, 7, 39, 4, 10);
 }
 
 void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
@@ -690,6 +715,8 @@ bool MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces) {
                                                                get<1>(locationToMove));
         pawn->currentTileNum = tileToMoveTo;
 
+//         if (prevTile) {
+//             prevTile->removePawn(); // should be correct pawn
         auto removed = prevTile->removePawn();
         if (removed && removed != pawn) {
             prevTile->removePawn();
@@ -697,8 +724,6 @@ bool MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces) {
         }
 
         nextTile->addPawn(pawn);
-        cout << nextTile->occupiedSpaceA() << ", " << nextTile->occupiedSpaceB() << ", " << nextTile->isBlockaded()
-             << endl;
         moveSuccessful = true;
 
         if (pawn->getStatus() == PawnStatus::START) {
@@ -773,18 +798,7 @@ tuple<int, string> MainWindow::getTileInformation(const QPointer<Pawn> &pawn, in
         tileInformation = "NormalTile" + to_string(tileToMoveTo);
     }
 
-    cout << pawn->team << ": " << pawn->currentTileNum << " -> " << tileToMoveTo << " @" << tileInformation << endl;
     return make_pair(tileToMoveTo, tileInformation);
-}
-
-
-void MainWindow::updateLabelText(const QString &text) {
-    function<void(QLabel *)> lambda = [&](QLabel *info) {
-
-        info->setText(info->text() + "\n" + text);
-        info->repaint();
-    };
-    iterateThroughLayout(lambda);
 }
 
 void MainWindow::updateScroll() {
@@ -837,24 +851,19 @@ void MainWindow::play(const Player &player) {
         settings.setValue("doubleCount", settings.value("doubleCount").toInt() + 1);
     } else {
         settings.setValue("rollWasDoubles", false);
+        settings.setValue("doubleCount", 0);
     }
 
-    if (player.color == players[settings.value("playerColor").toInt()].color) {
+    if (player.id == settings.value("humanPlayer").toInt()) {
         gameOutput.push_back("You rolled " +
                              QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
                              QString::fromStdString(", ") +
                              QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
-        if (settings.value("doubleCount").toInt() < 3) {
-            this->gameOutput.push_back("Please move " + QString(std::toupper(player.getColorString()[0])) +
-                                       QString::fromStdString(player.getColorString().erase(0, 1)));
-            updateScroll();
-            playerTurn(player);
-        } else {
-            this->gameOutput.emplace_back("Too many doubles");
-            updateScroll();
-            moveFarthestToStart(player);
-        }
-    } else {
+
+        updateScroll();
+        playerTurn(player);
+    } else if (player.id == settings.value("currentPlayer").toInt()) {
+
         gameOutput.push_back(QString(std::toupper(player.getColorString()[0])) +
                              QString::fromStdString(player.getColorString().erase(0, 1)) +
                              QString::fromStdString(" rolled ") +
@@ -862,18 +871,28 @@ void MainWindow::play(const Player &player) {
                              QString::fromStdString(", ") +
                              QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
         updateScroll();
-        if (settings.value("doubleCount").toInt() == 3) {
-            this->gameOutput.emplace_back("Too many doubles, l8r h8r.");
+
+        if (settings.value("doubleCount") == 3) {
+            this->gameOutput.emplace_back("3 doubles. Kicked back to start.");
+            gameOutput.push_back("It is " + QString(std::toupper(
+                    players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                 QString::fromStdString(players[
+                                                                (settings.value("currentPlayer").toInt() + 1) % 4
+                                                        ].getColorString().erase(0, 1)) + "'s turn!");
             updateScroll();
             moveFarthestToStart(player);
-        } else if (settings.value("doubleCount").toInt() > 0 && settings.value("rollWasDoubles").toBool()) {
-            cpuTurn(player);
-            this->gameOutput.emplace_back(
-                    QString::fromStdString(
-                            "Doubles, roll again " + QString(std::toupper(player.getColorString()[0])).toStdString() +
-                            (string(player.getColorString()).erase(0, 1)) + "!"));
+        } else if (settings.value("rollWasDoubles").toBool()) {
+            this->gameOutput.emplace_back("Doubles, roll again!");
+
             updateScroll();
+            cpuTurn(player);
         } else {
+            this->gameOutput.push_back("It is " + QString(std::toupper(
+                    players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                       QString::fromStdString(players[
+                                                                      (settings.value("currentPlayer").toInt() + 1) % 4
+                                                              ].getColorString().erase(0, 1)) + "'s turn!");
+            updateScroll();
             cpuTurn(player);
         }
     }
@@ -901,11 +920,15 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
         int tileNum = tile->getNumber();
 
         if (tile->isBlockaded()) {
-            cout << "Blockaded: " << tile->getNumber() << endl;
-            cout << "Aiming to get to tile " << wantsToMoveTo << endl;
             if (wantsToMoveTo != -5) { // magic number for home tile
                 if (wantsToMoveTo < 68 && current > max && current < tileNum && tileNum <= wantsToMoveTo) {
                     good = false;
+                } else if (wantsToMoveTo >= 0 && wantsToMoveTo <= max && current < 68) {
+                    if (current < tileNum && tileNum < 68) {
+                        good = false;
+                    } else if (tileNum >= 0 && tileNum <= wantsToMoveTo) {
+                        good = false;
+                    }
                 } else if (current <= max && wantsToMoveTo <= max && current < tileNum && tileNum <= wantsToMoveTo) {
                     good = false;
                 } else if (wantsToMoveTo >= max + jump(pawn) && wantsToMoveTo < max + jump(pawn) + 7) {
@@ -938,7 +961,7 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
     else if (pawn->getStatus() == PawnStatus::HOME) good = false;
     else if (pawn->getStatus() == PawnStatus::PLAYING && current + spaces > max + jump(pawn) + 7) good = false;
 
-    cout << "Returning " << (good ? "true" : "false") << endl;
+//    cout << "Returning " << (good ? "true" : "false") << endl;
     return good;
 }
 
@@ -956,33 +979,73 @@ int MainWindow::jump(const QPointer<Pawn> &pawn) const {
 }
 
 void MainWindow::playerTurn(const Player &player) {
-    // roll the dice
-    function<void(Die *)> rollDice = [&](Die *die) {
-        die->roll();
-        die->repaint();
-        settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
-    };
-    iterateThroughLayout(rollDice);
-    gameOutput.push_back(QString::fromStdString("You rolled ") +
-                         QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
-                         QString::fromStdString(", ") +
-                         QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
-    updateScroll();
 
-    // get current dice values
-    int dieOneValue = settings.value("firstRoll").toInt();
-    bool dieOneUsed = false;
-    int dieTwoValue = settings.value("secondRoll").toInt();
-    bool dieTwoUsed = false;
+    // initialize player turn
+    settings.setValue("isPlayerTurn", true);
+    settings.setValue("bigger", max(settings.value("firstRoll").toInt(), settings.value("secondRoll").toInt()));
+    settings.setValue("smaller", min(settings.value("firstRoll").toInt(), settings.value("secondRoll").toInt()));
+    settings.setValue("biggerUsed", false);
+    settings.setValue("smallerUsed", false);
+    // see if it can move at all
+    bool canMoveAtAll = false;
+    for (const QPointer<Pawn> &pawn : player.pawns) {
+        if (canMove(pawn, settings.value("bigger").toInt() + settings.value("smaller").toInt())) {
+            canMoveAtAll = true;
+        } else if (canMove(pawn, settings.value("bigger").toInt())) {
+            canMoveAtAll = true;
+        } else if (canMove(pawn, settings.value("smaller").toInt())) {
+            canMoveAtAll = true;
+        }
+    }
 
-    // find and display possible moves
-    function<void(Tile *)> checkForMoves = [&](Tile *tile) {
 
-    };
-    iterateThroughLayout(checkForMoves);
 
-    // wait for player to click on tile they want to move to
+    if (settings.value("rollWasDoubles").toBool() && settings.value("doubleCount") > 0 &&
+        settings.value("doubleCount").toInt() < 3) {
+        gameOutput.emplace_back("Doubles! Roll again!");
+        updateScroll();
+    } else if (settings.value("doubleCount").toInt() == 3) {
+        moveFarthestToStart(player);
+        settings.setValue("isPlayerTurn", false);
+        settings.setValue("doubleCount", 0);
+        settings.setValue("rollWasDoubles", false);
+        gameOutput.emplace_back("3 Doubles! kicked back to start!");
+        gameOutput.emplace_back("It is " + QString(std::toupper(
+                players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
+                                                               4].getColorString().erase(0, 1)) + "'s turn!");
+        updateScroll();
+        return;
+    }
 
+
+    if (!canMoveAtAll) {
+        gameOutput.emplace_back("You can't move wth that roll");
+        if (!settings.value("rollWasDoubles").toBool()) {
+            settings.setValue("isPlayerTurn", false);
+            settings.setValue("doubleCount", 0);
+            settings.setValue("rollWasDoubles", false);
+            gameOutput.emplace_back("It is " + QString(std::toupper(
+                    players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                    QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
+                                                                   4].getColorString().erase(0, 1)) + "'s turn!");
+        }
+        updateScroll();
+    } else {
+        gameOutput.emplace_back("Go ahead and move");
+        updateScroll();
+    }
+    if (int n = settings.value("enteredHomeBonus", 0) != 0) {
+        gameOutput.emplace_back(
+                QString::fromStdString("You have " + to_string(10 * n) + " bonus spaces for getting home!"));
+        updateScroll();
+//        settings.setValue("firstRoll", 10);
+    }
+    if (int n = settings.value("capturedBonus", 0) != 0) {
+        gameOutput.emplace_back(QString::fromStdString("You have " + to_string(20 * n) +
+                                                       " bonus spaces for capturing opponent's pawns!"));
+        updateScroll();
+    }
 }
 
 void MainWindow::cpuTurn(const Player &player) {
@@ -1032,7 +1095,6 @@ void MainWindow::cpuTurn(const Player &player) {
             }
         }
     }
-
 
     for (const QPointer<Pawn> &pawn : player.pawns) {
         if (settings.value("enteredHomeBonus", 0).toInt() != 0) {

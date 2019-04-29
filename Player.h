@@ -21,7 +21,7 @@ public:
     std::vector<QPointer<Pawn>> pawns;
     std::string colorString;
     const int id;
-    explicit Player(const QColor &color, const int id);
+    explicit Player(const QColor &color, int id);
 
     std::string getColorString() const;
 
