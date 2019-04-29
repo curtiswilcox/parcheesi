@@ -57,6 +57,7 @@ private:
     int jump(const QPointer<Pawn> &pawn) const;
 //    int jump(int startNum, int spaces, const Player &player) const;
     void cpuTurn(const Player &player);
+    void moveFarthestToStart(const Player &player);
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
