@@ -46,12 +46,10 @@ private:
     void addNextButton(QPointer<QGridLayout> &layout);
     void addDialogueBox(QPointer<QGridLayout> &layout);
 
+    bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     bool movePawn(const QPointer<Pawn> &pawn, int spaces);
     std::tuple<int, std::string> getTileInformation(const QPointer<Pawn> &pawn, int spaces) const;
 
-    inline void updateLabelText(const std::string &text) { this->updateLabelText(QString::fromStdString(text)); }
-
-    void updateLabelText(const QString &text);
     void updateScroll();
     QColor getPathColor(int i) const;
     int jump(const QPointer<Pawn> &pawn) const;
@@ -64,14 +62,11 @@ public:
     QString readRules();
     void createBoard(QPointer<QGridLayout> &layout);
     void resetBoard();
-    void showMenu();
     void play(const Player &player);
-    bool canMove(const QPointer<Pawn> &pawn, int spaces) const;
     std::string tolower(const std::string &s) const;
     std::string toupper(const std::string &s) const;
 
     template<typename T>
-
     void iterateThroughLayout(const std::function<void(T *)> &func) const {
         for (int i = 0; i < this->layout()->count(); ++i) {
             auto item = this->layout()->itemAt(i);
