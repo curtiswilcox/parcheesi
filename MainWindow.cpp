@@ -448,8 +448,6 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
                     settings.setValue("biggerUsed", true);
                     settings.setValue("smallerUsed", true);
                     settings.setValue("isPlayerTurn", false);
-//                    gameOutput.emplace_back("Good job!\nYour turn is over.");
-//                    updateScroll();
                 } else if (!settings.value("biggerUsed").toBool() && bigger == 5 && this->canMove(pawn, 5)) {
                     this->movePawn(pawn, 1);
                     settings.setValue("biggerUsed", true);
@@ -763,7 +761,6 @@ tuple<int, string> MainWindow::getTileInformation(const QPointer<Pawn> &pawn, in
         tileInformation = "NormalTile" + to_string(tileToMoveTo);
     }
 
-//    cout << pawn->team << ": " << pawn->currentTileNum << " -> " << tileToMoveTo << " @" << tileInformation << endl;
     return make_pair(tileToMoveTo, tileInformation);
 }
 
@@ -943,7 +940,6 @@ void MainWindow::playerTurn(const Player &player) {
     settings.setValue("smaller", min(settings.value("firstRoll").toInt(), settings.value("secondRoll").toInt()));
     settings.setValue("biggerUsed", false);
     settings.setValue("smallerUsed", false);
-
     // see if it can move at all
     bool canMoveAtAll = false;
     for (const QPointer<Pawn> &pawn : player.pawns) {
@@ -992,7 +988,6 @@ void MainWindow::playerTurn(const Player &player) {
         gameOutput.emplace_back("Go ahead and move");
         updateScroll();
     }
-
     if (int n = settings.value("enteredHomeBonus", 0) != 0) {
         gameOutput.emplace_back(
                 QString::fromStdString("You have " + to_string(10 * n) + " bonus spaces for getting home!"));
