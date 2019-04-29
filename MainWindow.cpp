@@ -85,8 +85,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         playersLabel->setText("Choose your number of players:");
 
         vbox->addWidget(colorLabel);
-        vbox->addWidget(colorRed);
         vbox->addWidget(colorBlue);
+        vbox->addWidget(colorRed);
         vbox->addWidget(colorGreen);
         vbox->addWidget(colorYellow);
 
@@ -115,6 +115,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
             this->players = this->resetBoard();
 
             settings.setValue("currentPlayer", QColor(0, 0, 153));
+            this->gameOutput.push_back("It is " + QString(std::toupper(players[0].getColorString()[0])) +
+                                       QString::fromStdString(players[0].getColorString().erase(0, 1)) + "'s turn!");
+            updateScroll();
 
 
             this->show();
@@ -563,6 +566,8 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
 
         for (const Player &player : this->players) {
             if (player.color == settings.value("currentPlayer").value<QColor>()) {
+
+                updateScroll();
                 this->play(player);
                 currId = player.id;
             }
@@ -571,7 +576,11 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
             settings.setValue("currentPlayer", players[(currId + 1) % 4].color);
             settings.setValue("doubleCount", 0);
             settings.setValue("rollWasDoubles", false);
+            this->gameOutput.push_back("It is " + QString(std::toupper(players[(currId + 1) % 4].getColorString()[0])) +
+                                       QString::fromStdString(players[(currId + 1) % 4].getColorString().erase(0, 1)) + "'s turn!");
+            updateScroll();
         }
+
     });
 
     layout->addWidget(nextButton, 9, 39, 1, 10);
@@ -585,8 +594,8 @@ void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
     label->setContentsMargins(5, label->contentsMargins().top(), 5, label->contentsMargins().bottom());
     label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
     label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
-    gameOutput.push_back("Welcome! Blue goes first");
-    label->setText("Welcome! Blue goes first");
+    gameOutput.push_back("Welcome!");
+    label->setText("Welcome!");
     label->setStyleSheet("background-color: white; color: black;font-size: 8px;");
     layout->addWidget(label, 12, 39, 26, 10);
 }
@@ -840,8 +849,6 @@ void MainWindow::play(const Player &player) {
             moveFarthestToStart(player);
         }
     } else {
-        this->gameOutput.push_back("It is " + QString(std::toupper(player.getColorString()[0])) +
-                                   QString::fromStdString(player.getColorString().erase(0, 1)) + "'s turn!");
         gameOutput.push_back(QString(std::toupper(player.getColorString()[0])) +
                              QString::fromStdString(player.getColorString().erase(0, 1)) +
                              QString::fromStdString(" rolled ") +
