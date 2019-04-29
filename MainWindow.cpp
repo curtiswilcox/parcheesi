@@ -531,26 +531,26 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
     QPointer<Die> secondDie = new Die("second", this);
     layout->addWidget(secondDie, 0, 44, 6, 6);
 
-    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
-    rollButton->setStyleSheet("background-color: white; color: black;");
+//    QPointer<QPushButton> rollButton = new QPushButton("Roll Dice", this);
+//    rollButton->setStyleSheet("background-color: white; color: black;");
+//
+//    connect(rollButton, &QPushButton::released, [&]() {
+//        function<void(Die *)> rollDice = [&](Die *die) {
+//            die->roll();
+//            die->repaint();
+//            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
+//        };
+//
+//        iterateThroughLayout(rollDice);
+//
+//        gameOutput.push_back(QString::fromStdString("You rolled ") +
+//                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
+//                             QString::fromStdString(", ") +
+//                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
+//        updateScroll();
+//    });
 
-    connect(rollButton, &QPushButton::released, [&]() {
-        function<void(Die *)> rollDice = [&](Die *die) {
-            die->roll();
-            die->repaint();
-            settings.setValue(QString::fromStdString(die->name) + "Roll", die->getValue());
-        };
-
-        iterateThroughLayout(rollDice);
-
-        gameOutput.push_back(QString::fromStdString("You rolled ") +
-                             QString::fromStdString(to_string(settings.value("firstRoll").toInt())) +
-                             QString::fromStdString(", ") +
-                             QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
-        updateScroll();
-    });
-
-    layout->addWidget(rollButton, 7, 39, 1, 10);
+//    layout->addWidget(rollButton, 7, 39, 1, 10);
 }
 
 void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
@@ -859,6 +859,7 @@ void MainWindow::play(const Player &player) {
             updateScroll();
             moveFarthestToStart(player);
         } else if (settings.value("doubleCount").toInt() > 0 && settings.value("rollWasDoubles").toBool()) {
+            cpuTurn(player);
             this->gameOutput.push_back("Doubles, roll again!");
             updateScroll();
         } else {
