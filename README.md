@@ -19,5 +19,6 @@ if (WIN32)
 ```
 
 - If you cannot run `C++ 17` on your machine, change the `CMAKE_CXX_STANDARD` from `17` to `14` (in `CMakeLists.txt`). You must then go into `Tile.h` and delete the line at the top that says `#include <optional>`, and replace it with `#include <experimental/optional>`. After the last `#include` line in the file, type `using std::experimental::optional;` and `using std::experimental::nullopt;`.
+  - Alternatively, if you've got a Mac, you can install/update Command Line Tools (the command is most likely `xcode-select --install`).
 
 - If the program will still not run, we apologize for the inconvenience it is causing. Jason might be able to help (unsure about his C++ knowledge), and you are certainly welcome to email Curtis if nothing is going your way.
