@@ -109,7 +109,7 @@ public:
     explicit RectangleTile(int counter, const Dimensions &d, const QColor &c = Qt::GlobalColor::white,
                            QWidget *parent = nullptr);
 
-    PlayerAddition addPawn(const QPointer<Pawn> &pawn);
+    PlayerAddition addPawn(const QPointer<Pawn> &pawn, bool toB = false);
     std::optional<QPointer<Pawn>> removePawn();
     std::optional<QPointer<Pawn>> getOccupyingPawn() const override;
 
