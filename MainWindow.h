@@ -47,7 +47,7 @@ private:
     void addDialogueBox(QPointer<QGridLayout> &layout);
     bool movePawn(const QPointer<Pawn> &pawn, int spaces, int pawnMax, bool backToStart = false);
 
-    bool movePawnTest(const QPointer<Pawn> &pawn, int spaces);
+    bool movePawn(const QPointer<Pawn> &pawn, int spaces);
     std::tuple<int, std::string> getTileInformation(const QPointer<Pawn> &pawn, int spaces) const;
 
     inline void updateLabelText(const std::string &text) {this->updateLabelText(QString::fromStdString(text)); }
