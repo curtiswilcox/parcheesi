@@ -400,8 +400,16 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
     Player yellowPlayer(QColor(153, 153, 0), 3); // yellow
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
+        cout << "curr " << settings.value("currentPlayer").toInt() << settings.value("isPlayerTurn").toBool() << endl;
+        int currentPlayer;
+        if (settings.value("doubleCount").toInt() > 0 && !settings.value("isPlayerTurn").toBool()
+                && settings.value("currentPlayer").toInt() == settings.value("humanPlayer").toInt()) {
+            currentPlayer = settings.value("currentPlayer").toInt() - 1;
+        } else {
+            currentPlayer = settings.value("currentPlayer").toInt();
+        }
         if (settings.value("isPlayerTurn").toBool() &&
-            tolower(players[settings.value("currentPlayer").toInt()].getColorString()) == tolower(pawn->team)) {
+            tolower(players[currentPlayer].getColorString()) == tolower(pawn->team)) {
             int bigger = settings.value("bigger").toInt();
             int smaller = settings.value("smaller").toInt();
             if (pawn->getStatus() == PawnStatus::PLAYING) {
@@ -566,16 +574,16 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
 
     connect(nextButton, &QPushButton::released, [&, this]() {
         for (const Player &player : this->players) {
-            cout << player.colorString << ", " << player.id << settings.value("currentPlayer").toInt() << endl;
             if (player.id == settings.value("currentPlayer").toInt()) {
+                cout << player.colorString << ", " << player.id << " " << settings.value("currentPlayer").toInt() << endl;
                 updateScroll();
                 this->play(player);
                 break;
             }
         }
-        if (settings.value("doubleCount", 0) == 0 &&
+        if (settings.value("doubleCount", 0) == 0 || settings.value("doubleCount", 0) == 3 /*&&
             settings.value("enteredHomeBonus", 0) == 0 &&
-            settings.value("capturedBonus", 0) == 0) {
+            settings.value("capturedBonus", 0) == 0*/) {
 
             settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
             if (settings.value("currentPlayer") == settings.value("humanPlayer")) {
@@ -833,7 +841,12 @@ void MainWindow::play(const Player &player) {
                              QString::fromStdString(to_string(settings.value("secondRoll").toInt())));
         updateScroll();
         if (settings.value("doubleCount") == 3) {
-            this->gameOutput.emplace_back("Too many doubles, l8r h8r.");
+            this->gameOutput.emplace_back("3 doubles. Kicked back to start.");
+            gameOutput.push_back("It is " + QString(std::toupper(
+                    players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
+                                 QString::fromStdString(players[
+                                                                (settings.value("currentPlayer").toInt() + 1) % 4
+                                                        ].getColorString().erase(0, 1)) + "'s turn!");
             updateScroll();
             moveFarthestToStart(player);
         } else if (settings.value("rollWasDoubles").toBool()) {
