@@ -114,15 +114,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
             settings.setValue("numPlayers", val);
             this->players = this->resetBoard();
 
-            if (colorChoiceId == 3) { // green
-                settings.setValue("currentPlayer", QColor(0, 102, 0));
-            } else if (colorChoiceId == 1) { // red
-                settings.setValue("currentPlayer", QColor(153, 0, 0));
-            } else if (colorChoiceId == 2) { // yellow
-                settings.setValue("currentPlayer", QColor(153, 153, 0));
-            } else { // blue
-                settings.setValue("currentPlayer", QColor(0, 0, 153));
-            }
+            settings.setValue("currentPlayer", QColor(0, 0, 153));
+
 
             this->show();
             startWindow->hide();
@@ -560,7 +553,7 @@ void MainWindow::addDice(QPointer<QGridLayout> &layout) {
 }
 
 void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
-    QPointer<QPushButton> nextButton = new QPushButton("Next Turn", this);
+    QPointer<QPushButton> nextButton = new QPushButton("Roll / Next Turn", this);
     nextButton->setStyleSheet("background-color: white; color: black;");
     settings.setValue("doubleCount", 0);
     settings.setValue("rollWasDoubles", false);
@@ -592,8 +585,8 @@ void MainWindow::addDialogueBox(QPointer<QGridLayout> &layout) {
     label->setContentsMargins(5, label->contentsMargins().top(), 5, label->contentsMargins().bottom());
     label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextEditable, false);
     label->textInteractionFlags().setFlag(Qt::TextInteractionFlag::TextSelectableByMouse, true);
-    gameOutput.push_back("Welcome!");
-    label->setText("Welcome!");
+    gameOutput.push_back("Welcome! Blue goes first");
+    label->setText("Welcome! Blue goes first");
     label->setStyleSheet("background-color: white; color: black;font-size: 8px;");
     layout->addWidget(label, 12, 39, 26, 10);
 }
@@ -887,7 +880,7 @@ bool MainWindow::canMove(const QPointer<Pawn> &pawn, int spaces) const {
         wantsToMoveTo = StartTile::YELLOW_START_NUM + 1;
     }
 
-    function<void(RectangleTile *)> blockadeAndSafeLambda = [&](RectangleTile *tile) { // FIXME this doesn't quite work
+    function<void(RectangleTile *)> blockadeAndSafeLambda = [&](RectangleTile *tile) {
         int tileNum = tile->getNumber();
 
         if (tile->isBlockaded()) {
