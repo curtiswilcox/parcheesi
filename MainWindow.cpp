@@ -81,14 +81,14 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent), settings("CS205", "Pa
         connect(startButton, &QPushButton::released, this, [colorChoice, this]() {
             int colorChoiceId = colorChoice->checkedId();
             if (colorChoiceId != -1) { // Qt's magic number if no button is marked
-                settings.setValue("currentPlayer", colorChoiceId);
+                settings.setValue("currentPlayer", 0);
                 settings.setValue("humanPlayer", colorChoiceId);
                 settings.setValue("isPlayerTurn", true);
                 this->resetBoard();
 
                 this->gameOutput.push_back(
-                        "It is " + QString(std::toupper(players[colorChoiceId].getColorString()[0])) +
-                        QString::fromStdString(players[colorChoiceId].getColorString().erase(0, 1)) + "'s turn!");
+                        "It is " + QString(std::toupper(players[0].getColorString()[0])) +
+                        QString::fromStdString(players[0].getColorString().erase(0, 1)) + "'s turn!");
                 updateScroll();
 
                 this->show();
@@ -404,13 +404,12 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
 
     function<void(QPointer<Pawn>)> movePawnLambda = [&, this](QPointer<Pawn> pawn) {
         cout << "curr " << settings.value("currentPlayer").toInt() << settings.value("isPlayerTurn").toBool() << endl;
-        int currentPlayer;
-        if (settings.value("doubleCount").toInt() > 0 && !settings.value("isPlayerTurn").toBool()
-                && settings.value("currentPlayer").toInt() == settings.value("humanPlayer").toInt()) {
-            currentPlayer = settings.value("currentPlayer").toInt() - 1;
-        } else {
-            currentPlayer = settings.value("currentPlayer").toInt();
-        }
+        int currentPlayer = settings.value("currentPlayer").toInt();
+//        if (settings.value("humanPlayer").toInt() == 0) {
+//            currentPlayer = settings.value("currentPlayer").toInt() - 1;
+//        } else {
+//            currentPlayer =  ;
+//        }
         if (settings.value("isPlayerTurn").toBool() &&
             tolower(players[currentPlayer].getColorString()) == tolower(pawn->team)) {
             int bigger = settings.value("bigger").toInt();
@@ -476,7 +475,12 @@ vector<Player> MainWindow::addPawns(QPointer<QGridLayout> &layout) {
                 settings.setValue("isPlayerTurn", false);
                 settings.setValue("doubleCount", 0);
                 settings.setValue("rollWasDoubles", false);
+                settings.setValue("turnIsOver", true);
+
                 gameOutput.emplace_back("Your turn is over");
+//                settings.setValue("biggerUsed", true);
+//                settings.setValue("smallerUsed", true);
+                settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
                 gameOutput.emplace_back(
                         "It is " +
                         QString(std::toupper(players[settings.value("currentPlayer").toInt()].getColorString()[0])) +
@@ -578,20 +582,19 @@ void MainWindow::addNextButton(QPointer<QGridLayout> &layout) {
     connect(nextButton, &QPushButton::released, [&, this]() {
         for (const Player &player : this->players) {
             if (player.id == settings.value("currentPlayer").toInt()) {
-                cout << player.colorString << ", " << player.id << " " << settings.value("currentPlayer").toInt() << endl;
+                cout << player.colorString << ", " << player.id << " " << settings.value("currentPlayer").toInt() << settings.value("isPlayerTurn").toBool() << endl;
                 updateScroll();
+                settings.setValue("turnIsOver", false);
                 this->play(player);
                 break;
             }
         }
-        if (settings.value("doubleCount", 0) == 0 || settings.value("doubleCount", 0) == 3 /*&&
-            settings.value("enteredHomeBonus", 0) == 0 &&
-            settings.value("capturedBonus", 0) == 0*/) {
 
+        if (settings.value("turnIsOver", false).toBool()) {
             settings.setValue("currentPlayer", (settings.value("currentPlayer").toInt() + 1) % 4);
-            if (settings.value("currentPlayer") == settings.value("humanPlayer")) {
-                settings.setValue("isPlayerTurn", true);
-            }
+//            if (settings.value("currentPlayer") == settings.value("humanPlayer")) {
+//                settings.setValue("isPlayerTurn", true);
+//            }
             settings.setValue("doubleCount", 0);
             settings.setValue("rollWasDoubles", false);
             updateScroll();
@@ -728,7 +731,8 @@ bool MainWindow::movePawn(const QPointer<Pawn> &pawn, int spaces) {
 
         if (pawn->getStatus() == PawnStatus::START) {
             pawn->setStatus(PawnStatus::PLAYING);
-            gameOutput.emplace_back(QString::fromStdString(pawn->team + " has left Start!"));
+//            gameOutput.emplace_back(QString::fromStdString(pawn->team + " has left Start!"));
+            updateScroll();
         }
 
         if (prevTile && prevTile->isOccupied() && !prevTile->isBlockaded()) {
@@ -874,6 +878,7 @@ void MainWindow::play(const Player &player) {
 
         if (settings.value("doubleCount") == 3) {
             this->gameOutput.emplace_back("3 doubles. Kicked back to start.");
+            settings.setValue("turnIsOver", true);
             gameOutput.push_back("It is " + QString(std::toupper(
                     players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
                                  QString::fromStdString(players[
@@ -887,6 +892,7 @@ void MainWindow::play(const Player &player) {
             updateScroll();
             cpuTurn(player);
         } else {
+            settings.setValue("turnIsOver", true);
             this->gameOutput.push_back("It is " + QString(std::toupper(
                     players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
                                        QString::fromStdString(players[
@@ -1010,6 +1016,7 @@ void MainWindow::playerTurn(const Player &player) {
         settings.setValue("doubleCount", 0);
         settings.setValue("rollWasDoubles", false);
         gameOutput.emplace_back("3 Doubles! kicked back to start!");
+        settings.setValue("turnIsOver", true);
         gameOutput.emplace_back("It is " + QString(std::toupper(
                 players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
                                 QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
@@ -1025,6 +1032,7 @@ void MainWindow::playerTurn(const Player &player) {
             settings.setValue("isPlayerTurn", false);
             settings.setValue("doubleCount", 0);
             settings.setValue("rollWasDoubles", false);
+            settings.setValue("turnIsOver", true);
             gameOutput.emplace_back("It is " + QString(std::toupper(
                     players[(settings.value("currentPlayer").toInt() + 1) % 4].getColorString()[0])) +
                                     QString::fromStdString(players[(settings.value("currentPlayer").toInt() + 1) %
@@ -1035,17 +1043,17 @@ void MainWindow::playerTurn(const Player &player) {
         gameOutput.emplace_back("Go ahead and move");
         updateScroll();
     }
-    if (int n = settings.value("enteredHomeBonus", 0) != 0) {
-        gameOutput.emplace_back(
-                QString::fromStdString("You have " + to_string(10 * n) + " bonus spaces for getting home!"));
-        updateScroll();
+//    if (int n = settings.value("enteredHomeBonus", 0) != 0) {
+//        gameOutput.emplace_back(
+//                QString::fromStdString("You have " + to_string(10 * n) + " bonus spaces for getting home!"));
+//        updateScroll();
 //        settings.setValue("firstRoll", 10);
-    }
-    if (int n = settings.value("capturedBonus", 0) != 0) {
-        gameOutput.emplace_back(QString::fromStdString("You have " + to_string(20 * n) +
-                                                       " bonus spaces for capturing opponent's pawns!"));
-        updateScroll();
-    }
+//    }
+//    if (int n = settings.value("capturedBonus", 0) != 0) {
+//        gameOutput.emplace_back(QString::fromStdString("You have " + to_string(20 * n) +
+//                                                       " bonus spaces for capturing opponent's pawns!"));
+//        updateScroll();
+//    }
 }
 
 void MainWindow::cpuTurn(const Player &player) {
@@ -1110,7 +1118,8 @@ void MainWindow::cpuTurn(const Player &player) {
             }
         }
     }
-
+//    settings.setValue("biggerUsed", true);
+//    settings.setValue("smallerUsed", true);
     cout << endl << endl;
 }
 
